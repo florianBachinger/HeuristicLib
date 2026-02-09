@@ -26,12 +26,12 @@ public class UnitTest1
 {
   private static MultiMutator<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace, IProblem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>> CreateSymRegAllMutator()
   {
-    var symRegAllMutator = MultiMutator.Create(
+    var symRegAllMutator = MultiMutator.Create([
     new ChangeNodeTypeManipulation(),
     new FullTreeShaker(),
     new OnePointShaker(),
     new RemoveBranchManipulation(),
-    new ReplaceBranchManipulation());
+    new ReplaceBranchManipulation()]);
 
     return symRegAllMutator;
   }
@@ -86,7 +86,7 @@ public class UnitTest1
     var res = ga.Build().RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed));
 
     Assert.Equal(gens, qualities.BestISolutions.Count);
-    Assert.Equal(popsize, res.Population.Solutions.Count);
+    Assert.Equal(popsize, res.Population.Solutions.Length);
     var graphViz = genealogy.Graph.ToGraphViz();
     Assert.True(graphViz.Length > 0);
     Assert.Equal(qualities.BestISolutions[^1].Best.ObjectiveVector, evalQualities.CurrentState[^1].best.ObjectiveVector);
@@ -129,7 +129,7 @@ public class UnitTest1
 
     var res = nsga2.Build().RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed));
     Assert.Equal(maximumIterations, qualities.BestISolutions.Count);
-    Assert.Equal(populationSize, res.Population.Solutions.Count);
+    Assert.Equal(populationSize, res.Population.Solutions.Length);
     var graphViz = genealogy.Graph.ToGraphViz();
     Assert.True(graphViz.Length > 0);
   }

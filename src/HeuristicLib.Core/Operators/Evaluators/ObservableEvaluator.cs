@@ -1,4 +1,5 @@
-﻿using HEAL.HeuristicLib.Analysis;
+﻿using Generator.Equals;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
@@ -7,24 +8,27 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Evaluators;
 
-public class ObservableEvaluator<TG, TS, TP>
+[Equatable]
+public partial record class ObservableEvaluator<TG, TS, TP>
   : IEvaluator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
-  private readonly IEvaluator<TG, TS, TP> evaluator;
-  private readonly IReadOnlyList<IEvaluatorObserver<TG, TS, TP>> observers;
+  public IEvaluator<TG, TS, TP> Evaluator { get; }
+  
+  [OrderedEquality]
+  public ImmutableArray<IEvaluatorObserver<TG, TS, TP>> Observers { get; }
 
-  public ObservableEvaluator(IEvaluator<TG, TS, TP> evaluator, params IReadOnlyList<IEvaluatorObserver<TG, TS, TP>> observers)
+  public ObservableEvaluator(IEvaluator<TG, TS, TP> evaluator, params ImmutableArray<IEvaluatorObserver<TG, TS, TP>> observers)
   {
-    this.evaluator = evaluator;
-    this.observers = observers;
+    this.Evaluator = evaluator;
+    this.Observers = observers;
   }
 
   public IEvaluatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var evaluatorInstance = instanceRegistry.GetOrCreate(evaluator);
-    return new ObservableEvaluatorInstance(evaluatorInstance, observers);
+    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
+    return new ObservableEvaluatorInstance(evaluatorInstance, Observers);
   }
   
   private sealed class ObservableEvaluatorInstance(IEvaluatorInstance<TG, TS, TP> evaluatorInstance, IReadOnlyList<IEvaluatorObserver<TG, TS, TP>> observers)
@@ -76,7 +80,7 @@ public static class ObservableEvaluatorExtensions
       return new ObservableEvaluator<TG, TS, TP>(evaluator, observer);
     }
 
-    public IEvaluator<TG, TS, TP> ObserveWith(params IReadOnlyList<IEvaluatorObserver<TG, TS, TP>> observers)
+    public IEvaluator<TG, TS, TP> ObserveWith(params ImmutableArray<IEvaluatorObserver<TG, TS, TP>> observers)
     {
       return new ObservableEvaluator<TG, TS, TP>(evaluator, observers);
     }

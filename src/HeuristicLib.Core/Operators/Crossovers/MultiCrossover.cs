@@ -14,39 +14,39 @@ public partial record class MultiCrossover<TGenotype, TSearchSpace, TProblem> : 
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   [OrderedEquality]
-  public IReadOnlyList<ICrossover<TGenotype, TSearchSpace, TProblem>> Crossovers { get; }
+  public ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> Crossovers { get; }
   
   [OrderedEquality]
-  public IReadOnlyList<double> Weights { get; }
+  public ImmutableArray<double> Weights { get; }
   
   [IgnoreEquality] 
   private readonly double sumWeights;
   [IgnoreEquality]
   private readonly double[] cumulativeSumWeights;
 
-  public MultiCrossover(IReadOnlyList<ICrossover<TGenotype, TSearchSpace, TProblem>> crossovers, IReadOnlyList<double>? weights = null)
+  public MultiCrossover(ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> crossovers, ImmutableArray<double>? weights = null)
   {
-    if (crossovers.Count == 0) {
+    if (crossovers.Length == 0) {
       throw new ArgumentException("At least one crossover must be provided.", nameof(crossovers));
     }
 
-    if (weights != null && weights.Count != crossovers.Count) {
+    if (weights is not null && weights.Value.Length != crossovers.Length) {
       throw new ArgumentException("Weights must have the same length as crossovers.", nameof(weights));
     }
 
-    if (weights != null && weights.Any(p => p < 0)) {
+    if (weights is not null && weights.Value.Any(p => p < 0)) {
       throw new ArgumentException("Weights must be non-negative.", nameof(weights));
     }
 
-    if (weights != null && weights.All(p => p <= 0)) {
+    if (weights is not null && weights.Value.All(p => p <= 0)) {
       throw new ArgumentException("At least one weight must be greater than zero.", nameof(weights));
     }
 
     Crossovers = crossovers;
-    Weights = weights ?? Enumerable.Repeat(1.0, crossovers.Count).ToArray();
+    Weights = weights ?? [..Enumerable.Repeat(1.0, crossovers.Length)];
 
-    cumulativeSumWeights = new double[Weights.Count];
-    for (var i = 0; i < Weights.Count; i++) {
+    cumulativeSumWeights = new double[Weights.Length];
+    for (var i = 0; i < Weights.Length; i++) {
       sumWeights += Weights[i];
       cumulativeSumWeights[i] = sumWeights;
     }
@@ -155,7 +155,7 @@ public partial record class MultiCrossover<TGenotype, TSearchSpace, TProblem> : 
 
 public static class MultiCrossover
 {
-   public static MultiCrossover<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(IReadOnlyList<ICrossover<TGenotype, TSearchSpace, TProblem>> crossovers, IReadOnlyList<double>? weights = null) 
+   public static MultiCrossover<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> crossovers, ImmutableArray<double>? weights = null) 
      where TSearchSpace : class, ISearchSpace<TGenotype> 
      where TProblem : class, IProblem<TGenotype, TSearchSpace>
    {
@@ -173,12 +173,12 @@ public static class MultiCrossover
    //   return new(crossovers, weights);
    // }
 
-   public static MultiCrossover<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(params IReadOnlyList<ICrossover<TGenotype, TSearchSpace, TProblem>> crossovers) 
-     where TSearchSpace : class, ISearchSpace<TGenotype> 
-     where TProblem : class, IProblem<TGenotype, TSearchSpace>
-   {
-     return new MultiCrossover<TGenotype, TSearchSpace, TProblem>(crossovers);
-   }
+   // public static MultiCrossover<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(params ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> crossovers) 
+   //   where TSearchSpace : class, ISearchSpace<TGenotype> 
+   //   where TProblem : class, IProblem<TGenotype, TSearchSpace>
+   // {
+   //   return new MultiCrossover<TGenotype, TSearchSpace, TProblem>(crossovers);
+   // }
 
    // public static MultiCrossover<TGenotype, TSearchSpace> Create<TGenotype, TSearchSpace>(params IReadOnlyList<ICrossover<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>> crossovers) 
    //   where TSearchSpace : class, ISearchSpace<TGenotype>

@@ -1,3 +1,4 @@
+using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
@@ -6,25 +7,28 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Operators.Terminators;
 
-public record class ObservableTerminator<TG, TR, TS, TP>
+[Equatable]
+public partial record class ObservableTerminator<TG, TR, TS, TP>
   : Terminator<TG, TR, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
   where TR : class, IAlgorithmState
 {
-  private readonly ITerminator<TG, TR, TS, TP> interceptor;
-  private readonly IReadOnlyList<ITerminatorObserver<TG, TR, TS, TP>> observers;
+  public ITerminator<TG, TR, TS, TP> Interceptor { get; }
   
-  public ObservableTerminator(ITerminator<TG, TR, TS, TP> interceptor, params IReadOnlyList<ITerminatorObserver<TG, TR, TS, TP>> observers)
+  [OrderedEquality]
+  public ImmutableArray<ITerminatorObserver<TG, TR, TS, TP>> Observers { get; }
+
+  public ObservableTerminator(ITerminator<TG, TR, TS, TP> interceptor, params ImmutableArray<ITerminatorObserver<TG, TR, TS, TP>> observers)
   {
-    this.interceptor = interceptor;
-    this.observers = observers;
+    this.Interceptor = interceptor;
+    this.Observers = observers;
   }
   
   public override ITerminatorInstance<TG, TR, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var interceptorInstance = instanceRegistry.GetOrCreate(interceptor);
-    return new ObservableTerminatorInstance(interceptorInstance, observers);
+    var interceptorInstance = instanceRegistry.GetOrCreate(Interceptor);
+    return new ObservableTerminatorInstance(interceptorInstance, Observers);
   }
 
   private sealed class ObservableTerminatorInstance(ITerminatorInstance<TG, TR, TS, TP> terminatorInstance, IReadOnlyList<ITerminatorObserver<TG, TR, TS, TP>> observers) 
@@ -82,7 +86,7 @@ public static class ObservableTerminatorExtensions
       return new ObservableTerminator<TG, TR, TS, TP>(terminator, observer);
     }
     
-    public ITerminator<TG, TR, TS, TP> ObserveWith(params IReadOnlyList<ITerminatorObserver<TG, TR, TS, TP>> observers)
+    public ITerminator<TG, TR, TS, TP> ObserveWith(params ImmutableArray<ITerminatorObserver<TG, TR, TS, TP>> observers)
     {
       return new ObservableTerminator<TG, TR, TS, TP>(terminator, observers);
     }

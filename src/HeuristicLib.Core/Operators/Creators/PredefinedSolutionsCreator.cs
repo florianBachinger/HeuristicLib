@@ -14,11 +14,11 @@ public partial record class PredefinedSolutionsCreator<TGenotype, TSearchSpace, 
 {
 
   [OrderedEquality]
-  public IReadOnlyList<TGenotype> PredefinedSolutions { get; init; }
+  public ImmutableArray<TGenotype> PredefinedSolutions { get; init; }
 
   public ICreator<TGenotype, TSearchSpace, TProblem> CreatorForRemainingSolutions { get; init; }
 
-  public PredefinedSolutionsCreator(IReadOnlyList<TGenotype> predefinedSolutions, ICreator<TGenotype, TSearchSpace, TProblem> creatorForRemainingSolutions)
+  public PredefinedSolutionsCreator(ImmutableArray<TGenotype> predefinedSolutions, ICreator<TGenotype, TSearchSpace, TProblem> creatorForRemainingSolutions)
   {
     this.PredefinedSolutions = predefinedSolutions;
     this.CreatorForRemainingSolutions = creatorForRemainingSolutions;

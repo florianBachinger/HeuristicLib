@@ -1,6 +1,5 @@
 ﻿using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
-using MoreLinq;
 
 namespace HEAL.HeuristicLib.Operators.Selectors;
 

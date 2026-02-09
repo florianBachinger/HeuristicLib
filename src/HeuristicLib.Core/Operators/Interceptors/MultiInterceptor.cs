@@ -15,14 +15,14 @@ public partial record class MultiInterceptor<TGenotype, TAlgorithmState, TSearch
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   [OrderedEquality]
-  private readonly IReadOnlyList<IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> interceptors;
-  
-  public MultiInterceptor(IReadOnlyList<IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> interceptors) {
-    this.interceptors = interceptors;
+  public ImmutableArray<IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> Interceptors { get; }
+
+  public MultiInterceptor(ImmutableArray<IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> interceptors) {
+    this.Interceptors = interceptors;
   }
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) {
-    var interceptorInstances = interceptors.Select(i => i.CreateExecutionInstance(instanceRegistry)).ToList();
+    var interceptorInstances = Interceptors.Select(i => i.CreateExecutionInstance(instanceRegistry)).ToList();
     return new Instance(interceptorInstances);
   }
 

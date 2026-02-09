@@ -12,19 +12,19 @@ public partial record class PipelineMutator<TG, TS, TP> : Mutator<TG, TS, TP>
   where TP : class, IProblem<TG, TS>
 {
   [OrderedEquality]
-  private readonly IReadOnlyList<IMutator<TG, TS, TP>> mutators;
+  public ImmutableArray<IMutator<TG, TS, TP>> Mutators { get; }
 
-  public PipelineMutator(IReadOnlyList<IMutator<TG, TS, TP>> mutators)
+  public PipelineMutator(ImmutableArray<IMutator<TG, TS, TP>> mutators)
   {
-    if (mutators.Count == 0) {
+    if (mutators.Length == 0) {
       throw new ArgumentException("At least one crossover must be provided.", nameof(mutators));
     }
 
-    this.mutators = mutators;
+    this.Mutators = mutators;
   }
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) {
-    var mutatorInstances = mutators.Select(instanceRegistry.GetOrCreate).ToArray();
+    var mutatorInstances = Mutators.Select(instanceRegistry.GetOrCreate).ToArray();
     return new Instance(mutatorInstances);
   }
 

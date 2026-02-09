@@ -21,7 +21,7 @@ public class BestMedianWorstQualityObserver<TG, TS, TP, TR> : IAlgorithmObserver
 
   public void AfterIteration(TR currentState, TR? previousState, IRandomNumberGenerator random, TP problem)
   {
-    if (currentState.Population.Solutions.Count <= 0) {
+    if (currentState.Population.Solutions.Length <= 0) {
       throw new InvalidOperationException("Population is empty, cannot determine best, median, and worst solutions.");
     }
 

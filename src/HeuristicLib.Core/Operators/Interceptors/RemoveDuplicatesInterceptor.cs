@@ -14,7 +14,7 @@ public record class RemoveDuplicatesInterceptor<TGenotype, TAlgorithmState>
 
   public override TAlgorithmState Transform(TAlgorithmState currentState, TAlgorithmState? previousState)
   {
-    var newSolutions = currentState.Population.DistinctBy(s => s.Genotype, comparer).ToArray();
+    var newSolutions = currentState.Population.DistinctBy(s => s.Genotype, comparer).ToImmutableArray();
     return currentState with {
       Population = new Population<TGenotype>(newSolutions)
     };

@@ -1,3 +1,4 @@
+using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
@@ -7,24 +8,27 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Crossovers;
 
-public record class ObservableCrossover<TG, TS, TP>
+[Equatable]
+public partial record class ObservableCrossover<TG, TS, TP>
   : Crossover<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
-  private readonly ICrossover<TG, TS, TP> crossover;
-  private readonly IReadOnlyList<ICrossoverObserver<TG, TS, TP>> observers;
+  public ICrossover<TG, TS, TP> Crossover { get; }
   
-  public ObservableCrossover(ICrossover<TG, TS, TP> crossover, params IReadOnlyList<ICrossoverObserver<TG, TS, TP>> observers)
+  [OrderedEquality]
+  public ImmutableArray<ICrossoverObserver<TG, TS, TP>> Observers { get; }
+
+  public ObservableCrossover(ICrossover<TG, TS, TP> crossover, params ImmutableArray<ICrossoverObserver<TG, TS, TP>> observers)
   {
-    this.crossover = crossover;
-    this.observers = observers;
+    this.Crossover = crossover;
+    this.Observers = observers;
   }
   
   public override ICrossoverInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var crossoverInstance = instanceRegistry.GetOrCreate(crossover);
-    return new ObservableCrossoverInstance(crossoverInstance, observers);
+    var crossoverInstance = instanceRegistry.GetOrCreate(Crossover);
+    return new ObservableCrossoverInstance(crossoverInstance, Observers);
   }
 
   private sealed class ObservableCrossoverInstance(ICrossoverInstance<TG, TS, TP> crossoverInstance, IReadOnlyList<ICrossoverObserver<TG, TS, TP>> observers) 
@@ -80,7 +84,7 @@ public static class ObservableCrossoverExtensions
       return new ObservableCrossover<TG, TS, TP>(crossover, observer);
     }
     
-    public ICrossover<TG, TS, TP> ObserveWith(params IReadOnlyList<ICrossoverObserver<TG, TS, TP>> observers)
+    public ICrossover<TG, TS, TP> ObserveWith(params ImmutableArray<ICrossoverObserver<TG, TS, TP>> observers)
     {
       return new ObservableCrossover<TG, TS, TP>(crossover, observers);
     }

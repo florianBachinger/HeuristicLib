@@ -27,7 +27,7 @@ public class BestMedianWorstPerEvaluationAnalysis<TGenotype>
   
   public void AfterInterception(PopulationState<TGenotype> newState, PopulationState<TGenotype> currentState, PopulationState<TGenotype>? previousState, ISearchSpace<TGenotype> searchSpace, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
   {
-    if (currentState.Population.Solutions.Count == 0) throw new InvalidOperationException("Population is empty, cannot determine best/median/worst solution.");
+    if (currentState.Population.Solutions.Length == 0) throw new InvalidOperationException("Population is empty, cannot determine best/median/worst solution.");
     
     var comp = problem.Objective.TotalOrderComparer is NoTotalOrderComparer ? new LexicographicComparer(problem.Objective.Directions) : problem.Objective.TotalOrderComparer;
     var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();

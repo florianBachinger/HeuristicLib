@@ -1,3 +1,4 @@
+using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
@@ -6,24 +7,27 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Mutators;
 
-public record class ObservableMutator<TG, TS, TP>
+[Equatable]
+public partial record class ObservableMutator<TG, TS, TP>
   : Mutator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
-  private readonly IMutator<TG, TS, TP> mutator;
-  private readonly IReadOnlyList<IMutatorObserver<TG, TS, TP>> observers;
+  public IMutator<TG, TS, TP> Mutator { get; }
   
-  public ObservableMutator(IMutator<TG, TS, TP> mutator, params IReadOnlyList<IMutatorObserver<TG, TS, TP>> observers)
+  [OrderedEquality]
+  public ImmutableArray<IMutatorObserver<TG, TS, TP>> Observers { get; }
+
+  public ObservableMutator(IMutator<TG, TS, TP> mutator, params ImmutableArray<IMutatorObserver<TG, TS, TP>> observers)
   {
-    this.mutator = mutator;
-    this.observers = observers;
+    this.Mutator = mutator;
+    this.Observers = observers;
   }
   
   public override IMutatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var mutatorInstance = instanceRegistry.GetOrCreate(mutator);
-    return new ObservableMutatorInstance(mutatorInstance, observers);
+    var mutatorInstance = instanceRegistry.GetOrCreate(Mutator);
+    return new ObservableMutatorInstance(mutatorInstance, Observers);
   }
 
   private sealed class ObservableMutatorInstance(IMutatorInstance<TG, TS, TP> mutatorInstance, IReadOnlyList<IMutatorObserver<TG, TS, TP>> observers) 
@@ -79,7 +83,7 @@ public static class ObservableMutatorExtensions
       return new ObservableMutator<TG, TS, TP>(mutator, observer);
     }
     
-    public IMutator<TG, TS, TP> ObserveWith(params IReadOnlyList<IMutatorObserver<TG, TS, TP>> observers)
+    public IMutator<TG, TS, TP> ObserveWith(params ImmutableArray<IMutatorObserver<TG, TS, TP>> observers)
     {
       return new ObservableMutator<TG, TS, TP>(mutator, observers);
     }

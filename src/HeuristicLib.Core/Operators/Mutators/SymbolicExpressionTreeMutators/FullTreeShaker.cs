@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using HEAL.HeuristicLib.Genotypes.Trees;
-using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces.Trees;
 

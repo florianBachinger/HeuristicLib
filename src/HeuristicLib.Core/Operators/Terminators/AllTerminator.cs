@@ -14,16 +14,16 @@ public partial record class AllTerminator<TGenotype, TAlgorithmState, TSearchSpa
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   [OrderedEquality]
-  private readonly IReadOnlyList<ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> terminators;
+  public ImmutableArray<ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> Terminators { get; }
 
-  public AllTerminator(params IReadOnlyList<ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> terminators)
+  public AllTerminator(params ImmutableArray<ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> terminators)
   {
-    this.terminators = terminators;
+    this.Terminators = terminators;
   }
   
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var terminatorInstances = terminators.Select(instanceRegistry.GetOrCreate).ToList();
+    var terminatorInstances = Terminators.Select(instanceRegistry.GetOrCreate).ToList();
     return new Instance(terminatorInstances);
   }
 

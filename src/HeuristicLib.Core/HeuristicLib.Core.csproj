@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="System.Collections.Immutable" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\HeuristicLib.Abstractions\HeuristicLib.Abstractions.csproj"/>
   </ItemGroup>
 

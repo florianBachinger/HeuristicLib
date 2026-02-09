@@ -97,7 +97,7 @@ public class OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotyp
     var oldPopulation = previousState.Population.Solutions;
 
     IReadOnlyList<ISolution<TGenotype>> newPop;
-    if (oldPopulation.Count <= 0) {
+    if (oldPopulation.Length <= 0) {
       newPop = CreateInitialPopulation(problem, random).Population.Solutions;
     } else {
       var selected = Selector.Select(oldPopulation, problem.Objective, MaxEffort * 2, random, problem.SearchSpace, problem);

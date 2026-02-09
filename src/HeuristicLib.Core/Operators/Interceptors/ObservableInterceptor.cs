@@ -1,3 +1,4 @@
+using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
@@ -6,25 +7,28 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Operators.Interceptors;
 
-public record class ObservableInterceptor<TG, TR, TS, TP>
+[Equatable]
+public partial record class ObservableInterceptor<TG, TR, TS, TP>
   : Interceptor<TG, TR, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
   where TR : class, IAlgorithmState
 {
-  private readonly IInterceptor<TG, TR, TS, TP> interceptor;
-  private readonly IReadOnlyList<IInterceptorObserver<TG, TR, TS, TP>> observers;
+  public IInterceptor<TG, TR, TS, TP> Interceptor { get; }
   
-  public ObservableInterceptor(IInterceptor<TG, TR, TS, TP> interceptor, params IReadOnlyList<IInterceptorObserver<TG, TR, TS, TP>> observers)
+  [OrderedEquality]
+  public ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> Observers { get; }
+
+  public ObservableInterceptor(IInterceptor<TG, TR, TS, TP> interceptor, params ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> observers)
   {
-    this.interceptor = interceptor;
-    this.observers = observers;
+    this.Interceptor = interceptor;
+    this.Observers = observers;
   }
   
   public override IInterceptorInstance<TG, TR, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var interceptorInstance = instanceRegistry.GetOrCreate(interceptor);
-    return new ObservableInterceptorInstance(interceptorInstance, observers);
+    var interceptorInstance = instanceRegistry.GetOrCreate(Interceptor);
+    return new ObservableInterceptorInstance(interceptorInstance, Observers);
   }
 
   private sealed class ObservableInterceptorInstance(IInterceptorInstance<TG, TR, TS, TP> interceptorInstance, IReadOnlyList<IInterceptorObserver<TG, TR, TS, TP>> observers) 
@@ -83,7 +87,7 @@ public static class ObservableInterceptorExtensions
       return new ObservableInterceptor<TG, TR, TS, TP>(interceptor, observer);
     }
     
-    public IInterceptor<TG, TR, TS, TP> ObserveWith(params IReadOnlyList<IInterceptorObserver<TG, TR, TS, TP>> observers)
+    public IInterceptor<TG, TR, TS, TP> ObserveWith(params ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> observers)
     {
       return new ObservableInterceptor<TG, TR, TS, TP>(interceptor, observers);
     }

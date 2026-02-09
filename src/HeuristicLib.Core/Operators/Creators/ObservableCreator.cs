@@ -1,4 +1,5 @@
-﻿using HEAL.HeuristicLib.Analysis;
+﻿using Generator.Equals;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -6,24 +7,27 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Creators;
 
-public record class ObservableCreator<TG, TS, TP>
+[Equatable]
+public partial record class ObservableCreator<TG, TS, TP>
   : Creator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
-  private readonly ICreator<TG, TS, TP> creator;
-  private readonly IReadOnlyList<ICreatorObserver<TG, TS, TP>> observers;
+  public ICreator<TG, TS, TP> Creator { get; }
   
-  public ObservableCreator(ICreator<TG, TS, TP> creator, params IReadOnlyList<ICreatorObserver<TG, TS, TP>> observers)
+  [OrderedEquality]
+  public ImmutableArray<ICreatorObserver<TG, TS, TP>> Observers { get; }
+
+  public ObservableCreator(ICreator<TG, TS, TP> creator, params ImmutableArray<ICreatorObserver<TG, TS, TP>> observers)
   {
-    this.creator = creator;
-    this.observers = observers;
+    this.Creator = creator;
+    this.Observers = observers;
   }
   
   public override ICreatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var creatorInstance = instanceRegistry.GetOrCreate(creator);
-    return new ObservableCreatorInstance(creatorInstance, observers);
+    var creatorInstance = instanceRegistry.GetOrCreate(Creator);
+    return new ObservableCreatorInstance(creatorInstance, Observers);
   }
 
   private sealed class ObservableCreatorInstance(ICreatorInstance<TG, TS, TP> creatorInstance, IReadOnlyList<ICreatorObserver<TG, TS, TP>> observers) 
@@ -78,7 +82,7 @@ public static class ObservableCreatorExtensions
       return new ObservableCreator<TG, TS, TP>(creator, observer);
     }
     
-    public ICreator<TG, TS, TP> ObserveWith(params IReadOnlyList<ICreatorObserver<TG, TS, TP>> observers)
+    public ICreator<TG, TS, TP> ObserveWith(params ImmutableArray<ICreatorObserver<TG, TS, TP>> observers)
     {
       return new ObservableCreator<TG, TS, TP>(creator, observers);
     }

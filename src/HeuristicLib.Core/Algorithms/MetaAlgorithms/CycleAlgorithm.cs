@@ -20,7 +20,7 @@ public partial record class CycleAlgorithm<TAlgorithm, TGenotype, TSearchSpace, 
   where TAlgorithm : IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
 {
   [OrderedEquality]
-  public IReadOnlyList<TAlgorithm> Algorithms { get; }
+  public ImmutableArray<TAlgorithm> Algorithms { get; }
   
   // ToDo: think if better place outside and keep CycleAlgorithm as infinite cycles?
   public int? MaximumCycles { get; init; }
@@ -28,7 +28,7 @@ public partial record class CycleAlgorithm<TAlgorithm, TGenotype, TSearchSpace, 
   // ToDo: maybe we need a new concept of ExecutionScope for this, if this comes up more often.
   public bool NewExecutionInstancesPerCycle { get; init; } = true;
 
-  public CycleAlgorithm(IReadOnlyList<TAlgorithm> algorithms)
+  public CycleAlgorithm(ImmutableArray<TAlgorithm> algorithms)
   {
     Algorithms = algorithms;
   }

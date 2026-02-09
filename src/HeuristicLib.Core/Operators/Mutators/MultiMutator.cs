@@ -14,38 +14,38 @@ public partial record class MultiMutator<TGenotype, TSearchSpace, TProblem>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   [OrderedEquality]
-  public IReadOnlyList<IMutator<TGenotype, TSearchSpace, TProblem>> Mutators { get; }
+  public ImmutableArray<IMutator<TGenotype, TSearchSpace, TProblem>> Mutators { get; }
   [OrderedEquality]
-  public IReadOnlyList<double> Weights { get; }
+  public ImmutableArray<double> Weights { get; }
   
   [IgnoreEquality]
   private readonly double sumWeights;
   [IgnoreEquality]
   private readonly double[] cumulativeSumWeights;
 
-  public MultiMutator(IReadOnlyList<IMutator<TGenotype, TSearchSpace, TProblem>> mutator, IReadOnlyList<double>? weights = null)
+  public MultiMutator(ImmutableArray<IMutator<TGenotype, TSearchSpace, TProblem>> mutator, ImmutableArray<double>? weights = null)
   {
-    if (mutator.Count == 0) {
+    if (mutator.Length == 0) {
       throw new ArgumentException("At least one mutator must be provided.", nameof(mutator));
     }
 
-    if (weights != null && weights.Count != mutator.Count) {
+    if (weights is not null && weights.Value.Length != mutator.Length) {
       throw new ArgumentException("Weights must have the same length as mutator.", nameof(weights));
     }
 
-    if (weights != null && weights.Any(p => p < 0)) {
+    if (weights is not null && weights.Value.Any(p => p < 0)) {
       throw new ArgumentException("Weights must be non-negative.", nameof(weights));
     }
 
-    if (weights != null && weights.All(p => p <= 0)) {
+    if (weights is not null && weights.Value.All(p => p <= 0)) {
       throw new ArgumentException("At least one weight must be greater than zero.", nameof(weights));
     }
 
     Mutators = mutator;
-    Weights = weights ?? Enumerable.Repeat(1.0, mutator.Count).ToArray();
+    Weights = weights ?? [..Enumerable.Repeat(1.0, mutator.Length)];
 
-    cumulativeSumWeights = new double[Weights.Count];
-    for (var i = 0; i < Weights.Count; i++) {
+    cumulativeSumWeights = new double[Weights.Length];
+    for (var i = 0; i < Weights.Length; i++) {
       sumWeights += Weights[i];
       cumulativeSumWeights[i] = sumWeights;
     }
@@ -113,10 +113,14 @@ public partial record class MultiMutator<TGenotype, TSearchSpace, TProblem>
 
 public static class MultiMutator
 {
-   public static MultiMutator<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(IReadOnlyList<IMutator<TGenotype, TSearchSpace, TProblem>> mutators, IReadOnlyList<double>? weights = null) 
+   public static MultiMutator<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(ImmutableArray<IMutator<TGenotype, TSearchSpace, TProblem>> mutators, ImmutableArray<double>? weights = null) 
      where TSearchSpace : class, ISearchSpace<TGenotype> 
      where TProblem : class, IProblem<TGenotype, TSearchSpace>
    {
+     if (weights == null) {
+       throw new ArgumentNullException(nameof(weights));
+     }
+
      return new MultiMutator<TGenotype, TSearchSpace, TProblem>(mutators, weights);
    }
 
@@ -131,12 +135,12 @@ public static class MultiMutator
    //   return new(mutators, weights);
    // }
 
-   public static MultiMutator<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(params IReadOnlyList<IMutator<TGenotype, TSearchSpace, TProblem>> mutators) 
-     where TSearchSpace : class, ISearchSpace<TGenotype> 
-     where TProblem : class, IProblem<TGenotype, TSearchSpace>
-   {
-     return new MultiMutator<TGenotype, TSearchSpace, TProblem>(mutators);
-   }
+   // public static MultiMutator<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(params ImmutableArray<IMutator<TGenotype, TSearchSpace, TProblem>> mutators) 
+   //   where TSearchSpace : class, ISearchSpace<TGenotype> 
+   //   where TProblem : class, IProblem<TGenotype, TSearchSpace>
+   // {
+   //   return new MultiMutator<TGenotype, TSearchSpace, TProblem>(mutators);
+   // }
 
    // public static MultiMutator<TGenotype, TSearchSpace> Create<TGenotype, TSearchSpace>(params IReadOnlyList<IMutator<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>> mutators) 
    //   where TSearchSpace : class, ISearchSpace<TGenotype>

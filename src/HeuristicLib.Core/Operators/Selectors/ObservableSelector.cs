@@ -1,3 +1,4 @@
+using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
@@ -7,24 +8,27 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Selectors;
 
-public record class ObservableSelector<TG, TS, TP>
+[Equatable]
+public partial record class ObservableSelector<TG, TS, TP>
   : Selector<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
-  private readonly ISelector<TG, TS, TP> selector;
-  private readonly IReadOnlyList<ISelectorObserver<TG, TS, TP>> observers;
+  public ISelector<TG, TS, TP> Selector { get; }
   
-  public ObservableSelector(ISelector<TG, TS, TP> selector, params IReadOnlyList<ISelectorObserver<TG, TS, TP>> observers)
+  [OrderedEquality]
+  public ImmutableArray<ISelectorObserver<TG, TS, TP>> Observers { get; }
+
+  public ObservableSelector(ISelector<TG, TS, TP> selector, params ImmutableArray<ISelectorObserver<TG, TS, TP>> observers)
   {
-    this.selector = selector;
-    this.observers = observers;
+    this.Selector = selector;
+    this.Observers = observers;
   }
   
   public override ISelectorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var selectorInstance = instanceRegistry.GetOrCreate(selector);
-    return new ObservableSelectorInstance(selectorInstance, observers);
+    var selectorInstance = instanceRegistry.GetOrCreate(Selector);
+    return new ObservableSelectorInstance(selectorInstance, Observers);
   }
 
   private sealed class ObservableSelectorInstance(ISelectorInstance<TG, TS, TP> selectorInstance, IReadOnlyList<ISelectorObserver<TG, TS, TP>> observers) 
@@ -79,7 +83,7 @@ public static class ObservableSelectorExtensions
       return new ObservableSelector<TG, TS, TP>(selector, observer);
     }
     
-    public ISelector<TG, TS, TP> ObserveWith(params IReadOnlyList<ISelectorObserver<TG, TS, TP>> observers)
+    public ISelector<TG, TS, TP> ObserveWith(params ImmutableArray<ISelectorObserver<TG, TS, TP>> observers)
     {
       return new ObservableSelector<TG, TS, TP>(selector, observers);
     }

@@ -21,9 +21,9 @@ public partial record class PipelineAlgorithm<TAlgorithm, TGenotype, TSearchSpac
   where TAlgorithm : IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
 {
   [OrderedEquality]
-  public IReadOnlyList<TAlgorithm> Algorithms { get; }
+  public ImmutableArray<TAlgorithm> Algorithms { get; }
 
-  public PipelineAlgorithm(IReadOnlyList<TAlgorithm> algorithms)
+  public PipelineAlgorithm(ImmutableArray<TAlgorithm> algorithms)
   {
     Algorithms = algorithms;
   }

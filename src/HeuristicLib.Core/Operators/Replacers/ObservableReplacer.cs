@@ -1,3 +1,4 @@
+using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
@@ -7,24 +8,27 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Replacers;
 
-public record class ObservableReplacer<TG, TS, TP>
+[Equatable]
+public partial record class ObservableReplacer<TG, TS, TP>
   : Replacer<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
-  private readonly IReplacer<TG, TS, TP> replacer;
-  private readonly IReadOnlyList<IReplacerObserver<TG, TS, TP>> observers;
-  
-  public ObservableReplacer(IReplacer<TG, TS, TP> replacer, params IReadOnlyList<IReplacerObserver<TG, TS, TP>> observers)
+  public IReplacer<TG, TS, TP> Replacer { get; }
+
+  [OrderedEquality]
+  public ImmutableArray<IReplacerObserver<TG, TS, TP>> Observers { get; }
+
+  public ObservableReplacer(IReplacer<TG, TS, TP> replacer, params ImmutableArray<IReplacerObserver<TG, TS, TP>> observers)
   {
-    this.replacer = replacer;
-    this.observers = observers;
+    this.Replacer = replacer;
+    this.Observers = observers;
   }
   
   public override IReplacerInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var replacerInstance = instanceRegistry.GetOrCreate(replacer);
-    return new ObservableReplacerInstance(replacerInstance, observers);
+    var replacerInstance = instanceRegistry.GetOrCreate(Replacer);
+    return new ObservableReplacerInstance(replacerInstance, Observers);
   }
 
   private sealed class ObservableReplacerInstance(IReplacerInstance<TG, TS, TP> replacerInstance, IReadOnlyList<IReplacerObserver<TG, TS, TP>> observers) 
@@ -81,7 +85,7 @@ public static class ObservableReplacerExtensions
       return new ObservableReplacer<TG, TS, TP>(replacer, observer);
     }
     
-    public IReplacer<TG, TS, TP> ObserveWith(params IReadOnlyList<IReplacerObserver<TG, TS, TP>> observers)
+    public IReplacer<TG, TS, TP> ObserveWith(params ImmutableArray<IReplacerObserver<TG, TS, TP>> observers)
     {
       return new ObservableReplacer<TG, TS, TP>(replacer, observers);
     }
