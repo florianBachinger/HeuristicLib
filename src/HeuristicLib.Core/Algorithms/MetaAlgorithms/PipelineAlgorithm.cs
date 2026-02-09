@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Generator.Equals;
 using HEAL.HeuristicLib.Collections;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
@@ -12,18 +13,20 @@ namespace HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
 // ToDo: Add Pipeline with different State types
 // ToDo: Add support for Transformation between different (or the same typed) states.
 
-public class PipelineAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>
+[Equatable]
+public partial record class PipelineAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>
   : Algorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
   where TAlgorithm : IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
 {
-  public ImmutableList<TAlgorithm> Algorithms { get; }
+  [OrderedEquality]
+  public IReadOnlyList<TAlgorithm> Algorithms { get; }
 
   public PipelineAlgorithm(IReadOnlyList<TAlgorithm> algorithms)
   {
-    Algorithms = new ImmutableList<TAlgorithm>(algorithms);
+    Algorithms = algorithms;
   }
 
   public override PipelineAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
@@ -44,16 +47,16 @@ public class PipelineAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TPro
   where TAlgorithmState : class, IAlgorithmState
   where TAlgorithm : IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
 {
-  protected readonly ImmutableList<TAlgorithm> Algorithms;
+  protected readonly IReadOnlyList<TAlgorithm> Algorithms;
 
-  public PipelineAlgorithmInstance(IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, ImmutableList<TAlgorithm> algorithms) 
+  public PipelineAlgorithmInstance(IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, IReadOnlyList<TAlgorithm> algorithms) 
     : base(evaluator)
   {
     Algorithms = algorithms;
   }
 
   public PipelineAlgorithmInstance(
-    ImmutableList<TAlgorithm> algorithms,
+    IReadOnlyList<TAlgorithm> algorithms,
     IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator)
     : base(evaluator)
   {

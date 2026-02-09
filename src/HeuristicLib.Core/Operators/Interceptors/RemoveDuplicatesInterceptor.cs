@@ -3,7 +3,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Operators.Interceptors;
 
-public class RemoveDuplicatesInterceptor<TGenotype, TAlgorithmState> 
+public record class RemoveDuplicatesInterceptor<TGenotype, TAlgorithmState> 
   : StatelessInterceptor<TGenotype, TAlgorithmState>
   where TAlgorithmState : PopulationState<TGenotype>
 {
@@ -14,7 +14,7 @@ public class RemoveDuplicatesInterceptor<TGenotype, TAlgorithmState>
 
   public override TAlgorithmState Transform(TAlgorithmState currentState, TAlgorithmState? previousState)
   {
-    var newSolutions = currentState.Population.DistinctBy(s => s.Genotype, comparer);
+    var newSolutions = currentState.Population.DistinctBy(s => s.Genotype, comparer).ToArray();
     return currentState with {
       Population = new Population<TGenotype>(newSolutions)
     };

@@ -36,7 +36,7 @@ file sealed class DummyDynamicProblem : DynamicProblem<DummyGenotype, DummySearc
   protected override void Update() {}
 }
 
-file sealed class CountingEvaluator : StatelessEvaluator<DummyGenotype, DummySearchSpace, DummyDynamicProblem>
+file sealed record class CountingEvaluator : StatelessEvaluator<DummyGenotype, DummySearchSpace, DummyDynamicProblem>
 {
   public int Calls { get; private set; }
   public int LastBatchSize { get; private set; }

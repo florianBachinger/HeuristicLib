@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Mutators;
 
-public class ObservableMutator<TG, TS, TP>
+public record class ObservableMutator<TG, TS, TP>
   : Mutator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>

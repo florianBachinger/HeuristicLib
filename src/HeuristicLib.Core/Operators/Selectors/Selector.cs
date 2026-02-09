@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Selectors;
 
-public abstract class Selector<TGenotype, TSearchSpace, TProblem> 
+public abstract record class Selector<TGenotype, TSearchSpace, TProblem> 
   : ISelector<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -23,7 +23,7 @@ public abstract class SelectorInstance<TGenotype, TSearchSpace, TProblem>
 }
 
 
-public abstract class Selector<TGenotype, TSearchSpace> 
+public abstract record class Selector<TGenotype, TSearchSpace> 
   : ISelector<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -41,7 +41,7 @@ public abstract class SelectorInstance<TGenotype, TSearchSpace>
 }
 
 
-public abstract class Selector<TGenotype> 
+public abstract record class Selector<TGenotype> 
   : ISelector<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {
   public abstract ISelectorInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry);
@@ -57,7 +57,7 @@ public abstract class SelectorInstance<TGenotype>
 }
 
 
-public abstract class StatelessSelector<TGenotype, TSearchSpace, TProblem> 
+public abstract record class StatelessSelector<TGenotype, TSearchSpace, TProblem> 
   : ISelector<TGenotype, TSearchSpace, TProblem>,
     ISelectorInstance<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -68,7 +68,7 @@ public abstract class StatelessSelector<TGenotype, TSearchSpace, TProblem>
   public abstract IReadOnlyList<ISolution<TGenotype>> Select(IReadOnlyList<ISolution<TGenotype>> population, Objective objective, int count, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
 }
 
-public abstract class StatelessSelector<TGenotype, TSearchSpace> 
+public abstract record class StatelessSelector<TGenotype, TSearchSpace> 
   : ISelector<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>,
     ISelectorInstance<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -81,7 +81,7 @@ public abstract class StatelessSelector<TGenotype, TSearchSpace>
     Select(population, objective, count, random, searchSpace);
 }
 
-public abstract class StatelessSelector<TGenotype> 
+public abstract record class StatelessSelector<TGenotype> 
   : ISelector<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>,
     ISelectorInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {

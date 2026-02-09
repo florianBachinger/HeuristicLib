@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Operators.Interceptors;
 
-public class ObservableInterceptor<TG, TR, TS, TP>
+public record class ObservableInterceptor<TG, TR, TS, TP>
   : Interceptor<TG, TR, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>

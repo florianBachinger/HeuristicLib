@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Generator.Equals;
 using HEAL.HeuristicLib.Collections;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
@@ -11,14 +12,16 @@ namespace HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
 
 // ToDo: maybe we need another base class for MetaAlgorithms like this?
 // ToDo: think if we want the CycleAlgorithm to terminate internally by checking each result of the inner algorihtms
-public class CycleAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>
+[Equatable]
+public partial record class CycleAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>
   : Algorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
   where TAlgorithm : IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
 {
-  public ImmutableList<TAlgorithm> Algorithms { get; }
+  [OrderedEquality]
+  public IReadOnlyList<TAlgorithm> Algorithms { get; }
   
   // ToDo: think if better place outside and keep CycleAlgorithm as infinite cycles?
   public int? MaximumCycles { get; init; }
@@ -28,7 +31,7 @@ public class CycleAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgo
 
   public CycleAlgorithm(IReadOnlyList<TAlgorithm> algorithms)
   {
-    Algorithms = new ImmutableList<TAlgorithm>(algorithms);
+    Algorithms = algorithms;
   }
 
   public override CycleAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)

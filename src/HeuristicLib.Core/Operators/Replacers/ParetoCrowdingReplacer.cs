@@ -3,7 +3,7 @@ using HEAL.HeuristicLib.Random;
 
 namespace HEAL.HeuristicLib.Operators.Replacers;
 
-public class ParetoCrowdingReplacer<TGenotype> 
+public record class ParetoCrowdingReplacer<TGenotype> 
   : StatelessReplacer<TGenotype>
 {
   private readonly bool dominateOnEqualities;

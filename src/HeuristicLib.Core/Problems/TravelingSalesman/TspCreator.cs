@@ -5,7 +5,7 @@ using HEAL.HeuristicLib.SearchSpaces.Vectors;
 
 namespace HEAL.HeuristicLib.Problems.TravelingSalesman;
 
-public class TspCreator : SingleSolutionStatelessCreator<Permutation, PermutationSearchSpace, TravelingSalesmanProblem>
+public record class TspCreator : SingleSolutionStatelessCreator<Permutation, PermutationSearchSpace, TravelingSalesmanProblem>
 {
   public override Permutation Create(IRandomNumberGenerator random, PermutationSearchSpace searchSpace, TravelingSalesmanProblem problem)
   {

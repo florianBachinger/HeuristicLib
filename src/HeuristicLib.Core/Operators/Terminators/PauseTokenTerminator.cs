@@ -1,6 +1,6 @@
 ﻿namespace HEAL.HeuristicLib.Operators.Terminators;
 
-public class PauseTokenTerminator<TGenotype> : StatelessTerminator<TGenotype>
+public record class PauseTokenTerminator<TGenotype> : StatelessTerminator<TGenotype>
 {
   private readonly PauseToken pauseToken;
   public PauseTokenTerminator(PauseToken pauseToken) {

@@ -7,7 +7,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Selectors;
 
-public class ObservableSelector<TG, TS, TP>
+public record class ObservableSelector<TG, TS, TP>
   : Selector<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>

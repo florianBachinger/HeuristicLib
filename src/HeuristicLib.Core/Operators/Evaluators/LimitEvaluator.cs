@@ -7,7 +7,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Evaluators;
 
-public class LimitEvaluator<TG, TS, TP>
+public record class LimitEvaluator<TG, TS, TP>
   : Evaluator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>

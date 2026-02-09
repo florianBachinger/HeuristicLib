@@ -4,7 +4,7 @@ using HEAL.HeuristicLib.SearchSpaces.Trees;
 
 namespace HEAL.HeuristicLib.Operators.Mutators.SymbolicExpressionTreeMutators;
 
-public sealed class OnePointShaker : SymbolicExpressionTreeManipulator
+public sealed record class OnePointShaker : SymbolicExpressionTreeManipulator
 {
   #region properties
 

@@ -12,7 +12,7 @@ namespace HEAL.HeuristicLib.Operators.Crossovers.SymbolicExpressionTreeCrossover
 ///   N0 and N1
 ///   until a valid configuration is found.
 /// </summary>
-public class SubtreeCrossover : SymbolicExpressionTreeCrossover
+public record class SubtreeCrossover : SymbolicExpressionTreeCrossover
 {
   public double InternalCrossoverPointProbability { get; set; } = 0.9;
 

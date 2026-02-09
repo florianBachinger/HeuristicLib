@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Generator.Equals;
 using HEAL.HeuristicLib.Collections;
 
 namespace HEAL.HeuristicLib.Optimization;
@@ -7,29 +8,32 @@ public static class Population
 {
   public static Population<TGenotype> From<TGenotype>(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> fitnesses) => new(genotypes, fitnesses);
 
-  public static Population<TGenotype> From<TGenotype>(IEnumerable<ISolution<TGenotype>> solutions) => new(new ImmutableList<ISolution<TGenotype>>(solutions));
+  public static Population<TGenotype> From<TGenotype>(IEnumerable<ISolution<TGenotype>> solutions) => new(solutions.ToList());
 }
 
-public record Population<TGenotype>(ImmutableList<ISolution<TGenotype>> Solutions) : IISolutionLayout<TGenotype>
+[Equatable]
+public partial record Population<TGenotype> : IISolutionLayout<TGenotype>
 {
-  public Population(params IEnumerable<ISolution<TGenotype>> solutions)
-    : this(new ImmutableList<ISolution<TGenotype>>(solutions))
-  {
-  }
-
+  [OrderedEquality]
+  public IReadOnlyList<ISolution<TGenotype>> Solutions { get; init; }
+  
   public Population(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> fitnesses)
-    : this(ToISolutions(genotypes, fitnesses))
+    : this(ToSolutions(genotypes, fitnesses))
   {
   }
+  public Population(params IReadOnlyList<ISolution<TGenotype>> Solutions)
+  {
+    this.Solutions = Solutions;
+  }
 
-  private static ImmutableList<ISolution<TGenotype>> ToISolutions(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> fitnesses)
+  private static IReadOnlyList<ISolution<TGenotype>> ToSolutions(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> fitnesses)
   {
     if (genotypes.Count != fitnesses.Count) {
       throw new ArgumentException("Genotypes and fitnesses must have the same length.");
     }
 
     var solutions = genotypes.Zip(fitnesses).Select(x => Solution.From(x.First, x.Second));
-    return new ImmutableList<ISolution<TGenotype>>(solutions);
+    return solutions.ToArray();
   }
 
   public IEnumerator<ISolution<TGenotype>> GetEnumerator() => Solutions.GetEnumerator();

@@ -1,4 +1,5 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using Generator.Equals;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
@@ -6,12 +7,14 @@ using HEAL.HeuristicLib.States;
 namespace HEAL.HeuristicLib.Operators.Interceptors;
 
 // ToDo: think about another name, maybe PipelineInceptor or SequentialInterceptor.
-public class MultiInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>
+[Equatable]
+public partial record class MultiInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>
   : Interceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem> 
   where TAlgorithmState : class, IAlgorithmState
   where TSearchSpace : class, ISearchSpace<TGenotype> 
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
+  [OrderedEquality]
   private readonly IReadOnlyList<IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> interceptors;
   
   public MultiInterceptor(IReadOnlyList<IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> interceptors) {

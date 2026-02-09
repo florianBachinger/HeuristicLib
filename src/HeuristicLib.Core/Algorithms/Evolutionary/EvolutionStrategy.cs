@@ -21,7 +21,7 @@ public record EvolutionStrategyState<TGenotype> : PopulationState<TGenotype>
   public required double MutationStrength { get; init; }
 }
 
-public class EvolutionStrategy<TGenotype, TSearchSpace, TProblem>
+public record class EvolutionStrategy<TGenotype, TSearchSpace, TProblem>
   : IterativeAlgorithm<TGenotype, TSearchSpace, TProblem, EvolutionStrategyState<TGenotype>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>

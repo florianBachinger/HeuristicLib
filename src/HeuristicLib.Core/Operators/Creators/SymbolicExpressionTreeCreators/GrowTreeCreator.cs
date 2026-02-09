@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols;
 
 namespace HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
 
-public class GrowTreeCreator : SymbolicExpressionTreeCreator
+public record class GrowTreeCreator : SymbolicExpressionTreeCreator
 {
   /// <summary>
   ///   GetEvaluator a symbolic expression tree using the 'Grow' method.

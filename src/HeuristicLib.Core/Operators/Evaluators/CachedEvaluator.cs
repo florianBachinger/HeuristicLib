@@ -8,7 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace HEAL.HeuristicLib.Operators.Evaluators;
 
 // ToDo: Keyless version of this if we simply use the Geotype as key.
-public class CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
+public record class CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   : Evaluator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>

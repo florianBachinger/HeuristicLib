@@ -3,7 +3,7 @@ using HEAL.HeuristicLib.Random;
 
 namespace HEAL.HeuristicLib.Operators.Crossovers;
 
-public class RandomCrossover<TGenotype> 
+public record class RandomCrossover<TGenotype> 
   : SingleSolutionStatelessCrossover<TGenotype>
 {
   public double Bias { get; }

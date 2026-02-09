@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols;
 
 namespace HEAL.HeuristicLib.Operators.Mutators.SymbolicExpressionTreeMutators;
 
-public sealed class RemoveBranchManipulation : SymbolicExpressionTreeManipulator
+public sealed record class RemoveBranchManipulation : SymbolicExpressionTreeManipulator
 {
   private const int MaxTries = 100;
 

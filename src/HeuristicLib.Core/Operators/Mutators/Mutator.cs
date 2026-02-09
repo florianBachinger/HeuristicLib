@@ -5,7 +5,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Mutators;
 
-public abstract class Mutator<TGenotype, TSearchSpace, TProblem> 
+public abstract record class Mutator<TGenotype, TSearchSpace, TProblem> 
   : IMutator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -22,7 +22,7 @@ public abstract class MutatorInstance<TGenotype, TSearchSpace, TProblem>
 }
 
 
-public abstract class Mutator<TGenotype, TSearchSpace>
+public abstract record class Mutator<TGenotype, TSearchSpace>
   : IMutator<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -40,7 +40,7 @@ public abstract class MutatorInstance<TGenotype, TSearchSpace>
 }
 
 
-public abstract class Mutator<TGenotype>
+public abstract record class Mutator<TGenotype>
   : IMutator<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {
   public abstract IMutatorInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry);
@@ -56,7 +56,7 @@ public abstract class MutatorInstance<TGenotype>
 }
 
 
-public abstract class StatelessMutator<TGenotype, TSearchSpace, TProblem> 
+public abstract record class StatelessMutator<TGenotype, TSearchSpace, TProblem> 
   : IMutator<TGenotype, TSearchSpace, TProblem>, 
     IMutatorInstance<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -67,7 +67,7 @@ public abstract class StatelessMutator<TGenotype, TSearchSpace, TProblem>
   public abstract IReadOnlyList<TGenotype> Mutate(IReadOnlyList<TGenotype> parent, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
 }
 
-public abstract class StatelessMutator<TGenotype, TSearchSpace> 
+public abstract record class StatelessMutator<TGenotype, TSearchSpace> 
   : IMutator<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>, 
     IMutatorInstance<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -80,7 +80,7 @@ public abstract class StatelessMutator<TGenotype, TSearchSpace>
     Mutate(parent, random, searchSpace);
 }
 
-public abstract class StatelessMutator<TGenotype>
+public abstract record class StatelessMutator<TGenotype>
   : IMutator<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>, 
     IMutatorInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {

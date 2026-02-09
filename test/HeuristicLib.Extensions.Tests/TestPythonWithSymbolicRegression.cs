@@ -13,7 +13,7 @@ public class TestPythonWithSymbolicRegression
     var i = 0;
     var file = @"TestData\192_vineyard.tsv";
     var res = PythonGenealogyAnalysis.RunSymbolicRegressionConfigurable(file,
-    new PythonGenealogyAnalysis.SymRegExperimentParameters {
+    new SymRegExperimentParameters {
       Seed = AlgorithmRandomSeed,
       Iterations = iterations
     },

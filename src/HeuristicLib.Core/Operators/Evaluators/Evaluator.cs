@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Evaluators;
 
-public abstract class Evaluator<TGenotype, TSearchSpace, TProblem> 
+public abstract record class Evaluator<TGenotype, TSearchSpace, TProblem> 
   : IEvaluator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -23,7 +23,7 @@ public abstract class EvaluatorInstance<TGenotype, TSearchSpace, TProblem>
 }
 
 
-public abstract class Evaluator<TGenotype, TSearchSpace>
+public abstract record class Evaluator<TGenotype, TSearchSpace>
   : IEvaluator<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -42,7 +42,7 @@ public abstract class EvaluatorInstance<TGenotype, TSearchSpace>
 }
 
 
-public abstract class Evaluator<TGenotype> 
+public abstract record class Evaluator<TGenotype> 
   : IEvaluator<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {
   public abstract IEvaluatorInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry);
@@ -58,7 +58,7 @@ public abstract class EvaluatorInstance<TGenotype>
 }
 
 
-public abstract class StatelessEvaluator<TGenotype, TSearchSpace, TProblem>
+public abstract record class StatelessEvaluator<TGenotype, TSearchSpace, TProblem>
   : IEvaluator<TGenotype, TSearchSpace, TProblem>,
     IEvaluatorInstance<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -69,7 +69,7 @@ public abstract class StatelessEvaluator<TGenotype, TSearchSpace, TProblem>
   public abstract IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
 }
 
-public abstract class StatelessEvaluator<TGenotype, TSearchSpace>
+public abstract record class StatelessEvaluator<TGenotype, TSearchSpace>
   : IEvaluator<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>,
     IEvaluatorInstance<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -82,7 +82,7 @@ public abstract class StatelessEvaluator<TGenotype, TSearchSpace>
     Evaluate(genotypes, random, searchSpace);
 }
 
-public abstract class StatelessEvaluator<TGenotype>
+public abstract record class StatelessEvaluator<TGenotype>
   : IEvaluator<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>,
     IEvaluatorInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {

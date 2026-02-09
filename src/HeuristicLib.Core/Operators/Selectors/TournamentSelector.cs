@@ -3,7 +3,7 @@ using HEAL.HeuristicLib.Random;
 
 namespace HEAL.HeuristicLib.Operators.Selectors;
 
-public class TournamentSelector<TGenotype> 
+public record class TournamentSelector<TGenotype> 
   : StatelessSelector<TGenotype>
 {
   private readonly int tournamentSize;

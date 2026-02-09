@@ -1,39 +1,66 @@
 ﻿using HEAL.HeuristicLib.Algorithms;
 using HEAL.HeuristicLib.Algorithms.Evolutionary;
 using HEAL.HeuristicLib.Algorithms.LocalSearch;
+using HEAL.HeuristicLib.Analyzers;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
 using HEAL.HeuristicLib.Operators.Crossovers.SymbolicExpressionTreeCrossovers;
+using HEAL.HeuristicLib.Operators.Interceptors;
+using HEAL.HeuristicLib.Operators.Mutators;
+using HEAL.HeuristicLib.Operators.Mutators.SymbolicExpressionTreeMutators;
 using HEAL.HeuristicLib.Operators.Selectors;
 using HEAL.HeuristicLib.Operators.Terminators;
+using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Problems.DataAnalysis;
 using HEAL.HeuristicLib.Problems.DataAnalysis.Regression;
 using HEAL.HeuristicLib.Problems.DataAnalysis.Regression.Evaluators;
 using HEAL.HeuristicLib.Random;
+using HEAL.HeuristicLib.SearchSpaces.Trees;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Grammars;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math;
+using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Extensions.Tests;
 
 public class UnitTest1
 {
+  private static MultiMutator<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace, IProblem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>> CreateSymRegAllMutator()
+  {
+    var symRegAllMutator = MultiMutator.Create(
+    new ChangeNodeTypeManipulation(),
+    new FullTreeShaker(),
+    new OnePointShaker(),
+    new RemoveBranchManipulation(),
+    new ReplaceBranchManipulation());
+
+    return symRegAllMutator;
+  }
+  
   [Fact]
   public void GeneticAlgorithmExecution()
   {
     var problem = CreateTestSymbolicRegressionProblem();
 
-    var ga = GeneticAlgorithm.GetBuilder(new ProbabilisticTreeCreator(), new SubtreeCrossover(), CreateSymRegAllMutator());
-    ga.PopulationSize = 100;
-    ga.MutationRate = 0.05;
-    ga.Selector = new TournamentSelector<SymbolicExpressionTree>(3);
-    ga.Elites = 1;
+    var builder = GeneticAlgorithm.GetBuilder(new ProbabilisticTreeCreator(), new SubtreeCrossover(), CreateSymRegAllMutator());
+    builder.PopulationSize = 100;
+    builder.MutationRate = 0.05;
+    builder.Selector = new TournamentSelector<SymbolicExpressionTree>(3);
+    builder.Elites = 1;
     //ga.RandomSeed = AlgorithmRandomSeed;
-    ga.Terminator = new AfterIterationsTerminator<SymbolicExpressionTree>(100);
-
-    var qualities = BestMedianWorstAnalysis.Analyze(ga);
-    var res = ga.Build().RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed));
-
-    Assert.Equal(100, qualities.BestISolutions.Count);
+    builder.Terminator = new AfterIterationsTerminator<SymbolicExpressionTree>(100);
+    var ga = builder.Build();
+    
+    //var qualities = BestMedianWorstAnalysis<>.Analyze(ga);
+    var analysis = new BestMedianWorstAnalysis<SymbolicExpressionTree>();
+    var interceptor = ga.Interceptor ?? new IdentityInterceptor<SymbolicExpressionTree, PopulationState<SymbolicExpressionTree>>();
+      
+    var wrappedInterceptor = interceptor.ObserveWith(analysis);
+      
+    ga = ga with { Interceptor = wrappedInterceptor };
+      
+    var res = ga.RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed));
+    
+    Assert.Equal(100, analysis.BestSolutions.Count);
     Assert.Equal(100, res.Population.Solutions.Count);
   }
   

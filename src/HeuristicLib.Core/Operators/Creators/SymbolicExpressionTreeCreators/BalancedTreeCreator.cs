@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols;
 
 namespace HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
 
-public class BalancedTreeCreator : SymbolicExpressionTreeCreator
+public record class BalancedTreeCreator : SymbolicExpressionTreeCreator
 {
   public double IrregularityBias { get; set; }
 

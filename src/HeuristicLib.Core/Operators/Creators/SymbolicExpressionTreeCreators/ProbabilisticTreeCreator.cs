@@ -5,7 +5,7 @@ using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Grammars;
 
 namespace HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
 
-public class ProbabilisticTreeCreator : SymbolicExpressionTreeCreator
+public record class ProbabilisticTreeCreator : SymbolicExpressionTreeCreator
 {
   private const int MaxTries = 100;
 

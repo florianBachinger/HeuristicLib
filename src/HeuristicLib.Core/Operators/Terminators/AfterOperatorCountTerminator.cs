@@ -2,7 +2,7 @@ using HEAL.HeuristicLib.Analysis;
 
 namespace HEAL.HeuristicLib.Operators.Terminators;
 
-public class AfterOperatorCountTerminator<TGenotype> : StatelessTerminator<TGenotype>
+public record class AfterOperatorCountTerminator<TGenotype> : StatelessTerminator<TGenotype>
 {
   public AfterOperatorCountTerminator(InvocationCounter counter, int maximumCount)
   {

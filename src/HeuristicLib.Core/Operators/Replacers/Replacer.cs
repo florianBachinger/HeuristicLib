@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Replacers;
 
-public abstract class Replacer<TGenotype, TSearchSpace, TProblem> 
+public abstract record class Replacer<TGenotype, TSearchSpace, TProblem> 
   : IReplacer<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -25,7 +25,7 @@ public abstract class ReplacerInstance<TGenotype, TSearchSpace, TProblem>
 }
 
 
-public abstract class Replacer<TGenotype, TSearchSpace> 
+public abstract record class Replacer<TGenotype, TSearchSpace> 
   : IReplacer<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -45,7 +45,7 @@ public abstract class ReplacerInstance<TGenotype, TSearchSpace>
 }
 
 
-public abstract class Replacer<TGenotype> 
+public abstract record class Replacer<TGenotype> 
   : IReplacer<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {
   public abstract IReplacerInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry);
@@ -63,7 +63,7 @@ public abstract class ReplacerInstance<TGenotype>
 }
 
 
-public abstract class StatelessReplacer<TGenotype, TSearchSpace, TProblem> 
+public abstract record class StatelessReplacer<TGenotype, TSearchSpace, TProblem> 
   : IReplacer<TGenotype, TSearchSpace, TProblem>,
     IReplacerInstance<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -76,7 +76,7 @@ public abstract class StatelessReplacer<TGenotype, TSearchSpace, TProblem>
   public abstract int GetOffspringCount(int populationSize);
 }
 
-public abstract class StatelessReplacer<TGenotype, TSearchSpace> 
+public abstract record class StatelessReplacer<TGenotype, TSearchSpace> 
   : IReplacer<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>,
     IReplacerInstance<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -91,7 +91,7 @@ public abstract class StatelessReplacer<TGenotype, TSearchSpace>
     Replace(previousPopulation, offspringPopulation, objective, random, searchSpace);
 }
 
-public abstract class StatelessReplacer<TGenotype> 
+public abstract record class StatelessReplacer<TGenotype> 
   : IReplacer<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>,
     IReplacerInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {

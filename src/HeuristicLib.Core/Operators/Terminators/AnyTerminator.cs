@@ -1,15 +1,18 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using Generator.Equals;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Operators.Terminators;
 
-public class AnyTerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem> : Terminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>
+[Equatable]
+public partial record class AnyTerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem> : Terminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>
   where TAlgorithmState : class, IAlgorithmState
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
+  [OrderedEquality]
   private readonly IReadOnlyList<ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> terminators;
 
   public AnyTerminator(params IReadOnlyList<ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> terminators)

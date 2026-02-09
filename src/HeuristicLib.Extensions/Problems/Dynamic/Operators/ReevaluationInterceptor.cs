@@ -7,7 +7,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Problems.Dynamic.Operators;
 
-public class ReevaluationInterceptor<T, TR, TE, TP> 
+public record class ReevaluationInterceptor<T, TR, TE, TP> 
   : Interceptor<T, TR, TE, TP>
   where TR : PopulationState<T>
   where TE : class, ISearchSpace<T>

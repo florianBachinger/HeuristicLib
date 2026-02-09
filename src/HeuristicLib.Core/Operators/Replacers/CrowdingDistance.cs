@@ -2,7 +2,7 @@
 
 namespace HEAL.HeuristicLib.Operators.Replacers;
 
-public class CrowdingDistance
+public static class CrowdingDistance
 {
   public static double[] CalculateCrowdingDistances(IReadOnlyList<ObjectiveVector> population)
   {

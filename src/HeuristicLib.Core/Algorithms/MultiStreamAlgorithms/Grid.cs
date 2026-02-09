@@ -1,11 +1,15 @@
+using System.Collections;
 using System.Collections.Immutable;
+using Generator.Equals;
 
 namespace HEAL.HeuristicLib.Algorithms.MultiStreamAlgorithms;
 
-public class Grid<T>
+[Equatable]
+public partial class Grid<T> : IEnumerable<T>
 {
   public T Prototype { get; }
 
+  [OrderedEquality]
   public ImmutableList<IGridParameter<T>> Parameters { get; } = [];
 
   public Grid(T prototype)
@@ -30,6 +34,9 @@ public class Grid<T>
 
     return Parameters.Aggregate(configurations, (current, parameter) => parameter.GetConfigurations(current)).ToList();
   }
+  
+  public IEnumerator<T> GetEnumerator() => GetConfigurations().GetEnumerator();
+  IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
 
 

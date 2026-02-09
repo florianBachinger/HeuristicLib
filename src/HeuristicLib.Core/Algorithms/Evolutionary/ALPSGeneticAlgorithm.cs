@@ -18,7 +18,7 @@ public record AlpsState<TGenotype> : AlgorithmState
   public required IReadOnlyList<IReadOnlyList<int>> Ages { get; init; }
 }
 
-public class AlpsGeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
+public record class AlpsGeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
   : IterativeAlgorithm<TGenotype, TSearchSpace, TProblem, AlpsState<TGenotype>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -134,7 +134,7 @@ public class AlpsGeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>
     var newPopulation = agedReplacer.Replace(oldPopulation, evaluatedPopulation.ToList(), problem.Objective, random, agedSearchSpace, agedProblem);
 
     var result = new AlpsState<TGenotype> {
-      Population = [new Population<TGenotype>(new ImmutableList<ISolution<TGenotype>>(newPopulation))],
+      Population = [new Population<TGenotype>(newPopulation)],
       Ages = [offspringAges], // ToDo: ERROR here, since the replacer might shuffled the population and keeps some of the old solutions, so we need to track the ages through the replacer as well
       //CurrentIteration = previousGenerationState.CurrentIteration + 1
     };

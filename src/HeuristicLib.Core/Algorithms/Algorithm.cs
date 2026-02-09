@@ -8,7 +8,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Algorithms;
 
-public abstract class Algorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
+public abstract record class Algorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
   : IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>

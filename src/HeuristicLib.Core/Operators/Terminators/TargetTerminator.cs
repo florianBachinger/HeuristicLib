@@ -5,7 +5,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Operators.Terminators;
 
-public class TargetTerminator<TGenotype>
+public record class TargetTerminator<TGenotype>
   : StatelessTerminator<TGenotype, PopulationState<TGenotype>, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
 {
   private readonly ObjectiveVector target;

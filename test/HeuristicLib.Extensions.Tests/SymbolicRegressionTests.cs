@@ -2,30 +2,14 @@ using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
 using HEAL.HeuristicLib.Operators.Mutators;
 using HEAL.HeuristicLib.Operators.Mutators.SymbolicExpressionTreeMutators;
-using HEAL.HeuristicLib.Algorithms.Evolutionary.GeneticAlgorithm;
-using HEAL.HeuristicLib.Algorithms.Evolutionary.NSGA2;
-using HEAL.HeuristicLib.Algorithms.LocalSearch;
-using HEAL.HeuristicLib.Genotypes.Trees;
-using HEAL.HeuristicLib.Operators.Analyzers;
-using HEAL.HeuristicLib.Operators.Analyzers.Genealogy;
-using HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
-using HEAL.HeuristicLib.Operators.Crossovers.SymbolicExpressionTreeCrossovers;
-using HEAL.HeuristicLib.Operators.Mutators;
-using HEAL.HeuristicLib.Operators.Mutators.SymbolicExpressionTreeMutators;
-using HEAL.HeuristicLib.Operators.Selectors;
-using HEAL.HeuristicLib.Operators.Terminators;
 using HEAL.HeuristicLib.Optimization;
-using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Problems.DataAnalysis;
 using HEAL.HeuristicLib.Problems.DataAnalysis.Regression;
 using HEAL.HeuristicLib.Problems.DataAnalysis.Regression.Evaluators;
-
-using HEAL.HeuristicLib.PythonInterOptScripts;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces.Trees;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Grammars;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math;
-
 
 namespace HEAL.HeuristicLib.Extensions.Tests;
 
@@ -33,7 +17,50 @@ public class SymbolicRegressionTests
 {
   private const int AlgorithmRandomSeed = 42;
   public static readonly double[,] Data = new double[,] { { 0, 10 }, { 1, 10 }, { 2, 10 }, { 3, 10 }, { 4, 10 }, { 5, 10 }, { 6, 10 }, { 7, 10 }, { 8, 10 }, { 9, 10 }, { 10, 10 } };
+  private static SymbolicRegressionProblem CreateTestSymbolicRegressionProblem(int treeLength = 40, bool multiObjective = false, int constOptIteration = 5)
+  {
+    var problemData = new RegressionProblemData(new ModifiableDataset(["x", "y"], Data));
 
+    IRegressionEvaluator<SymbolicExpressionTree>[] objectives = multiObjective
+      ? [
+        new MaxAbsoluteErrorEvaluator(),
+        new MeanAbsoluteErrorEvaluator(),
+        new MeanLogErrorEvaluator(),
+        new MeanRelativeErrorEvaluator(),
+        new MeanSquaredErrorCalculator(),
+        new NormalizedMeanSquaredErrorEvaluator(),
+        new NumberOfVariablesEvaluator(),
+        new PearsonR2Evaluator(),
+        new RootMeanSquaredErrorEvaluator(),
+        new TreeComplexityEvaluator(),
+        new TreeLengthEvaluator()
+      ]
+      : [new RootMeanSquaredErrorEvaluator()];
+    var problem = new SymbolicRegressionProblem(problemData, objectives) {
+      LowerPredictionBound = 0,
+      UpperPredictionBound = 100,
+      SearchSpace = {
+        TreeDepth = treeLength,
+        TreeLength = treeLength
+      },
+      ParameterOptimizationIterations = constOptIteration
+    };
+
+    var linearScalingRoot = problem.SearchSpace.Grammar.AddLinearScaling();
+    problem.SearchSpace.Grammar.AddFullyConnectedSymbols(
+    linearScalingRoot,
+    new Addition(),
+    new Subtraction(),
+    new Multiplication(),
+    new Division(),
+    new Number(),
+    new SquareRoot(),
+    new Logarithm(),
+    new Exponential(),
+    new Variable { VariableNames = problemData.InputVariables });
+    return problem;
+  }
+  
   [Fact]
   public void MultiObjectiveConstant()
   {

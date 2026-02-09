@@ -11,7 +11,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Algorithms.Evolutionary;
 
-public class GeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
+public record class GeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
   : IterativeAlgorithm<TGenotype, TSearchSpace, TProblem, PopulationState<TGenotype>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -123,9 +123,10 @@ public class GeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>
   }
 }
 
-public class GeneticAlgorithm<TGenotype, TSearchSpace> : GeneticAlgorithm<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>> where TGenotype : class where TSearchSpace : class, ISearchSpace<TGenotype>;
+// ToDo: Do we want this, and if yes, do we want it for all algorithms?
+public record class GeneticAlgorithm<TGenotype, TSearchSpace> : GeneticAlgorithm<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>> where TGenotype : class where TSearchSpace : class, ISearchSpace<TGenotype>;
 
-public class GeneticAlgorithm<TGenotype> : GeneticAlgorithm<TGenotype, ISearchSpace<TGenotype>> where TGenotype : class;
+public record class GeneticAlgorithm<TGenotype> : GeneticAlgorithm<TGenotype, ISearchSpace<TGenotype>> where TGenotype : class;
 
 public static class GeneticAlgorithm
 {

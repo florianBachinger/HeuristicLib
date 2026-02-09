@@ -1,4 +1,5 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using Generator.Equals;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -6,13 +7,20 @@ using HEAL.HeuristicLib.SearchSpaces;
 namespace HEAL.HeuristicLib.Operators.Mutators;
 
 // ToDo: Think of a better name, maybe "ChooseOneMutator".
-public class MultiMutator<TGenotype, TSearchSpace, TProblem> : Mutator<TGenotype, TSearchSpace, TProblem>
+[Equatable]
+public partial record class MultiMutator<TGenotype, TSearchSpace, TProblem> 
+  : Mutator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
+  [OrderedEquality]
   public IReadOnlyList<IMutator<TGenotype, TSearchSpace, TProblem>> Mutators { get; }
+  [OrderedEquality]
   public IReadOnlyList<double> Weights { get; }
+  
+  [IgnoreEquality]
   private readonly double sumWeights;
+  [IgnoreEquality]
   private readonly double[] cumulativeSumWeights;
 
   public MultiMutator(IReadOnlyList<IMutator<TGenotype, TSearchSpace, TProblem>> mutator, IReadOnlyList<double>? weights = null)
@@ -42,7 +50,7 @@ public class MultiMutator<TGenotype, TSearchSpace, TProblem> : Mutator<TGenotype
       cumulativeSumWeights[i] = sumWeights;
     }
   }
-  
+
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var mutatorInstances = Mutators.Select(instanceRegistry.GetOrCreate).ToArray();

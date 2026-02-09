@@ -1,3 +1,4 @@
+using Generator.Equals;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -5,11 +6,13 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Mutators;
 
-public class PipelineMutator<TG, TS, TP> : Mutator<TG, TS, TP>
+[Equatable]
+public partial record class PipelineMutator<TG, TS, TP> : Mutator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
-  private IReadOnlyList<IMutator<TG, TS, TP>> mutators;
+  [OrderedEquality]
+  private readonly IReadOnlyList<IMutator<TG, TS, TP>> mutators;
 
   public PipelineMutator(IReadOnlyList<IMutator<TG, TS, TP>> mutators)
   {

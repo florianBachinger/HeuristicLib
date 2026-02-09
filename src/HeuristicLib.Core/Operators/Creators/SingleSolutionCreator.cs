@@ -5,7 +5,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Creators;
 
-public abstract class SingleSolutionCreator<TGenotype, TSearchSpace, TProblem> 
+public abstract record class SingleSolutionCreator<TGenotype, TSearchSpace, TProblem> 
   : Creator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -24,7 +24,7 @@ public abstract class SingleSolutionCreatorInstance<TGenotype, TSearchSpace, TPr
 }
 
 
-public abstract class SingleSolutionCreator<TGenotype, TSearchSpace>
+public abstract record class SingleSolutionCreator<TGenotype, TSearchSpace>
   : Creator<TGenotype, TSearchSpace>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -41,7 +41,7 @@ public abstract class SingleSolutionCreatorInstance<TGenotype, TSearchSpace>
 }
 
 
-public abstract class SingleSolutionCreator<TGenotype>
+public abstract record class SingleSolutionCreator<TGenotype>
   : Creator<TGenotype>
 {
 }
@@ -58,7 +58,7 @@ public abstract class SingleSolutionCreatorInstance<TGenotype>
 
 // ToDo: Since the stateless versions will be the most commonly used ones, think about naming them "Creator" and the other ones the "StatefulCreator".
 
-public abstract class SingleSolutionStatelessCreator<TGenotype, TSearchSpace, TProblem> 
+public abstract record class SingleSolutionStatelessCreator<TGenotype, TSearchSpace, TProblem> 
   : StatelessCreator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -69,7 +69,7 @@ public abstract class SingleSolutionStatelessCreator<TGenotype, TSearchSpace, TP
     BatchExecution.Sequential(count, r => Create(r, searchSpace, problem), random);
 }
 
-public abstract class SingleSolutionStatelessCreator<TGenotype, TSearchSpace> 
+public abstract record class SingleSolutionStatelessCreator<TGenotype, TSearchSpace> 
   : StatelessCreator<TGenotype, TSearchSpace>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -79,7 +79,7 @@ public abstract class SingleSolutionStatelessCreator<TGenotype, TSearchSpace>
     BatchExecution.Sequential(count, r => Create(r, searchSpace), random);
 }
 
-public abstract class SingleSolutionStatelessCreator<TGenotype>
+public abstract record class SingleSolutionStatelessCreator<TGenotype>
   : StatelessCreator<TGenotype>
 {
   public abstract TGenotype Create(IRandomNumberGenerator random);

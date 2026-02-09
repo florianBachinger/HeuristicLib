@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Algorithms.MultiStreamAlgorithms;
 
-public class RepeatAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>
+public record class RepeatAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>
   : MultiStreamAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, int>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>

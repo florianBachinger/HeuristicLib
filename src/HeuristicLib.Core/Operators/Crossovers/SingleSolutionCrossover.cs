@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Crossovers;
 
-public abstract class SingleSolutionCrossover<TGenotype, TSearchSpace, TProblem> 
+public abstract record class SingleSolutionCrossover<TGenotype, TSearchSpace, TProblem> 
   : Crossover<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -25,7 +25,7 @@ public abstract class SingleSolutionCrossoverInstance<TGenotype, TSearchSpace, T
 }
 
 
-public abstract class SingleSolutionCrossover<TGenotype, TSearchSpace>
+public abstract record class SingleSolutionCrossover<TGenotype, TSearchSpace>
   : Crossover<TGenotype, TSearchSpace>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -42,7 +42,7 @@ public abstract class SingleSolutionCrossoverInstance<TGenotype, TSearchSpace>
 }
 
 
-public abstract class SingleSolutionCrossover<TGenotype>
+public abstract record class SingleSolutionCrossover<TGenotype>
   : Crossover<TGenotype>
 {
 }
@@ -59,7 +59,7 @@ public abstract class SingleSolutionCrossoverInstance<TGenotype>
 
 // ToDo: Since the stateless versions will be the most commonly used ones, think about naming them "Crossover" and the other ones the "StatefulCrossover".
 
-public abstract class SingleSolutionStatelessCrossover<TGenotype, TSearchSpace, TProblem> 
+public abstract record class SingleSolutionStatelessCrossover<TGenotype, TSearchSpace, TProblem> 
   : StatelessCrossover<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -70,7 +70,7 @@ public abstract class SingleSolutionStatelessCrossover<TGenotype, TSearchSpace, 
     BatchExecution.Sequential(parents, (p, r) => Cross(p, r, searchSpace, problem), random);
 }
 
-public abstract class SingleSolutionStatelessCrossover<TGenotype, TSearchSpace> 
+public abstract record class SingleSolutionStatelessCrossover<TGenotype, TSearchSpace> 
   : StatelessCrossover<TGenotype, TSearchSpace>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -80,7 +80,7 @@ public abstract class SingleSolutionStatelessCrossover<TGenotype, TSearchSpace>
     BatchExecution.Sequential(parents, (p, r) => Cross(p, r, searchSpace), random);
 }
 
-public abstract class SingleSolutionStatelessCrossover<TGenotype>
+public abstract record class SingleSolutionStatelessCrossover<TGenotype>
   : StatelessCrossover<TGenotype>
 {
   public abstract TGenotype Cross(IParents<TGenotype> parents, IRandomNumberGenerator random);

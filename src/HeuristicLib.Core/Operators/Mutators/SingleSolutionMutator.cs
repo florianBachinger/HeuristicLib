@@ -5,7 +5,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Mutators;
 
-public abstract class SingleSolutionMutator<TGenotype, TSearchSpace, TProblem> 
+public abstract record class SingleSolutionMutator<TGenotype, TSearchSpace, TProblem> 
   : Mutator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -24,7 +24,7 @@ public abstract class SingleSolutionMutatorInstance<TGenotype, TSearchSpace, TPr
 }
 
 
-public abstract class SingleSolutionMutator<TGenotype, TSearchSpace>
+public abstract record class SingleSolutionMutator<TGenotype, TSearchSpace>
   : Mutator<TGenotype, TSearchSpace>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -41,7 +41,7 @@ public abstract class SingleSolutionMutatorInstance<TGenotype, TSearchSpace>
 }
 
 
-public abstract class SingleSolutionMutator<TGenotype>
+public abstract record class SingleSolutionMutator<TGenotype>
   : Mutator<TGenotype>
 {
 }
@@ -56,7 +56,7 @@ public abstract class SingleSolutionMutatorInstance<TGenotype>
 }
 
 
-public abstract class SingleSolutionStatelessMutator<TGenotype, TSearchSpace, TProblem> 
+public abstract record class SingleSolutionStatelessMutator<TGenotype, TSearchSpace, TProblem> 
   : StatelessMutator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -67,7 +67,7 @@ public abstract class SingleSolutionStatelessMutator<TGenotype, TSearchSpace, TP
     BatchExecution.Sequential(parent, (p, r) => Mutate(p, r, searchSpace, problem), random);
 }
 
-public abstract class SingleSolutionStatelessMutator<TGenotype, TSearchSpace> 
+public abstract record class SingleSolutionStatelessMutator<TGenotype, TSearchSpace> 
   : StatelessMutator<TGenotype, TSearchSpace>
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
@@ -77,7 +77,7 @@ public abstract class SingleSolutionStatelessMutator<TGenotype, TSearchSpace>
     BatchExecution.Sequential(parent, (p, r) => Mutate(p, r, searchSpace), random);
 }
 
-public abstract class SingleSolutionStatelessMutator<TGenotype>
+public abstract record class SingleSolutionStatelessMutator<TGenotype>
   : StatelessMutator<TGenotype>
 {
   public abstract TGenotype Mutate(TGenotype parent, IRandomNumberGenerator random);

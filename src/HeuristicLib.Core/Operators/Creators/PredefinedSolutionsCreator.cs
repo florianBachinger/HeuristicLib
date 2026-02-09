@@ -1,28 +1,33 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using Generator.Equals;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Creators;
 
-public class PredefinedSolutionsCreator<TGenotype, TSearchSpace, TProblem>
+[Equatable]
+public partial record class PredefinedSolutionsCreator<TGenotype, TSearchSpace, TProblem>
   : Creator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
-  private readonly IReadOnlyList<TGenotype> predefinedSolutions;
-  private readonly ICreator<TGenotype, TSearchSpace, TProblem> creatorForRemainingSolutions;
-  
+
+  [OrderedEquality]
+  public IReadOnlyList<TGenotype> PredefinedSolutions { get; init; }
+
+  public ICreator<TGenotype, TSearchSpace, TProblem> CreatorForRemainingSolutions { get; init; }
+
   public PredefinedSolutionsCreator(IReadOnlyList<TGenotype> predefinedSolutions, ICreator<TGenotype, TSearchSpace, TProblem> creatorForRemainingSolutions)
   {
-    this.predefinedSolutions = predefinedSolutions;
-    this.creatorForRemainingSolutions = creatorForRemainingSolutions;
+    this.PredefinedSolutions = predefinedSolutions;
+    this.CreatorForRemainingSolutions = creatorForRemainingSolutions;
   }
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var creatorForRemainingSolutionsInstance = instanceRegistry.GetOrCreate(creatorForRemainingSolutions);
-    return new Instance(this.predefinedSolutions, creatorForRemainingSolutionsInstance);
+    var creatorForRemainingSolutionsInstance = instanceRegistry.GetOrCreate(CreatorForRemainingSolutions);
+    return new Instance(this.PredefinedSolutions, creatorForRemainingSolutionsInstance);
   }
   
   public class Instance 

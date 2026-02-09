@@ -1,4 +1,5 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using Generator.Equals;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -7,13 +8,15 @@ using HEAL.HeuristicLib.States;
 namespace HEAL.HeuristicLib.Algorithms.MultiStreamAlgorithms;
 
 // ToDo: Think if we need a better name for this: "PortfolioAlgorithm" or something like this, since this algorithm is not an algorithm that is actually doing something on a grid.
-public class GridAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>
+[Equatable]
+public partial record class GridAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>
   : MultiStreamAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
   where TAlgorithm : class, IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
 {
+  [OrderedEquality]
   public required Grid<TAlgorithm> ParameterGrid { get; init; }
 
   public override GridAlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)

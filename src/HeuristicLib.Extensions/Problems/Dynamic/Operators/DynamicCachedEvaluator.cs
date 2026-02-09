@@ -7,7 +7,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Problems.Dynamic.Operators;
 
-public class DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
+public record class DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   : CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : DynamicProblem<TGenotype, TSearchSpace>

@@ -1,4 +1,5 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using Generator.Equals;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -7,13 +8,20 @@ using HEAL.HeuristicLib.SearchSpaces;
 namespace HEAL.HeuristicLib.Operators.Crossovers;
 
 // ToDo: Think of a better name, maybe "ChooseOneCrossover".
-public class MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crossover<TGenotype, TSearchSpace, TProblem>
+[Equatable]
+public partial record class MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crossover<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
+  [OrderedEquality]
   public IReadOnlyList<ICrossover<TGenotype, TSearchSpace, TProblem>> Crossovers { get; }
+  
+  [OrderedEquality]
   public IReadOnlyList<double> Weights { get; }
+  
+  [IgnoreEquality] 
   private readonly double sumWeights;
+  [IgnoreEquality]
   private readonly double[] cumulativeSumWeights;
 
   public MultiCrossover(IReadOnlyList<ICrossover<TGenotype, TSearchSpace, TProblem>> crossovers, IReadOnlyList<double>? weights = null)

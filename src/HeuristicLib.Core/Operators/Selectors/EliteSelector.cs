@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Selectors;
 
-public class EliteSelector<TGenotype, TSearchSpace, TProblem> 
+public record class EliteSelector<TGenotype, TSearchSpace, TProblem> 
   : Selector<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>

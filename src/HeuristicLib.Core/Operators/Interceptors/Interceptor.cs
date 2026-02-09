@@ -5,7 +5,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Operators.Interceptors;
 
-public abstract class Interceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem> 
+public abstract record class Interceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem> 
   : IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>
   where TAlgorithmState : class, IAlgorithmState
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -24,7 +24,7 @@ public abstract class InterceptorInstance<TGenotype, TAlgorithmState, TSearchSpa
 }
 
 
-public abstract class Interceptor<TGenotype, TAlgorithmState, TSearchSpace> 
+public abstract record class Interceptor<TGenotype, TAlgorithmState, TSearchSpace> 
   : IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TAlgorithmState : class, IAlgorithmState
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -44,7 +44,7 @@ public abstract class InterceptorInstance<TGenotype, TAlgorithmState, TSearchSpa
 }
 
 
-public abstract class Interceptor<TGenotype, TAlgorithmState> 
+public abstract record class Interceptor<TGenotype, TAlgorithmState> 
   : IInterceptor<TGenotype, TAlgorithmState, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
   where TAlgorithmState : class, IAlgorithmState
 {
@@ -62,7 +62,7 @@ public abstract class InterceptorInstance<TGenotype, TAlgorithmState>
 }
 
 
-public abstract class StatelessInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem> 
+public abstract record class StatelessInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem> 
   : IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>,
     IInterceptorInstance<TGenotype, TAlgorithmState, TSearchSpace, TProblem>
   where TAlgorithmState : class, IAlgorithmState
@@ -74,7 +74,7 @@ public abstract class StatelessInterceptor<TGenotype, TAlgorithmState, TSearchSp
   public abstract TAlgorithmState Transform(TAlgorithmState currentState, TAlgorithmState? previousState, TSearchSpace searchSpace, TProblem problem);
 }
 
-public abstract class StatelessInterceptor<TGenotype, TAlgorithmState, TSearchSpace> 
+public abstract record class StatelessInterceptor<TGenotype, TAlgorithmState, TSearchSpace> 
   : IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, IProblem<TGenotype, TSearchSpace>>,
     IInterceptorInstance<TGenotype, TAlgorithmState, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TAlgorithmState : class, IAlgorithmState
@@ -88,7 +88,7 @@ public abstract class StatelessInterceptor<TGenotype, TAlgorithmState, TSearchSp
     Transform(currentState, previousState, searchSpace);
 }
 
-public abstract class StatelessInterceptor<TGenotype, TAlgorithmState> 
+public abstract record class StatelessInterceptor<TGenotype, TAlgorithmState> 
   : IInterceptor<TGenotype, TAlgorithmState, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>,
     IInterceptorInstance<TGenotype, TAlgorithmState, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
   where TAlgorithmState : class, IAlgorithmState

@@ -2,7 +2,7 @@
 
 namespace HEAL.HeuristicLib.Operators.Terminators;
 
-public class AfterIterationsTerminator<TGenotype>
+public record class AfterIterationsTerminator<TGenotype>
   : Terminator<TGenotype>
 {
   private readonly int maximumIterations;

@@ -6,7 +6,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Operators.Terminators;
 
-public class ObservableTerminator<TG, TR, TS, TP>
+public record class ObservableTerminator<TG, TR, TS, TP>
   : Terminator<TG, TR, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
