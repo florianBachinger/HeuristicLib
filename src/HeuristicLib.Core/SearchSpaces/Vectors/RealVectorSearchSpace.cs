@@ -3,7 +3,7 @@ using HEAL.HeuristicLib.Optimization;
 
 namespace HEAL.HeuristicLib.SearchSpaces.Vectors;
 
-public record RealVectorSearchSpace : SearchSpace<RealVector>, ISubSearchSpaceComparable<RealVectorSearchSpace>
+public record RealVectorSearchSpace : SearchSpace<RealVector>
 {
   public int Length { get; }
   public RealVector Minimum { get; }

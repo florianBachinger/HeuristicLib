@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics.Contracts;
-using HEAL.HeuristicLib.Optimization;
 
-namespace HEAL.HeuristicLib.Collections;
+namespace HEAL.HeuristicLib.Optimization;
 
+// ToDo: look if there is another library that can do all this instead
+[Obsolete]
 public static class EnumerableStatisticExtensions
 {
   /// <param name="values"></param>

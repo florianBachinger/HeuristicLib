@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
@@ -62,8 +63,9 @@ public record class SubtreeCrossover : SymbolicExpressionTreeCrossover
         crossoverPoint0.Parent.AddSubtree(selectedBranch);
       }
     }
-
-    Extensions.CheckDebug(searchSpace.Contains(parent0), "Generated Invalid Child");
+    
+    Debug.Assert(searchSpace.Contains(parent0), "Generated Invalid Child");
+    
     return parent0;
   }
 

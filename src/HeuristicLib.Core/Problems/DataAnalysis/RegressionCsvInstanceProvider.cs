@@ -1,4 +1,4 @@
-﻿using HEAL.HeuristicLib.Collections;
+﻿using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems.DataAnalysis.Regression;
 
 namespace HEAL.HeuristicLib.Problems.DataAnalysis;

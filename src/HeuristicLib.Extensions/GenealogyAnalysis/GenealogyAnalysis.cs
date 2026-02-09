@@ -1,5 +1,4 @@
-﻿using HEAL.HeuristicLib.Collections;
-using HEAL.HeuristicLib.Observers;
+﻿using HEAL.HeuristicLib.Observers;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -84,7 +83,7 @@ public class RankAnalysis<T>(IEqualityComparer<T>? equality = null) : GenealogyA
     var line = graph.Nodes[^2].Values
                     .Where(x => x.Layer == 0)
                     .OrderBy(x => x.Rank)
-                    .Select(node => node.GetAllDescendants().Where(x => x.Rank >= 0).AverageOrNaN(x => x.Rank))
+                    .Select(node => node.GetAllDescendants().Where(x => x.Rank >= 0).Select(x => (double)x.Rank).DefaultIfEmpty(double.NaN).Average())
                     .ToList();
     if (line.Count > 0) {
       ranks.Add(line);

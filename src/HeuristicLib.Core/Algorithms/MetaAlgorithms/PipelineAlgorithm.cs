@@ -1,6 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using Generator.Equals;
-using HEAL.HeuristicLib.Collections;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Problems;

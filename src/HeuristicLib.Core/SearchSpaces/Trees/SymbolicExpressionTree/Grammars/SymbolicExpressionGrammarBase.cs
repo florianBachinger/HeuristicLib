@@ -331,7 +331,7 @@ public abstract class SymbolicExpressionGrammarBase
     if (childSymbols.Contains(child)) {
       return false;
     }
-    childSymbols = pconfig.AllowedChildSymbolsPerIndex.GetOrInitialize(argumentIndex, []);
+    childSymbols = pconfig.AllowedChildSymbolsPerIndex.GetOrAdd(argumentIndex, []);
 
     if (childSymbols.Contains(child)) {
       return false;

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using Generator.Equals;
-using HEAL.HeuristicLib.Collections;
 
 namespace HEAL.HeuristicLib.Optimization;
 

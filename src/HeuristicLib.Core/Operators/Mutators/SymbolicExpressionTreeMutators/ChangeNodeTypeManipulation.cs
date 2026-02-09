@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
@@ -78,7 +79,7 @@ public record class ChangeNodeTypeManipulation : SymbolicExpressionTreeManipulat
   public override SymbolicExpressionTree Mutate(SymbolicExpressionTree parent, IRandomNumberGenerator random, SymbolicExpressionTreeSearchSpace searchSpace)
   {
     var t = ChangeNodeType(parent, random, searchSpace);
-    Extensions.CheckDebug(searchSpace.Contains(t), "Upps destroyed tree");
+    Debug.Assert(searchSpace.Contains(t), "Upps destroyed tree");
     return t;
   }
 }

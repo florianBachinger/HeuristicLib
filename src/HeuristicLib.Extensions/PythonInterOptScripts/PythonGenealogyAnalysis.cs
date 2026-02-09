@@ -1,6 +1,7 @@
 ﻿using HEAL.HeuristicLib.Algorithms;
 using HEAL.HeuristicLib.Algorithms.Evolutionary;
 using HEAL.HeuristicLib.Algorithms.LocalSearch;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Genotypes.Vectors;
 using HEAL.HeuristicLib.Operators.Creators.PermutationCreators;
@@ -36,10 +37,8 @@ public class PythonGenealogyAnalysis
     RunConfigurableRepeated<T>(int repetitions, Func<int, ExperimentResult<T>> experiment, int seed)
     where T : class
   {
-    return Enumerable.Range(0, repetitions).ParallelSelect(
-      RandomNumberGenerator.Create(seed),
-      action: (_, _, r) => experiment(r.NextInt())
-    ).ToArray();
+    return BatchExecution.Parallel<ExperimentResult<T>>(repetitions, r => experiment( r.NextInt()), RandomNumberGenerator.Create(seed), maxDegreeOfParallelism: -1)
+    .ToArray();
   }
 
   public static ExperimentResult<SymbolicExpressionTree>[] RunSymbolicRegressionConfigurable(string file, SymRegExperimentParameters parameters, int repetitions) =>

@@ -1,5 +1,4 @@
-﻿using HEAL.HeuristicLib.Collections;
-using HEAL.HeuristicLib.Execution;
+﻿using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Mutators;
 using HEAL.HeuristicLib.Operators.Replacers;

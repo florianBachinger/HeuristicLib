@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
@@ -85,7 +86,7 @@ public sealed record class RemoveBranchManipulation : SymbolicExpressionTreeMani
   public override SymbolicExpressionTree Mutate(SymbolicExpressionTree parent, IRandomNumberGenerator random, SymbolicExpressionTreeSearchSpace searchSpace)
   {
     var t = RemoveRandomBranch(random, parent, searchSpace);
-    Extensions.CheckDebug(searchSpace.Contains(t), "Upps destroyed tree");
+    Debug.Assert(searchSpace.Contains(t), "Upps destroyed tree");
     return t;
   }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
 using HEAL.HeuristicLib.Optimization;
@@ -61,7 +62,7 @@ public sealed record class ReplaceBranchManipulation : SymbolicExpressionTreeMan
   public override SymbolicExpressionTree Mutate(SymbolicExpressionTree parent, IRandomNumberGenerator random, SymbolicExpressionTreeSearchSpace searchSpace)
   {
     var t = ReplaceRandomBranch(random, parent, searchSpace);
-    Extensions.CheckDebug(searchSpace.Contains(t), "Upps destroyed tree");
+    Debug.Assert(searchSpace.Contains(t), "Upps destroyed tree");
     return t;
   }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
@@ -29,7 +30,7 @@ public sealed record class FullTreeShaker : SymbolicExpressionTreeManipulator
     SymbolicExpressionTree parent, IRandomNumberGenerator random, SymbolicExpressionTreeSearchSpace searchSpace)
   {
     var t = Apply(random, parent, ShakingFactor);
-    Extensions.CheckDebug(searchSpace.Contains(t), "Upps destroyed tree");
+    Debug.Assert(searchSpace.Contains(t), "Upps destroyed tree");
     return t;
   }
 }

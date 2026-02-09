@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Problems.DataAnalysis.Regression.Evaluators;
 using HEAL.HeuristicLib.Problems.DataAnalysis.Symbolic;
@@ -143,7 +144,7 @@ public static class SymbolicRegressionParameterOptimization
     UpdateParameters(tree, cOpt, updateVariableWeights);
     var quality2 = problemData.Evaluate(model, rows, Evaluator)[0];
 
-    Optimization.Extensions.CheckDebug(Math.Abs(quality2 - quality) < 1e-3, "Math.Net!= alglib");
+    Debug.Assert(Math.Abs(quality2 - quality) < 1e-3, "Math.Net!= alglib");
 
     var improvement = originalQuality - quality <= 0.001 && !double.IsNaN(quality);
 

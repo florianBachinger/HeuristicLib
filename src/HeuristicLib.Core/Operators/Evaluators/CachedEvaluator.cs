@@ -45,7 +45,6 @@ public record class CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
       this.KeySelector = keySelector;
       var cacheOptions = new MemoryCacheOptions { SizeLimit = sizeLimit };
       Cache = new MemoryCache(cacheOptions);
-      
     }
     
     public override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
