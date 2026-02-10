@@ -11,8 +11,11 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.4" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="SonarAnalyzer.CSharp" Version="10.19.0.132793">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,6 +29,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\HeuristicLib.Extensions\HeuristicLib.Extensions.csproj" />
+      <ProjectReference Include="..\HeuristicLib.Core.Tests\HeuristicLib.Core.Tests.csproj" />
     </ItemGroup>
 
 </Project>

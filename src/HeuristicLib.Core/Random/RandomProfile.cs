@@ -17,10 +17,4 @@ public sealed class RandomProfile
   public static RandomProfile Default { get; } = new(new SplitMix64KeyCombiner(), seed => new Pcg64Engine(seed));
 
   public static RandomProfile Philox { get; } = new(new Fmix64KeyCombiner(), seed => new PhiloxEngine(seed));
-
-  [Obsolete("Slow and not cryptographically secure. Use only for testing purposes.")]
-  public static RandomProfile SystemRandom { get; } = new(new SimpleKeyCombiner(), seed => new SystemRandomEngine(seed));
-  
-  [Obsolete("This is only useful for testing, and probably should be defined in test code.")]
-  public static RandomProfile NoRandom { get; } = new(new NoKeyCombiner(), seed => new NoRandomEngine());
 }
