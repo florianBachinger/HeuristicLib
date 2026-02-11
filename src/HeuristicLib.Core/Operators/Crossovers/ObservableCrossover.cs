@@ -27,7 +27,7 @@ public partial record ObservableCrossover<TG, TS, TP>
 
   public override ICrossoverInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var crossoverInstance = instanceRegistry.GetOrCreate(Crossover);
+    var crossoverInstance = instanceRegistry.Resolve(Crossover);
     return new ObservableCrossoverInstance(crossoverInstance, Observers);
   }
 

@@ -24,7 +24,7 @@ public partial record PipelineMutator<TG, TS, TP> : Mutator<TG, TS, TP>
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var mutatorInstances = Mutators.Select(instanceRegistry.GetOrCreate).ToArray();
+    var mutatorInstances = Mutators.Select(instanceRegistry.Resolve).ToArray();
     return new Instance(mutatorInstances);
   }
 

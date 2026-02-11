@@ -7,13 +7,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace HEAL.HeuristicLib.Operators.Evaluators;
 
-public record CachedEvaluator<TGenotype, TSearchSpace, TProblem> : CachedEvaluator<TGenotype, TSearchSpace, TProblem, TGenotype> where TGenotype : notnull where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace>
-{
-  public CachedEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, long? sizeLimit = null) : base(evaluator, x => x, sizeLimit) { }
-}
-
-// ToDo: Keyless version of this if we simply use the Genotype as key.
-public record CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
+public record CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   : Evaluator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -24,7 +18,7 @@ public record CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   protected readonly Func<TGenotype, TKey> KeySelector;
   protected readonly long? SizeLimit;
 
-  public CachedEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
+  public CachingEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
   {
     this.Evaluator = evaluator;
     this.KeySelector = keySelector ?? (g => (TKey)(object)g);
@@ -33,7 +27,7 @@ public record CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
     return new Instance(evaluatorInstance, KeySelector, SizeLimit);
   }
 
@@ -92,6 +86,15 @@ public record CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   }
 }
 
+public record CachingEvaluator<TGenotype, TSearchSpace, TProblem> 
+  : CachingEvaluator<TGenotype, TSearchSpace, TProblem, TGenotype> 
+  where TGenotype : notnull 
+  where TSearchSpace : class, ISearchSpace<TGenotype> 
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  public CachingEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, long? sizeLimit = null) : base(evaluator, x => x, sizeLimit) { }
+}
+
 public static class CachedEvaluatorExtensions
 {
   extension<TGenotype, TSearchSpace, TProblem>(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator)
@@ -99,15 +102,15 @@ public static class CachedEvaluatorExtensions
     where TSearchSpace : class, ISearchSpace<TGenotype>
     where TProblem : class, IProblem<TGenotype, TSearchSpace>
   {
-    public CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey> WithCache<TKey>(Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
+    public CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey> WithCache<TKey>(Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
       where TKey : notnull
     {
-      return new CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>(evaluator, keySelector, sizeLimit);
+      return new CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>(evaluator, keySelector, sizeLimit);
     }
 
-    public CachedEvaluator<TGenotype, TSearchSpace, TProblem, TGenotype> WithCache(long? sizeLimit = null)
+    public CachingEvaluator<TGenotype, TSearchSpace, TProblem, TGenotype> WithCache(long? sizeLimit = null)
     {
-      return new CachedEvaluator<TGenotype, TSearchSpace, TProblem, TGenotype>(evaluator, sizeLimit: sizeLimit);
+      return new CachingEvaluator<TGenotype, TSearchSpace, TProblem, TGenotype>(evaluator, sizeLimit: sizeLimit);
     }
   }
 }

@@ -55,7 +55,7 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var crossoverInstances = Crossovers.Select(instanceRegistry.GetOrCreate).ToArray();
+    var crossoverInstances = Crossovers.Select(instanceRegistry.Resolve).ToArray();
     return new Instance(crossoverInstances, cumulativeSumWeights, sumWeights);
   }
 

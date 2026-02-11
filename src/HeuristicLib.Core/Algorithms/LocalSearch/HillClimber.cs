@@ -22,10 +22,10 @@ public record HillClimber<TGenotype, TSearchSpace, TProblem>
 
   public override HillClimberInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var interceptorInstance = Interceptor is not null ? instanceRegistry.GetOrCreate(Interceptor) : null;
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
-    var creatorInstance = instanceRegistry.GetOrCreate(Creator);
-    var mutatorInstance = instanceRegistry.GetOrCreate(Mutator);
+    var interceptorInstance = Interceptor is not null ? instanceRegistry.Resolve(Interceptor) : null;
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
+    var creatorInstance = instanceRegistry.Resolve(Creator);
+    var mutatorInstance = instanceRegistry.Resolve(Mutator);
 
     return new HillClimberInstance<TGenotype, TSearchSpace, TProblem>(
       interceptorInstance,

@@ -26,7 +26,7 @@ public partial record ObservableReplacer<TG, TS, TP>
 
   public override IReplacerInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var replacerInstance = instanceRegistry.GetOrCreate(Replacer);
+    var replacerInstance = instanceRegistry.Resolve(Replacer);
     return new ObservableReplacerInstance(replacerInstance, Observers);
   }
 

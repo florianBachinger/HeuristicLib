@@ -26,7 +26,7 @@ public partial record ObservableMutator<TG, TS, TP>
 
   public override IMutatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var mutatorInstance = instanceRegistry.GetOrCreate(Mutator);
+    var mutatorInstance = instanceRegistry.Resolve(Mutator);
     return new ObservableMutatorInstance(mutatorInstance, Observers);
   }
 

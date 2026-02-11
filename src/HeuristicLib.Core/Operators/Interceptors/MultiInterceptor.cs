@@ -23,7 +23,7 @@ public partial record MultiInterceptor<TGenotype, TAlgorithmState, TSearchSpace,
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var interceptorInstances = Interceptors.Select(i => i.CreateExecutionInstance(instanceRegistry)).ToList();
+    var interceptorInstances = Interceptors.Select(instanceRegistry.Resolve).ToList();
     return new Instance(interceptorInstances);
   }
 

@@ -37,19 +37,19 @@ public record EvolutionStrategy<TGenotype, TSearchSpace, TProblem>
 
   public override EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var interceptorInstance = Interceptor is not null ? instanceRegistry.GetOrCreate(Interceptor) : null;
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
-    var creatorInstance = instanceRegistry.GetOrCreate(Creator);
-    var mutatorInstance = instanceRegistry.GetOrCreate(Mutator);
-    var crossoverInstance = Crossover is not null ? instanceRegistry.GetOrCreate(Crossover) : null;
-    var selectorInstance = instanceRegistry.GetOrCreate(Selector);
+    var interceptorInstance = Interceptor is not null ? instanceRegistry.Resolve(Interceptor) : null;
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
+    var creatorInstance = instanceRegistry.Resolve(Creator);
+    var mutatorInstance = instanceRegistry.Resolve(Mutator);
+    var crossoverInstance = Crossover is not null ? instanceRegistry.Resolve(Crossover) : null;
+    var selectorInstance = instanceRegistry.Resolve(Selector);
 
     IReplacer<TGenotype, TSearchSpace, TProblem> replacer = Strategy switch {
       EvolutionStrategyType.Comma => new ElitismReplacer<TGenotype>(0),
       EvolutionStrategyType.Plus => new PlusSelectionReplacer<TGenotype>(),
       _ => throw new InvalidOperationException($"Unknown strategy {Strategy}")
     };
-    var replacerInstance = instanceRegistry.GetOrCreate(replacer);
+    var replacerInstance = instanceRegistry.Resolve(replacer);
 
     return new EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem>(
       interceptorInstance,

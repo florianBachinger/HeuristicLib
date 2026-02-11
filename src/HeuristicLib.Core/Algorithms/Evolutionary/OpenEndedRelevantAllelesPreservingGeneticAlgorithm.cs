@@ -28,12 +28,12 @@ public record OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TGenotype, TSea
 
   public override OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var interceptorInstance = Interceptor is not null ? instanceRegistry.GetOrCreate(Interceptor) : null;
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
-    var creatorInstance = instanceRegistry.GetOrCreate(Creator);
-    var crossoverInstance = instanceRegistry.GetOrCreate(Crossover);
-    var mutatorInstance = instanceRegistry.GetOrCreate(Mutator);
-    var selectorInstance = instanceRegistry.GetOrCreate(Selector);
+    var interceptorInstance = Interceptor is not null ? instanceRegistry.Resolve(Interceptor) : null;
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
+    var creatorInstance = instanceRegistry.Resolve(Creator);
+    var crossoverInstance = instanceRegistry.Resolve(Crossover);
+    var mutatorInstance = instanceRegistry.Resolve(Mutator);
+    var selectorInstance = instanceRegistry.Resolve(Selector);
 
     return new OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>(
       interceptorInstance,

@@ -26,7 +26,7 @@ public partial record ObservableCreator<TG, TS, TP>
 
   public override ICreatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var creatorInstance = instanceRegistry.GetOrCreate(Creator);
+    var creatorInstance = instanceRegistry.Resolve(Creator);
     return new ObservableCreatorInstance(creatorInstance, Observers);
   }
 

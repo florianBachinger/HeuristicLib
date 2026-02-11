@@ -37,13 +37,13 @@ public record GeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
       ? Mutator
       : Mutator.WithRate(MutationRate);
 
-    var interceptorInstance = Interceptor is not null ? instanceRegistry.GetOrCreate(Interceptor) : null;
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
-    var creatorInstance = instanceRegistry.GetOrCreate(Creator);
-    var crossoverInstance = instanceRegistry.GetOrCreate(Crossover);
-    var mutatorInstance = instanceRegistry.GetOrCreate(mutator);
-    var selectorInstance = instanceRegistry.GetOrCreate(Selector);
-    var replacerInstance = instanceRegistry.GetOrCreate(Replacer);
+    var interceptorInstance = Interceptor is not null ? instanceRegistry.Resolve(Interceptor) : null;
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
+    var creatorInstance = instanceRegistry.Resolve(Creator);
+    var crossoverInstance = instanceRegistry.Resolve(Crossover);
+    var mutatorInstance = instanceRegistry.Resolve(mutator);
+    var selectorInstance = instanceRegistry.Resolve(Selector);
+    var replacerInstance = instanceRegistry.Resolve(Replacer);
 
     return new GeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>(
       PopulationSize,

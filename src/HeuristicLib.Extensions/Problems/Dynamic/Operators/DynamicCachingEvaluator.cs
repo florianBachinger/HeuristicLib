@@ -7,8 +7,8 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Problems.Dynamic.Operators;
 
-public record DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
-  : CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
+public record DynamicCachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
+  : CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : DynamicProblem<TGenotype, TSearchSpace>
   where TGenotype : class
@@ -16,7 +16,7 @@ public record DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
 {
   private readonly TProblem problem;
 
-  public DynamicCachedEvaluator(
+  public DynamicCachingEvaluator(
     IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator,
     TProblem problem,
     Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
@@ -29,11 +29,11 @@ public record DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
     return new Instance(problem, evaluatorInstance, KeySelector, SizeLimit, GraceCount);
   }
 
-  public new class Instance : CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>.Instance
+  public new class Instance : CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>.Instance
   {
     private readonly long graceCount;
     private long hitCount;
@@ -95,7 +95,7 @@ public record DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
 
 public static class DynamicCachedEvaluatorExtension
 {
-  public static DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
+  public static DynamicCachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
     WithCache<TGenotype, TSearchSpace, TProblem, TKey>(this IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator,
                                                        TProblem problem,
                                                        Func<TGenotype, TKey>? keySelector = null)
@@ -105,16 +105,16 @@ public static class DynamicCachedEvaluatorExtension
     where TKey : notnull
 
   {
-    return new DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>(evaluator, problem, keySelector);
+    return new DynamicCachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>(evaluator, problem, keySelector);
   }
 
-  public static DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
+  public static DynamicCachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
     GetCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>(this TProblem problem, Func<TGenotype, TKey>? keySelector = null)
     where TSearchSpace : class, ISearchSpace<TGenotype>
     where TProblem : DynamicProblem<TGenotype, TSearchSpace>
     where TGenotype : class
     where TKey : notnull
   {
-    return new DynamicCachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>(new DirectEvaluator<TGenotype>(), problem, keySelector);
+    return new DynamicCachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>(new DirectEvaluator<TGenotype>(), problem, keySelector);
   }
 }
