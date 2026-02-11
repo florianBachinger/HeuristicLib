@@ -28,11 +28,11 @@ public partial record ObservableReplacer<TG, TS, TP>
   {
     var replacerInstance = instanceRegistry.Resolve(Replacer);
     var replacerObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();
-    return new ObservableReplacerInstance(replacerInstance, replacerObserverInstances);
+    return new Instance(replacerInstance, replacerObserverInstances);
   }
 
-  private sealed class ObservableReplacerInstance(IReplacerInstance<TG, TS, TP> replacerInstance, IReadOnlyList<IReplacerObserverInstance<TG, TS, TP>> observers)
-    : ReplacerInstance<TG, TS, TP>
+  public new sealed class Instance(IReplacerInstance<TG, TS, TP> replacerInstance, IReadOnlyList<IReplacerObserverInstance<TG, TS, TP>> observers)
+    : Replacer<TG, TS, TP>.Instance
   {
     public override IReadOnlyList<ISolution<TG>> Replace(IReadOnlyList<ISolution<TG>> previousPopulation, IReadOnlyList<ISolution<TG>> offspringPopulation, Objective objective, IRandomNumberGenerator random, TS searchSpace, TP problem)
     {

@@ -29,11 +29,11 @@ public partial record ObservableSelector<TG, TS, TP>
   {
     var selectorInstance = instanceRegistry.Resolve(Selector);
     var selectorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();
-    return new ObservableSelectorInstance(selectorInstance, selectorObserverInstances);
+    return new Instance(selectorInstance, selectorObserverInstances);
   }
 
-  private sealed class ObservableSelectorInstance(ISelectorInstance<TG, TS, TP> selectorInstance, IReadOnlyList<ISelectorObserverInstance<TG, TS, TP>> observers)
-    : SelectorInstance<TG, TS, TP>
+  public new sealed class Instance(ISelectorInstance<TG, TS, TP> selectorInstance, IReadOnlyList<ISelectorObserverInstance<TG, TS, TP>> observers)
+    : Selector<TG, TS, TP>.Instance
   {
     public override IReadOnlyList<ISolution<TG>> Select(IReadOnlyList<ISolution<TG>> population, Objective objective, int count, IRandomNumberGenerator random, TS searchSpace, TP problem)
     {

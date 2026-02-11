@@ -24,15 +24,15 @@ public partial record ObservableCrossover<TG, TS, TP>
     Observers = observers;
   }
 
-  public override ICrossoverInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var crossoverInstance = instanceRegistry.Resolve(Crossover);
     var observerInstances = Observers.Select(instanceRegistry.Resolve).ToArray();
-    return new ObservableCrossoverInstance(crossoverInstance, observerInstances);
+    return new Instance(crossoverInstance, observerInstances);
   }
 
-  private sealed class ObservableCrossoverInstance(ICrossoverInstance<TG, TS, TP> crossoverInstance, IReadOnlyList<ICrossoverObserverInstance<TG, TS, TP>> observers)
-    : CrossoverInstance<TG, TS, TP>
+  public new sealed class Instance(ICrossoverInstance<TG, TS, TP> crossoverInstance, IReadOnlyList<ICrossoverObserverInstance<TG, TS, TP>> observers)
+    : Crossover<TG, TS, TP>.Instance
   {
     public override IReadOnlyList<TG> Cross(IReadOnlyList<IParents<TG>> parents, IRandomNumberGenerator random, TS searchSpace, TP problem)
     {

@@ -27,11 +27,11 @@ public partial record ObservableMutator<TG, TS, TP>
   {
     var mutatorInstance = instanceRegistry.Resolve(Mutator);
     var mutatorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();
-    return new ObservableMutatorInstance(mutatorInstance, mutatorObserverInstances);
+    return new Instance(mutatorInstance, mutatorObserverInstances);
   }
 
-  private sealed class ObservableMutatorInstance(IMutatorInstance<TG, TS, TP> mutatorInstance, IReadOnlyList<IMutatorObserverInstance<TG, TS, TP>> observers)
-    : MutatorInstance<TG, TS, TP>
+  public new sealed class Instance(IMutatorInstance<TG, TS, TP> mutatorInstance, IReadOnlyList<IMutatorObserverInstance<TG, TS, TP>> observers)
+    : Mutator<TG, TS, TP>.Instance
   {
     public override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parent, IRandomNumberGenerator random, TS searchSpace, TP problem)
     {

@@ -24,14 +24,14 @@ public partial record ObservableCreator<TG, TS, TP>
     Observers = observers;
   }
 
-  public override ICreatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var creatorInstance = instanceRegistry.Resolve(Creator);
-    return new ObservableCreatorInstance(creatorInstance, Observers.Select(instanceRegistry.Resolve).ToArray());
+    return new Instance(creatorInstance, Observers.Select(instanceRegistry.Resolve).ToArray());
   }
 
-  private sealed class ObservableCreatorInstance(ICreatorInstance<TG, TS, TP> creatorInstance, IReadOnlyList<ICreatorObserverInstance<TG, TS, TP>> observers)
-    : CreatorInstance<TG, TS, TP>
+  public new sealed class Instance(ICreatorInstance<TG, TS, TP> creatorInstance, IReadOnlyList<ICreatorObserverInstance<TG, TS, TP>> observers)
+    : Creator<TG, TS, TP>.Instance
   {
     public override IReadOnlyList<TG> Create(int count, IRandomNumberGenerator random, TS searchSpace, TP problem)
     {

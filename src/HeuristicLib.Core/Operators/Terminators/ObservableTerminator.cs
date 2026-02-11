@@ -29,11 +29,11 @@ public partial record ObservableTerminator<TG, TR, TS, TP>
   {
     var interceptorInstance = instanceRegistry.Resolve(Interceptor);
     var terminatorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();
-    return new ObservableTerminatorInstance(interceptorInstance, terminatorObserverInstances);
+    return new Instance(interceptorInstance, terminatorObserverInstances);
   }
 
-  private sealed class ObservableTerminatorInstance(ITerminatorInstance<TG, TR, TS, TP> terminatorInstance, IReadOnlyList<ITerminatorObserverInstance<TG, TS, TP, TR>> observers)
-    : TerminatorInstance<TG, TR, TS, TP>
+  public new sealed class Instance(ITerminatorInstance<TG, TR, TS, TP> terminatorInstance, IReadOnlyList<ITerminatorObserverInstance<TG, TS, TP, TR>> observers)
+    : Terminator<TG, TR, TS, TP>.Instance
   {
     public override bool ShouldTerminate(TR state, TS searchSpace, TP problem)
     {

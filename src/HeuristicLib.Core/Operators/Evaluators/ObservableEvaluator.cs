@@ -28,11 +28,11 @@ public partial record ObservableEvaluator<TG, TS, TP>
   {
     var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
     var evaluatorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();
-    return new ObservableEvaluatorInstance(evaluatorInstance, evaluatorObserverInstances);
+    return new Instance(evaluatorInstance, evaluatorObserverInstances);
   }
 
-  private sealed class ObservableEvaluatorInstance(IEvaluatorInstance<TG, TS, TP> evaluatorInstance, IReadOnlyList<IEvaluatorObserverInstance<TG, TS, TP>> observers)
-    : EvaluatorInstance<TG, TS, TP>
+  public new sealed class Instance(IEvaluatorInstance<TG, TS, TP> evaluatorInstance, IReadOnlyList<IEvaluatorObserverInstance<TG, TS, TP>> observers)
+    : Evaluator<TG, TS, TP>.Instance
   {
     public override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TG> genotypes, IRandomNumberGenerator random, TS searchSpace, TP problem)
     {

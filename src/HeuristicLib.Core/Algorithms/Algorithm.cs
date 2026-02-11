@@ -53,7 +53,7 @@ public static class AlgorithmExtensions
       TAlgorithmState? initialState = null,
       CancellationToken ct = default)
     {
-      var algorithmInstance = algorithm.CreateNewExecutionInstance();
+      var algorithmInstance = algorithm.CreateExecutionInstance();
       return algorithmInstance.RunStreamingAsync(problem, random, initialState, ct);
     }
 
