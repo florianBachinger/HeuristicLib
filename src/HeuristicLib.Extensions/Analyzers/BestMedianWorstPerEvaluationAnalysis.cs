@@ -1,6 +1,8 @@
 ﻿using HEAL.HeuristicLib.Algorithms;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Evaluators;
+using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -15,35 +17,50 @@ public class BestMedianWorstPerEvaluationAnalysis<TGenotype>
     IInterceptorObserver<TGenotype, PopulationState<TGenotype>>
 // IAlgorithmObserver<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>
 {
-  private int currentEvaluationsCount = 0;
-  private readonly List<(int, BestMedianWorstEntry<TGenotype>)> bestSolutions = [];
-  public IReadOnlyList<(int, BestMedianWorstEntry<TGenotype>)> BestSolutions => bestSolutions;
-
-  public void AfterEvaluation(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> values, IRandomNumberGenerator random, ISearchSpace<TGenotype> searchSpace, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
+  public sealed class Instance :
+    IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>,
+    IInterceptorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>
   {
-    currentEvaluationsCount++;
+    private int currentEvaluationsCount;
+    private readonly List<(int, BestMedianWorstEntry<TGenotype>)> bestSolutions = [];
+    public IReadOnlyList<(int, BestMedianWorstEntry<TGenotype>)> BestSolutions => bestSolutions;
+
+    public void AfterEvaluation(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> values, ISearchSpace<TGenotype> searchSpace, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
+    {
+      currentEvaluationsCount++;
+    }
+
+    public void AfterInterception(PopulationState<TGenotype> newState, PopulationState<TGenotype> currentState, PopulationState<TGenotype>? previousState, ISearchSpace<TGenotype> searchSpace, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
+    {
+      if (currentState.Population.Solutions.Length == 0)
+        throw new InvalidOperationException("Population is empty, cannot determine best/median/worst solution.");
+
+      var comp = problem.Objective.TotalOrderComparer is NoTotalOrderComparer ? new LexicographicComparer(problem.Objective.Directions) : problem.Objective.TotalOrderComparer;
+      var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();
+
+      bestSolutions.Add((currentEvaluationsCount, new BestMedianWorstEntry<TGenotype>(ordered[0], ordered[ordered.Length / 2], ordered[^1])));
+    }
+
+    // public void AfterIteration(PopulationState<TGenotype> currentState, PopulationState<TGenotype>? previousState, IRandomNumberGenerator random, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
+    // {
+    //   if (currentState.Population.Solutions.Count == 0) throw new InvalidOperationException("Population is empty, cannot determine best/median/worst solution.");
+    //   
+    //   var comp = problem.Objective.TotalOrderComparer is NoTotalOrderComparer ? new LexicographicComparer(problem.Objective.Directions) : problem.Objective.TotalOrderComparer;
+    //   var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();
+    // 
+    //   bestSolutions.Add((currentEvaluationsCount, new BestMedianWorstEntry<TGenotype>(ordered[0], ordered[ordered.Length / 2], ordered[^1])));
+    // }
   }
 
-  public void AfterInterception(PopulationState<TGenotype> newState, PopulationState<TGenotype> currentState, PopulationState<TGenotype>? previousState, ISearchSpace<TGenotype> searchSpace, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
-  {
-    if (currentState.Population.Solutions.Length == 0)
-      throw new InvalidOperationException("Population is empty, cannot determine best/median/worst solution.");
+  IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
+    IExecutable<IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>>
+    .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+    => new Instance();
 
-    var comp = problem.Objective.TotalOrderComparer is NoTotalOrderComparer ? new LexicographicComparer(problem.Objective.Directions) : problem.Objective.TotalOrderComparer;
-    var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();
-
-    bestSolutions.Add((currentEvaluationsCount, new BestMedianWorstEntry<TGenotype>(ordered[0], ordered[ordered.Length / 2], ordered[^1])));
-  }
-
-  // public void AfterIteration(PopulationState<TGenotype> currentState, PopulationState<TGenotype>? previousState, IRandomNumberGenerator random, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
-  // {
-  //   if (currentState.Population.Solutions.Count == 0) throw new InvalidOperationException("Population is empty, cannot determine best/median/worst solution.");
-  //   
-  //   var comp = problem.Objective.TotalOrderComparer is NoTotalOrderComparer ? new LexicographicComparer(problem.Objective.Directions) : problem.Objective.TotalOrderComparer;
-  //   var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();
-  // 
-  //   bestSolutions.Add((currentEvaluationsCount, new BestMedianWorstEntry<TGenotype>(ordered[0], ordered[ordered.Length / 2], ordered[^1])));
-  // }
+  IInterceptorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>
+    IExecutable<IInterceptorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>>
+    .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+    => new Instance();
 }
 
 public static class BestMedianWorstPerEvaluationAnalysis

@@ -15,7 +15,8 @@ public partial record ObservableCreator<TG, TS, TP>
 {
   public ICreator<TG, TS, TP> Creator { get; }
 
-  [OrderedEquality] public ImmutableArray<ICreatorObserver<TG, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<ICreatorObserver<TG, TS, TP>> Observers { get; }
 
   public ObservableCreator(ICreator<TG, TS, TP> creator, params ImmutableArray<ICreatorObserver<TG, TS, TP>> observers)
   {
