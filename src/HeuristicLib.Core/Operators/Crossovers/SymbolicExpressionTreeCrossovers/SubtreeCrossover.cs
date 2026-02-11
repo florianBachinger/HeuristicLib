@@ -77,30 +77,30 @@ public record SubtreeCrossover : SymbolicExpressionTreeCrossover
     var internalCrossoverPoints = new List<CutPoint>();
     var leafCrossoverPoints = new List<CutPoint>();
     parent0.Root.ForEachNodePostfix(n => {
-        if (n.SubtreeCount <= 0 || n == parent0.Root) {
-          return;
+      if (n.SubtreeCount <= 0 || n == parent0.Root) {
+        return;
+      }
+
+      // avoid linq to reduce memory pressure
+      for (var i = 0; i < n.SubtreeCount; i++) {
+        var child = n[i];
+        if (child.GetLength() > maxBranchLength || child.GetDepth() > maxBranchDepth) {
+          continue;
         }
 
-        // avoid linq to reduce memory pressure
-        for (var i = 0; i < n.SubtreeCount; i++) {
-          var child = n[i];
-          if (child.GetLength() > maxBranchLength || child.GetDepth() > maxBranchDepth) {
-            continue;
-          }
-
-          if (child.SubtreeCount > 0) {
-            internalCrossoverPoints.Add(new CutPoint(n, child, searchSpace));
-          } else {
-            leafCrossoverPoints.Add(new CutPoint(n, child, searchSpace));
-          }
-        }
-
-        // add one additional extension point if the number of subtrees for the symbol is not full
-        if (n.SubtreeCount < searchSpace.Grammar.GetMaximumSubtreeCount(n.Symbol)) {
-          // empty extension point
-          internalCrossoverPoints.Add(new CutPoint(n, n.SubtreeCount, searchSpace));
+        if (child.SubtreeCount > 0) {
+          internalCrossoverPoints.Add(new CutPoint(n, child, searchSpace));
+        } else {
+          leafCrossoverPoints.Add(new CutPoint(n, child, searchSpace));
         }
       }
+
+      // add one additional extension point if the number of subtrees for the symbol is not full
+      if (n.SubtreeCount < searchSpace.Grammar.GetMaximumSubtreeCount(n.Symbol)) {
+        // empty extension point
+        internalCrossoverPoints.Add(new CutPoint(n, n.SubtreeCount, searchSpace));
+      }
+    }
     );
 
     if (random.NextDouble() < internalNodeProbability) {

@@ -13,19 +13,16 @@ public abstract record AlgorithmBuildSpec<TG, TS, TP, TR> : ISpecWithEvaluator<T
   public IEvaluator<TG, TS, TP> Evaluator { get; set; }
   public ITerminator<TG, TR, TS, TP> Terminator { get; set; }
   public IInterceptor<TG, TR, TS, TP>? Interceptor { get; set; }
-  // public IIterationObserver<TG, TS, TP, TR>? Observer { get; set; }
 
   protected AlgorithmBuildSpec(
     IEvaluator<TG, TS, TP> evaluator,
     ITerminator<TG, TR, TS, TP> terminator,
     IInterceptor<TG, TR, TS, TP>? interceptor
-    // IIterationObserver<TG, TS, TP, TR>? observer
   )
   {
     Evaluator = evaluator;
     Terminator = terminator;
     Interceptor = interceptor;
-    // Observer = observer;
   }
 }
 

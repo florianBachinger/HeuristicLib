@@ -34,7 +34,7 @@ file sealed class DummyDynamicProblem : DynamicProblem<DummyGenotype, DummySearc
 
   public override ObjectiveVector Evaluate(DummyGenotype solution, IRandomNumberGenerator random, EvaluationTiming timing) => solution.Value;
 
-  protected override void Update() {}
+  protected override void Update() { }
 }
 
 file sealed record CountingEvaluator : StatelessEvaluator<DummyGenotype, DummySearchSpace, DummyDynamicProblem>
@@ -107,7 +107,7 @@ public class DynamicEvaluationCacheTests
   public void EpochBoundary_ClearsCache_ThenRequiresReevaluation()
   {
     var env = RandomNumberGenerator.Create(0);
-    ;
+
     var problem = new DummyDynamicProblem(env, 2);// boundary every 2 evals
     var inner = new CountingEvaluator();
 
@@ -122,7 +122,7 @@ public class DynamicEvaluationCacheTests
     Assert.True(problem.EpochClock.PendingEpochs > 0);
 
     // resolve -> fires OnEpochChange -> cached evaluator clears cache
-    problem.EpochClock.ResolvePendingEpochs(() => {});
+    problem.EpochClock.ResolvePendingEpochs(() => { });
 
     Assert.Equal(1, problem.EpochClock.CurrentEpoch);
     Assert.Equal(0, problem.EpochClock.PendingEpochs);
@@ -161,7 +161,7 @@ public class DynamicEvaluationCacheTests
     Assert.True(problem.EpochClock.PendingEpochs > 0); // epoch forced
 
     // resolve -> epoch changes -> cache cleared
-    problem.EpochClock.ResolvePendingEpochs(() => {});
+    problem.EpochClock.ResolvePendingEpochs(() => { });
 
     Assert.Equal(1, problem.EpochClock.CurrentEpoch);
 

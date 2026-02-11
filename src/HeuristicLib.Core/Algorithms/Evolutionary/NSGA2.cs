@@ -96,10 +96,13 @@ public static class NSGA2
     ICreator<TGenotype, TSearchSpace, TProblem> creator,
     ICrossover<TGenotype, TSearchSpace, TProblem> crossover,
     IMutator<TGenotype, TSearchSpace, TProblem> mutator, bool dominateOnEquals = true)
-    where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace> where TGenotype : class => new() {
-    Mutator = mutator,
-    Crossover = crossover,
-    Creator = creator,
-    Selector = new ParetoCrowdingTournamentSelector<TGenotype>(dominateOnEquals)
-  };
+    where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace> where TGenotype : class
+  {
+    return new() {
+      Mutator = mutator,
+      Crossover = crossover,
+      Creator = creator,
+      Selector = new ParetoCrowdingTournamentSelector<TGenotype>(dominateOnEquals)
+    };
+  }
 }

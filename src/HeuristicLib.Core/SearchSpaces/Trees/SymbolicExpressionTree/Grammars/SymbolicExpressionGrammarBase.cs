@@ -170,11 +170,11 @@ public abstract class SymbolicExpressionGrammarBase
 
     tempMaxExpressionLength[key] = int.MaxValue; // prevent infinite recursion
     var sumOfMaxTrees = 1 + (from argIndex in Enumerable.Range(0, GetMaximumSubtreeCount(symbol))
-      let maxForSlot = (long)(from s in GetAllowedChildSymbols(symbol, argIndex)
-        where s.InitialFrequency > 0.0
-        where GetMinimumExpressionDepth(s) < maxDepth
-        select GetMaximumExpressionLength(s, maxDepth - 1, tempMaxExpressionLength)).DefaultIfEmpty(0).Max()
-      select maxForSlot).DefaultIfEmpty(0).Sum();
+                             let maxForSlot = (long)(from s in GetAllowedChildSymbols(symbol, argIndex)
+                                                     where s.InitialFrequency > 0.0
+                                                     where GetMinimumExpressionDepth(s) < maxDepth
+                                                     select GetMaximumExpressionLength(s, maxDepth - 1, tempMaxExpressionLength)).DefaultIfEmpty(0).Max()
+                             select maxForSlot).DefaultIfEmpty(0).Sum();
 
     return tempMaxExpressionLength[key] = (int)Math.Min(sumOfMaxTrees, int.MaxValue);
   }
@@ -228,10 +228,10 @@ public abstract class SymbolicExpressionGrammarBase
 
     tempCachedMaxExpressionDepth[symbol] = int.MaxValue; // prevent infinite recursion
     var maxDepth = 1 + (from argIndex in Enumerable.Range(0, GetMaximumSubtreeCount(symbol))
-      let maxForSlot = (long)(from s in GetAllowedChildSymbols(symbol, argIndex)
-        where s.InitialFrequency > 0.0
-        select GetMaximumExpressionDepth(s, tempCachedMaxExpressionDepth)).DefaultIfEmpty(0).Max()
-      select maxForSlot).DefaultIfEmpty(0).Max();
+                        let maxForSlot = (long)(from s in GetAllowedChildSymbols(symbol, argIndex)
+                                                where s.InitialFrequency > 0.0
+                                                select GetMaximumExpressionDepth(s, tempCachedMaxExpressionDepth)).DefaultIfEmpty(0).Max()
+                        select maxForSlot).DefaultIfEmpty(0).Max();
 
     return tempCachedMaxExpressionDepth[symbol] = (int)Math.Min(maxDepth, int.MaxValue);
   }

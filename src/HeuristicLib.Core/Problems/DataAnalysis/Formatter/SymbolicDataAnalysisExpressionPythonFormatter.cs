@@ -59,13 +59,13 @@ public sealed class SymbolicDataAnalysisExpressionPythonFormatter : ISymbolicExp
 
           break;
         default: {
-          if (node is VariableTreeNode varNode) {
-            var formattedVariable = VariableName2Identifier(varNode.VariableName);
-            variables.Add(formattedVariable);
-          }
+            if (node is VariableTreeNode varNode) {
+              var formattedVariable = VariableName2Identifier(varNode.VariableName);
+              variables.Add(formattedVariable);
+            }
 
-          break;
-        }
+            break;
+          }
       }
     }
 

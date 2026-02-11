@@ -25,7 +25,7 @@ public sealed class SubFunctionTreeNode : SymbolicExpressionTreeNode
 
   #region Constructors
 
-  public SubFunctionTreeNode(SubFunctionSymbol symbol) : base(symbol) {}
+  public SubFunctionTreeNode(SubFunctionSymbol symbol) : base(symbol) { }
 
   private SubFunctionTreeNode(SubFunctionTreeNode original) : base(original)
   {

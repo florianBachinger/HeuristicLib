@@ -89,7 +89,7 @@ public class ActivatedTravelingSalesmanProblem : DynamicProblem<Permutation, Per
     CurrentState = next;
   }
 
-// Fisher–Yates shuffle
+  // Fisher–Yates shuffle
   private static void ShuffleInPlace<T>(IList<T> list, IRandomNumberGenerator rng)
   {
     for (var i = list.Count - 1; i > 0; i--) {

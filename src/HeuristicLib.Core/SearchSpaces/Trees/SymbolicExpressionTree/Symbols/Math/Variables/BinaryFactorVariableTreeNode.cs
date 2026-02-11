@@ -9,7 +9,7 @@ public sealed class BinaryFactorVariableTreeNode : VariableTreeNodeBase
 
   private BinaryFactorVariableTreeNode(BinaryFactorVariableTreeNode original) : base(original) => VariableValue = original.VariableValue;
 
-  public BinaryFactorVariableTreeNode(BinaryFactorVariable variableSymbol) : base(variableSymbol) {}
+  public BinaryFactorVariableTreeNode(BinaryFactorVariable variableSymbol) : base(variableSymbol) { }
   public new BinaryFactorVariable Symbol => (BinaryFactorVariable)base.Symbol;
 
   public string VariableValue { get; set; } = "";

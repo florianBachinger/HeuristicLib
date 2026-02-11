@@ -90,18 +90,18 @@ public sealed class SymbolicDataAnalysisExpressionExcelFormatter : ISymbolicExpr
       case StartSymbol:
         return FormatRecursively(node.GetSubtree(0));
       case Addition: {
-        stringBuilder.Append('(');
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          if (i > 0) {
-            stringBuilder.Append('+');
+          stringBuilder.Append('(');
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            if (i > 0) {
+              stringBuilder.Append('+');
+            }
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
           }
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+
+          stringBuilder.Append(')');
+
+          break;
         }
-
-        stringBuilder.Append(')');
-
-        break;
-      }
       case Absolute:
         stringBuilder.Append($"ABS({FormatRecursively(node.GetSubtree(0))})");
 
@@ -111,28 +111,28 @@ public sealed class SymbolicDataAnalysisExpressionExcelFormatter : ISymbolicExpr
 
         break;
       case Average: {
-        stringBuilder.Append("(1/(");
-        stringBuilder.Append(node.SubtreeCount);
-        stringBuilder.Append(")*(");
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          if (i > 0) {
-            stringBuilder.Append('+');
+          stringBuilder.Append("(1/(");
+          stringBuilder.Append(node.SubtreeCount);
+          stringBuilder.Append(")*(");
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            if (i > 0) {
+              stringBuilder.Append('+');
+            }
+            stringBuilder.Append('(');
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            stringBuilder.Append(')');
           }
-          stringBuilder.Append('(');
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
-          stringBuilder.Append(')');
+
+          stringBuilder.Append("))");
+
+          break;
         }
-
-        stringBuilder.Append("))");
-
-        break;
-      }
       case Number: {
-        var numTreeNode = (NumberTreeNode)node;
-        stringBuilder.Append(numTreeNode.Value.ToString(CultureInfo.InvariantCulture));
+          var numTreeNode = (NumberTreeNode)node;
+          stringBuilder.Append(numTreeNode.Value.ToString(CultureInfo.InvariantCulture));
 
-        break;
-      }
+          break;
+        }
       case Cosine:
         stringBuilder.Append("COS(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -144,30 +144,30 @@ public sealed class SymbolicDataAnalysisExpressionExcelFormatter : ISymbolicExpr
 
         break;
       case CubeRoot: {
-        var argExpr = FormatRecursively(node.GetSubtree(0));
-        stringBuilder.Append($"IF({argExpr} < 0, -POWER(-{argExpr}, 1/3), POWER({argExpr}, 1/3))");
+          var argExpr = FormatRecursively(node.GetSubtree(0));
+          stringBuilder.Append($"IF({argExpr} < 0, -POWER(-{argExpr}, 1/3), POWER({argExpr}, 1/3))");
 
-        break;
-      }
-      case Division: {
-        if (node.SubtreeCount == 1) {
-          stringBuilder.Append("1/(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-        } else {
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append("/(");
-          for (var i = 1; i < node.SubtreeCount; i++) {
-            if (i > 1) {
-              stringBuilder.Append('*');
-            }
-            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
-          }
+          break;
         }
+      case Division: {
+          if (node.SubtreeCount == 1) {
+            stringBuilder.Append("1/(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+          } else {
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append("/(");
+            for (var i = 1; i < node.SubtreeCount; i++) {
+              if (i > 1) {
+                stringBuilder.Append('*');
+              }
+              stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            }
+          }
 
-        stringBuilder.Append(')');
+          stringBuilder.Append(')');
 
-        break;
-      }
+          break;
+        }
       case Exponential:
         stringBuilder.Append("EXP(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -193,15 +193,15 @@ public sealed class SymbolicDataAnalysisExpressionExcelFormatter : ISymbolicExpr
 
         break;
       case Multiplication: {
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          if (i > 0) {
-            stringBuilder.Append('*');
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            if (i > 0) {
+              stringBuilder.Append('*');
+            }
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
           }
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
-        }
 
-        break;
-      }
+          break;
+        }
       case Sine:
         stringBuilder.Append("SIN(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -209,22 +209,22 @@ public sealed class SymbolicDataAnalysisExpressionExcelFormatter : ISymbolicExpr
 
         break;
       case Subtraction: {
-        stringBuilder.Append('(');
-        if (node.SubtreeCount == 1) {
-          stringBuilder.Append('-');
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-        } else {
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          for (var i = 1; i < node.SubtreeCount; i++) {
+          stringBuilder.Append('(');
+          if (node.SubtreeCount == 1) {
             stringBuilder.Append('-');
-            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+          } else {
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            for (var i = 1; i < node.SubtreeCount; i++) {
+              stringBuilder.Append('-');
+              stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            }
           }
+
+          stringBuilder.Append(')');
+
+          break;
         }
-
-        stringBuilder.Append(')');
-
-        break;
-      }
       case Tangent:
         stringBuilder.Append("TAN(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -238,37 +238,37 @@ public sealed class SymbolicDataAnalysisExpressionExcelFormatter : ISymbolicExpr
 
         break;
       case Variable: {
-        var variableTreeNode = (VariableTreeNode)node;
-        stringBuilder.Append(variableTreeNode.Weight.ToString(CultureInfo.InvariantCulture));
-        stringBuilder.Append('*');
-        stringBuilder.Append(GetColumnToVariableName(variableTreeNode.VariableName));
+          var variableTreeNode = (VariableTreeNode)node;
+          stringBuilder.Append(variableTreeNode.Weight.ToString(CultureInfo.InvariantCulture));
+          stringBuilder.Append('*');
+          stringBuilder.Append(GetColumnToVariableName(variableTreeNode.VariableName));
 
-        break;
-      }
-      case BinaryFactorVariable: {
-        var binFactorNode = (BinaryFactorVariableTreeNode)node;
-        stringBuilder.AppendFormat("IF({0}=\"{1}\", {2}, 0)",
-          GetColumnToVariableName(binFactorNode.VariableName),
-          binFactorNode.VariableValue,
-          binFactorNode.Weight.ToString(CultureInfo.InvariantCulture)
-        );
-
-        break;
-      }
-      case FactorVariable: {
-        var factorNode = (FactorVariableTreeNode)node;
-        var values = factorNode.Symbol.GetVariableValues(factorNode.VariableName).ToArray();
-        var w = factorNode.Weights;
-        // create nested if
-        for (var i = 0; i < values.Length; i++) {
-          stringBuilder.Append($"IF({GetColumnToVariableName(factorNode.VariableName)}=\"{values[i]}\", {w![i].ToString(CultureInfo.InvariantCulture)}, ");
+          break;
         }
+      case BinaryFactorVariable: {
+          var binFactorNode = (BinaryFactorVariableTreeNode)node;
+          stringBuilder.AppendFormat("IF({0}=\"{1}\", {2}, 0)",
+            GetColumnToVariableName(binFactorNode.VariableName),
+            binFactorNode.VariableValue,
+            binFactorNode.Weight.ToString(CultureInfo.InvariantCulture)
+          );
 
-        stringBuilder.Append("\"\""); // return empty string on unknown value
-        stringBuilder.Append(')', values.Length); // add closing parenthesis
+          break;
+        }
+      case FactorVariable: {
+          var factorNode = (FactorVariableTreeNode)node;
+          var values = factorNode.Symbol.GetVariableValues(factorNode.VariableName).ToArray();
+          var w = factorNode.Weights;
+          // create nested if
+          for (var i = 0; i < values.Length; i++) {
+            stringBuilder.Append($"IF({GetColumnToVariableName(factorNode.VariableName)}=\"{values[i]}\", {w![i].ToString(CultureInfo.InvariantCulture)}, ");
+          }
 
-        break;
-      }
+          stringBuilder.Append("\"\""); // return empty string on unknown value
+          stringBuilder.Append(')', values.Length); // add closing parenthesis
+
+          break;
+        }
       case Power:
         stringBuilder.Append("POWER(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -296,28 +296,28 @@ public sealed class SymbolicDataAnalysisExpressionExcelFormatter : ISymbolicExpr
 
         break;
       case VariableCondition: {
-        var variableConditionTreeNode = (VariableConditionTreeNode)node;
-        if (!variableConditionTreeNode.Symbol.IgnoreSlope) {
-          var threshold = variableConditionTreeNode.Threshold;
-          var slope = variableConditionTreeNode.Slope;
-          var p = "(1 / (1 + EXP(-" + slope.ToString(CultureInfo.InvariantCulture) + " * (" +
-            GetColumnToVariableName(variableConditionTreeNode.VariableName) + "-" +
-            threshold.ToString(CultureInfo.InvariantCulture) + "))))";
-          stringBuilder.Append("((");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append('*');
-          stringBuilder.Append(p);
-          stringBuilder.Append(") + (");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(1)));
-          stringBuilder.Append("*(");
-          stringBuilder.Append("1 - " + p + ")");
-          stringBuilder.Append("))");
-        } else {
-          stringBuilder.Append(CultureInfo.InvariantCulture, $"(IF({GetColumnToVariableName(variableConditionTreeNode.VariableName)} <= {variableConditionTreeNode.Threshold}, {FormatRecursively(node.GetSubtree(0))}, {FormatRecursively(node.GetSubtree(1))}))");
-        }
+          var variableConditionTreeNode = (VariableConditionTreeNode)node;
+          if (!variableConditionTreeNode.Symbol.IgnoreSlope) {
+            var threshold = variableConditionTreeNode.Threshold;
+            var slope = variableConditionTreeNode.Slope;
+            var p = "(1 / (1 + EXP(-" + slope.ToString(CultureInfo.InvariantCulture) + " * (" +
+              GetColumnToVariableName(variableConditionTreeNode.VariableName) + "-" +
+              threshold.ToString(CultureInfo.InvariantCulture) + "))))";
+            stringBuilder.Append("((");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append('*');
+            stringBuilder.Append(p);
+            stringBuilder.Append(") + (");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(1)));
+            stringBuilder.Append("*(");
+            stringBuilder.Append("1 - " + p + ")");
+            stringBuilder.Append("))");
+          } else {
+            stringBuilder.Append(CultureInfo.InvariantCulture, $"(IF({GetColumnToVariableName(variableConditionTreeNode.VariableName)} <= {variableConditionTreeNode.Threshold}, {FormatRecursively(node.GetSubtree(0))}, {FormatRecursively(node.GetSubtree(1))}))");
+          }
 
-        break;
-      }
+          break;
+        }
       case Xor:
         stringBuilder.Append("IF(");
         stringBuilder.Append("XOR(");

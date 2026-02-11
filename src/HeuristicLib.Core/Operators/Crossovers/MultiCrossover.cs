@@ -44,7 +44,7 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
     }
 
     Crossovers = crossovers;
-    Weights = weights ?? [..Enumerable.Repeat(1.0, crossovers.Length)];
+    Weights = weights ?? [.. Enumerable.Repeat(1.0, crossovers.Length)];
 
     cumulativeSumWeights = new double[Weights.Length];
     for (var i = 0; i < Weights.Length; i++) {

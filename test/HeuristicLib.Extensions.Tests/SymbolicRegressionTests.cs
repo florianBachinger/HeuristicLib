@@ -167,15 +167,4 @@ public class SymbolicRegressionTests
       _ = problem.Evaluate(tree);
     }
   }
-
-  private static MultiMutator<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace, Problems.IProblem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>> CreateSymRegAllMutator()
-  {
-    return MultiMutator.Create([
-      new ChangeNodeTypeManipulation(),
-      new FullTreeShaker(),
-      new OnePointShaker(),
-      new RemoveBranchManipulation(),
-      new ReplaceBranchManipulation()
-    ]);
-  }
 }

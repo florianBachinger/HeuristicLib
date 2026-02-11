@@ -89,13 +89,13 @@ public static class DatasetExtensions
     this Dataset ds, IEnumerable<string> factorVariables, IEnumerable<int> rows)
   {
     return from factor in factorVariables
-      let distinctValues = ds.GetStringValues(factor, rows).Distinct().ToArray()
-      // 1 distinct value => skip (constant)
-      // 2 distinct values => only take one of the two values
-      // >=3 distinct values => create a binary value for each value
-      let reducedValues = distinctValues.Length <= 2
-        ? distinctValues.Take(distinctValues.Length - 1)
-        : distinctValues
-      select new KeyValuePair<string, IEnumerable<string>>(factor, reducedValues);
+           let distinctValues = ds.GetStringValues(factor, rows).Distinct().ToArray()
+           // 1 distinct value => skip (constant)
+           // 2 distinct values => only take one of the two values
+           // >=3 distinct values => create a binary value for each value
+           let reducedValues = distinctValues.Length <= 2
+             ? distinctValues.Take(distinctValues.Length - 1)
+             : distinctValues
+           select new KeyValuePair<string, IEnumerable<string>>(factor, reducedValues);
   }
 }

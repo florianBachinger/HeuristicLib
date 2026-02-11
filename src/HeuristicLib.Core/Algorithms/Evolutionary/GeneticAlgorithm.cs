@@ -157,9 +157,12 @@ public static class GeneticAlgorithm
     IMutator<TGenotype, TSearchSpace, TProblem> mutator)
     where TSearchSpace : class, ISearchSpace<TGenotype>
     where TProblem : class, IProblem<TGenotype, TSearchSpace>
-    where TGenotype : class => new() {
-    Mutator = mutator,
-    Crossover = crossover,
-    Creator = creator
-  };
+    where TGenotype : class
+  {
+    return new() {
+      Mutator = mutator,
+      Crossover = crossover,
+      Creator = creator
+    };
+  }
 }

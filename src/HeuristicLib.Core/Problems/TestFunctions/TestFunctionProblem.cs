@@ -9,7 +9,7 @@ namespace HEAL.HeuristicLib.Problems.TestFunctions;
 public class TestFunctionProblem : RealVectorProblem
 {
   public readonly ITestFunction TestFunction;
-  public TestFunctionProblem() : this(null!) {}
+  public TestFunctionProblem() : this(null!) { }
 
   public TestFunctionProblem(ITestFunction testFunction) : base(SingleObjective.Create(testFunction.Objective), GetEncoding(testFunction)) => TestFunction = testFunction;
 
