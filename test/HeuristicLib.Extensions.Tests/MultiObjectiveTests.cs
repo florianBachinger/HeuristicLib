@@ -28,7 +28,7 @@ public class MultiObjectiveTests
     var solutions = Array.Empty<ISolution<object>>();
     var objective = MinimizeAll(2);
 
-    var fronts = DominationCalculator.CalculateAllParetoFronts(solutions, objective, out var rank, true);
+    var fronts = DominationCalculator.CalculateAllParetoFronts(solutions, objective, out var rank);
 
     Assert.Empty(fronts);
     Assert.Empty(rank);
@@ -50,9 +50,9 @@ public class MultiObjectiveTests
     // Assert
     var ids = FrontIds(fronts);
     Assert.Equal(3, fronts.Count);
-    Assert.Equal(["A"], ids[0]);// Front 0
-    Assert.Equal(["C", "D", "E"], ids[1]);// Front 1
-    Assert.Equal(["B"], ids[2]);// Front 2
+    Assert.Equal(["A"], ids[0]); // Front 0
+    Assert.Equal(["C", "D", "E"], ids[1]); // Front 1
+    Assert.Equal(["B"], ids[2]); // Front 2
 
     // Rank array matches positions: A=0; C/D/E=1; B=2
     var map = solutions.Select((s, i) => (s.Genotype, i)).ToDictionary(keySelector: x => x.Genotype, elementSelector: x => x.i);
@@ -74,7 +74,7 @@ public class MultiObjectiveTests
     // Assert
     var ids = FrontIds(fronts);
     Assert.Equal(2, fronts.Count);
-    Assert.Equal(["A", "B"], ids[0]);// both non-dominated
+    Assert.Equal(["A", "B"], ids[0]); // both non-dominated
     Assert.Equal(["C"], ids[1]);
 
     var map = solutions.Select((s, i) => (s.Genotype, i)).ToDictionary(keySelector: x => x.Genotype, elementSelector: x => x.i);
@@ -96,7 +96,7 @@ public class MultiObjectiveTests
     // Assert
     Assert.Equal(3, fronts.Count);
     var ids = FrontIds(fronts);
-    Assert.Equal(["A", "B"], ids[0].Concat(ids[1]).OrderBy(x => x));// Implementation may break ties arbitrarily
+    Assert.Equal(["A", "B"], ids[0].Concat(ids[1]).OrderBy(x => x)); // Implementation may break ties arbitrarily
     Assert.Equal(["C"], ids[2]);
   }
 

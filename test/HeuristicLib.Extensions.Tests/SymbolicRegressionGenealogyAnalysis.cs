@@ -62,7 +62,7 @@ public class UnitTest1
 
     ga = ga with { Interceptor = wrappedInterceptor };
 
-    var res = ga.RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed));
+    var res = ga.RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed), ct: CancellationToken.None);
 
     Assert.Equal(100, analysis.BestSolutions.Count);
     Assert.Equal(100, res.Population.Solutions.Count());
@@ -109,7 +109,7 @@ public class UnitTest1
 
     var genealogy = new GenealogyAnalysis<SymbolicExpressionTree>();
     ga.AttachObserver(genealogy);
-    var res = ga.Build().RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed));
+    var res = ga.Build().RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed), ct: CancellationToken.None);
     Assert.Single(res.Population.Solutions);
     var graphViz = genealogy.Graph.ToGraphViz();
     Assert.True(graphViz.Length > 0);
@@ -136,7 +136,7 @@ public class UnitTest1
     var qualities = new BestMedianWorstAnalysis<SymbolicExpressionTree>();
     nsga2.AttachObserver(qualities);
 
-    var res = nsga2.Build().RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed));
+    var res = nsga2.Build().RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed), ct: CancellationToken.None);
     Assert.Equal(maximumIterations, qualities.BestSolutions.Count);
     Assert.Equal(populationSize, res.Population.Solutions.Length);
     var graphViz = genealogy.Graph.ToGraphViz();

@@ -35,13 +35,13 @@ public static class MultiStreamAlgorithmExtensions
   {
     public IReadOnlyList<KeyValuePair<TAlgorithmKey, IAsyncEnumerable<TAlgorithmState>>> RunStreamingAsync(TProblem problem, IRandomNumberGenerator random, TAlgorithmState? initialState = null, CancellationToken ct = default)
     {
-      var algorithmInstance = algorithm.CreateExecutionInstance(new ExecutionInstanceRegistry());
+      var algorithmInstance = algorithm.CreateNewExecutionInstance();
       return algorithmInstance.RunStreamingAsync(problem, random, initialState, ct);
     }
 
     public async Task<IReadOnlyList<KeyValuePair<TAlgorithmKey, TAlgorithmState>>> RunToCompletionAsync(TProblem problem, IRandomNumberGenerator random, TAlgorithmState? initialState = null, CancellationToken cancellationToken = default)
     {
-      var algorithmInstance = algorithm.CreateExecutionInstance(new ExecutionInstanceRegistry());
+      var algorithmInstance = algorithm.CreateNewExecutionInstance();
       var tasks = algorithmInstance.RunStreamingAsync(problem, random, initialState, cancellationToken)
                                    .Select(async kvp => KeyValuePair.Create(kvp.Key, await kvp.Value.LastAsync(cancellationToken)))
                                    .ToList();
@@ -55,7 +55,7 @@ public static class MultiStreamAlgorithmExtensions
       CancellationToken ct = default
     )
     {
-      var algorithmInstance = algorithm.CreateExecutionInstance(new ExecutionInstanceRegistry());
+      var algorithmInstance = algorithm.CreateNewExecutionInstance();
       return algorithmInstance.RunStreamingAsync(problem, random, initialState, ct).Select(kvp => KeyValuePair.Create(kvp.Key, kvp.Value.ToBlockingEnumerable(ct))).ToList();
     }
 
@@ -66,7 +66,7 @@ public static class MultiStreamAlgorithmExtensions
       CancellationToken ct = default
     )
     {
-      var algorithmInstance = algorithm.CreateExecutionInstance(new ExecutionInstanceRegistry());
+      var algorithmInstance = algorithm.CreateNewExecutionInstance();
       return algorithmInstance.RunToCompletionAsync<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm, TAlgorithmKey>(problem, random, initialState, ct).GetAwaiter().GetResult();
     }
   }
