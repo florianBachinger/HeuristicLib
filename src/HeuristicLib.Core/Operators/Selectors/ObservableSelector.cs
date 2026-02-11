@@ -27,7 +27,7 @@ public partial record ObservableSelector<TG, TS, TP>
 
   public override ISelectorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var selectorInstance = instanceRegistry.GetOrCreate(Selector);
+    var selectorInstance = instanceRegistry.Resolve(Selector);
     return new ObservableSelectorInstance(selectorInstance, Observers);
   }
 

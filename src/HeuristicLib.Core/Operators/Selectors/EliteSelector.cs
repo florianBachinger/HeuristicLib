@@ -23,8 +23,8 @@ public record EliteSelector<TGenotype, TSearchSpace, TProblem>
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var selectorInstance = instanceRegistry.GetOrCreate(selector);
-    var bestInstance = instanceRegistry.GetOrCreate(best);
+    var selectorInstance = instanceRegistry.Resolve(selector);
+    var bestInstance = instanceRegistry.Resolve(best);
     return new Instance(selectorInstance, bestInstance, elites);
   }
 

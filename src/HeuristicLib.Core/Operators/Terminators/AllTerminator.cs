@@ -22,7 +22,7 @@ public partial record AllTerminator<TGenotype, TAlgorithmState, TSearchSpace, TP
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var terminatorInstances = Terminators.Select(instanceRegistry.GetOrCreate).ToList();
+    var terminatorInstances = Terminators.Select(instanceRegistry.Resolve).ToList();
     return new Instance(terminatorInstances);
   }
 

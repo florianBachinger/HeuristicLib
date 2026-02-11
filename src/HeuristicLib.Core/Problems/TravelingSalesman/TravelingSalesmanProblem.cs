@@ -8,7 +8,7 @@ namespace HEAL.HeuristicLib.Problems.TravelingSalesman;
 public class TravelingSalesmanProblem(ITravelingSalesmanProblemData problemData) : PermutationProblem(SingleObjective.Minimize, GetEncoding(problemData)) /*, IDeterministicProblem<Permutation>*/
 {
 
-  public TravelingSalesmanProblem() : this(new TravelingSalesmanCoordinatesData(DefaultProblemCoordinates)) {}
+  public TravelingSalesmanProblem() : this(new TravelingSalesmanCoordinatesData(DefaultProblemCoordinates)) { }
   public ITravelingSalesmanProblemData ProblemData { get; } = problemData;
 
   public override ObjectiveVector Evaluate(Permutation solution, IRandomNumberGenerator random)

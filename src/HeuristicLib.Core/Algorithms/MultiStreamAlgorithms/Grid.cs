@@ -57,7 +57,6 @@ public record GridParameter<T, TParam>(IReadOnlyList<TParam> Values, Func<T, TPa
 public static class Grid
 {
   public static Grid<T> Create<T>(T prototype)
-    // where T : IAlgorithm
   {
     return new Grid<T>(prototype);
   }

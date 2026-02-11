@@ -16,7 +16,7 @@ public sealed class VariableConditionTreeNode : SymbolicExpressionTreeNode
     Slope = original.Slope;
   }
 
-  public VariableConditionTreeNode(VariableCondition variableConditionSymbol) : base(variableConditionSymbol) {}
+  public VariableConditionTreeNode(VariableCondition variableConditionSymbol) : base(variableConditionSymbol) { }
   public override bool HasLocalParameters => true;
 
   public override SymbolicExpressionTreeNode Clone() => new VariableConditionTreeNode(this);

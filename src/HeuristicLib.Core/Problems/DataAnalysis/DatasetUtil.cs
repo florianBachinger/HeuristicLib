@@ -4,7 +4,7 @@ using HEAL.HeuristicLib.Random;
 
 namespace HEAL.HeuristicLib.Problems.DataAnalysis;
 
-using ValuesType=Dictionary<string, IList>;
+using ValuesType = Dictionary<string, IList>;
 
 public static class DatasetUtil
 {

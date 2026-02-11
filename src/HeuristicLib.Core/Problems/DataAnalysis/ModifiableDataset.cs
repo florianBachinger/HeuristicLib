@@ -6,7 +6,7 @@ namespace HEAL.HeuristicLib.Problems.DataAnalysis;
 
 public class ModifiableDataset : Dataset
 {
-  public ModifiableDataset() {}
+  public ModifiableDataset() { }
 
   public ModifiableDataset(IEnumerable<string> variableNames, IEnumerable<IList> variableValues, bool cloneValues) :
     base(variableNames, variableValues, cloneValues)

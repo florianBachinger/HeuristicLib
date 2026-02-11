@@ -21,9 +21,9 @@ public record TerminatableAlgorithm<TG, TS, TP, TR>
 
   public override TerminatableAlgorithmInstance<TG, TS, TP, TR> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
-    var terminatorInstance = instanceRegistry.GetOrCreate(Terminator);
-    var algorithmInstance = instanceRegistry.GetOrCreate(Algorithm);
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
+    var terminatorInstance = instanceRegistry.Resolve(Terminator);
+    var algorithmInstance = instanceRegistry.Resolve(Algorithm);
 
     return new TerminatableAlgorithmInstance<TG, TS, TP, TR>(
       evaluatorInstance,

@@ -40,13 +40,13 @@ public record AlpsGeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
     var internalMutator = new MultiMutator<TGenotype, TSearchSpace, TProblem>([Mutator, new NoChangeMutator<TGenotype>()], [MutationRate, 1 - MutationRate]);
     var internalReplacer = new ElitismReplacer<TGenotype>(Elites);
 
-    var interceptorInstance = Interceptor is not null ? instanceRegistry.GetOrCreate(Interceptor) : null;
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
-    var creatorInstance = instanceRegistry.GetOrCreate(Creator);
-    var crossoverInstance = instanceRegistry.GetOrCreate(Crossover);
-    var mutatorInstance = instanceRegistry.GetOrCreate(internalMutator);
-    var selectorInstance = instanceRegistry.GetOrCreate(Selector);
-    var replacerInstance = instanceRegistry.GetOrCreate(internalReplacer);
+    var interceptorInstance = Interceptor is not null ? instanceRegistry.Resolve(Interceptor) : null;
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
+    var creatorInstance = instanceRegistry.Resolve(Creator);
+    var crossoverInstance = instanceRegistry.Resolve(Crossover);
+    var mutatorInstance = instanceRegistry.Resolve(internalMutator);
+    var selectorInstance = instanceRegistry.Resolve(Selector);
+    var replacerInstance = instanceRegistry.Resolve(internalReplacer);
 
     return new AlpsGeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>(
       interceptorInstance,

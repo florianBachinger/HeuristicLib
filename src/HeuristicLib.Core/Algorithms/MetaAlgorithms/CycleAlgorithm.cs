@@ -35,7 +35,7 @@ public partial record CycleAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TProbl
 
   public override CycleAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var evaluatorInstance = Evaluator.CreateExecutionInstance(instanceRegistry);
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
 
     return new CycleAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>(
       evaluatorInstance,

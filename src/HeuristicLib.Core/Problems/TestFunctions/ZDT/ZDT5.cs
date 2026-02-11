@@ -28,7 +28,9 @@ public class Zdt5 : Problem<BoolVector, BoolVectorSearchSpace>
     return new ObjectiveVector(f1, g * H(f1, g));
   }
 
+#pragma warning disable S1172
   private static double H(double f1, double d) => 1.0 / f1;
+#pragma warning restore S1172
 
   private static double F1(BoolVector solution) => 1 + U(solution, 0);
 

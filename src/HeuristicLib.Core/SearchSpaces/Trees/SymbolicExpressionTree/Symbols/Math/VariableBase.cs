@@ -7,8 +7,8 @@ public class VariableBase : Symbol
   {
     WeightMu = original.WeightMu;
     weightSigma = original.weightSigma;
-    variableNames = [..original.variableNames];
-    allVariableNames = [..original.allVariableNames];
+    variableNames = [.. original.variableNames];
+    allVariableNames = [.. original.allVariableNames];
     WeightManipulatorMu = original.WeightManipulatorMu;
     weightManipulatorSigma = original.weightManipulatorSigma;
     multiplicativeWeightManipulatorSigma = original.multiplicativeWeightManipulatorSigma;

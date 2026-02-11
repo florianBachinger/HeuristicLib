@@ -3,11 +3,11 @@
 public sealed class GroupSymbol : Symbol
 {
 
-  public GroupSymbol() : this([]) {}
+  public GroupSymbol() : this([]) { }
 
   public GroupSymbol(IEnumerable<Symbol> symbols) : base(0, 0, 0)
   {
-    SymbolsCollection = [..symbols];
+    SymbolsCollection = [.. symbols];
     InitialFrequency = 0.0;
   }
   public List<Symbol> SymbolsCollection { get; }

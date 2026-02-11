@@ -3,7 +3,7 @@ using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math.Variables;
-using Variable=HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math.Variable;
+using Variable = HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math.Variable;
 
 namespace HEAL.HeuristicLib.Problems.DataAnalysis.Regression;
 
@@ -24,7 +24,7 @@ public class TreeToAutoDiffTermConverter
   private TreeToAutoDiffTermConverter(bool makeVariableWeightsVariable, IEnumerable<SymbolicExpressionTreeNode> excludedNodes)
   {
     this.makeVariableWeightsVariable = makeVariableWeightsVariable;
-    this.excludedNodes = [..excludedNodes];
+    this.excludedNodes = [.. excludedNodes];
 
     initialParamValues = [];
     parameters = [];
@@ -52,7 +52,7 @@ public class TreeToAutoDiffTermConverter
       var parameterEntries = transformator.parameters.ToArray(); // guarantee same order for keys and values
       var compiledTerm = term.Compile(transformator.variables.ToArray(),
         parameterEntries.Select(kvp => kvp.Value).ToArray());
-      parameters = [..parameterEntries.Select(kvp => kvp.Key)];
+      parameters = [.. parameterEntries.Select(kvp => kvp.Key)];
       initialParamValues = transformator.initialParamValues.ToArray();
       func = compiledTerm.Evaluate;
       funcGrad = compiledTerm.Differentiate;
@@ -72,104 +72,104 @@ public class TreeToAutoDiffTermConverter
   {
     switch (node.Symbol) {
       case Number: {
-        initialParamValues.Add(((NumberTreeNode)node).Value);
-        var var = new AutoDiff.Variable();
-        variables.Add(var);
+          initialParamValues.Add(((NumberTreeNode)node).Value);
+          var var = new AutoDiff.Variable();
+          variables.Add(var);
 
-        return var;
-      }
+          return var;
+        }
       case Variable:
       case BinaryFactorVariable: {
-        var varNode = (VariableTreeNodeBase)node;
-        // factor variable values are only 0 or 1 and set in x accordingly
-        var varValue = node is BinaryFactorVariableTreeNode factorVarNode ? factorVarNode.VariableValue : string.Empty;
-        var par = FindOrCreateParameter(parameters, varNode.VariableName, varValue);
+          var varNode = (VariableTreeNodeBase)node;
+          // factor variable values are only 0 or 1 and set in x accordingly
+          var varValue = node is BinaryFactorVariableTreeNode factorVarNode ? factorVarNode.VariableValue : string.Empty;
+          var par = FindOrCreateParameter(parameters, varNode.VariableName, varValue);
 
-        if (!makeVariableWeightsVariable || excludedNodes.Contains(node)) {
-          return varNode.Weight * par;
+          if (!makeVariableWeightsVariable || excludedNodes.Contains(node)) {
+            return varNode.Weight * par;
+          }
+
+          initialParamValues.Add(varNode.Weight);
+          var w = new AutoDiff.Variable();
+          variables.Add(w);
+
+          return TermBuilder.Product(w, par);
         }
-
-        initialParamValues.Add(varNode.Weight);
-        var w = new AutoDiff.Variable();
-        variables.Add(w);
-
-        return TermBuilder.Product(w, par);
-      }
       case FactorVariable: {
-        var factorVarNode = (FactorVariableTreeNode)node;
-        var products = new List<Term>();
-        foreach (var variableValue in factorVarNode.Symbol.GetVariableValues(factorVarNode.VariableName)) {
-          var par = FindOrCreateParameter(parameters, factorVarNode.VariableName, variableValue);
+          var factorVarNode = (FactorVariableTreeNode)node;
+          var products = new List<Term>();
+          foreach (var variableValue in factorVarNode.Symbol.GetVariableValues(factorVarNode.VariableName)) {
+            var par = FindOrCreateParameter(parameters, factorVarNode.VariableName, variableValue);
 
-          if (makeVariableWeightsVariable && !excludedNodes.Contains(node)) {
-            initialParamValues.Add(factorVarNode.GetValue(variableValue));
-            var wVar = new AutoDiff.Variable();
-            variables.Add(wVar);
+            if (makeVariableWeightsVariable && !excludedNodes.Contains(node)) {
+              initialParamValues.Add(factorVarNode.GetValue(variableValue));
+              var wVar = new AutoDiff.Variable();
+              variables.Add(wVar);
 
-            products.Add(TermBuilder.Product(wVar, par));
-          } else {
-            var weight = factorVarNode.GetValue(variableValue);
-            products.Add(weight * par);
+              products.Add(TermBuilder.Product(wVar, par));
+            } else {
+              var weight = factorVarNode.GetValue(variableValue);
+              products.Add(weight * par);
+            }
           }
-        }
 
-        return TermBuilder.Sum(products);
-      }
+          return TermBuilder.Sum(products);
+        }
       case LaggedVariable: {
-        var varNode = (LaggedVariableTreeNode)node;
-        var par = FindOrCreateParameter(parameters, varNode.VariableName, string.Empty, varNode.Lag);
+          var varNode = (LaggedVariableTreeNode)node;
+          var par = FindOrCreateParameter(parameters, varNode.VariableName, string.Empty, varNode.Lag);
 
-        if (!makeVariableWeightsVariable || excludedNodes.Contains(node)) {
-          return varNode.Weight * par;
-        }
-
-        initialParamValues.Add(varNode.Weight);
-        var w = new AutoDiff.Variable();
-        variables.Add(w);
-
-        return TermBuilder.Product(w, par);
-      }
-      case Addition: {
-        var terms = node.Subtrees.Select(ConvertToAutoDiff).ToList();
-
-        return TermBuilder.Sum(terms);
-      }
-      case Subtraction: {
-        var terms = new List<Term>();
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          var t = ConvertToAutoDiff(node[i]);
-          if (i > 0) {
-            t = -t;
+          if (!makeVariableWeightsVariable || excludedNodes.Contains(node)) {
+            return varNode.Weight * par;
           }
-          terms.Add(t);
-        }
 
-        return terms.Count == 1 ? -terms[0] : TermBuilder.Sum(terms);
-      }
+          initialParamValues.Add(varNode.Weight);
+          var w = new AutoDiff.Variable();
+          variables.Add(w);
+
+          return TermBuilder.Product(w, par);
+        }
+      case Addition: {
+          var terms = node.Subtrees.Select(ConvertToAutoDiff).ToList();
+
+          return TermBuilder.Sum(terms);
+        }
+      case Subtraction: {
+          var terms = new List<Term>();
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            var t = ConvertToAutoDiff(node[i]);
+            if (i > 0) {
+              t = -t;
+            }
+            terms.Add(t);
+          }
+
+          return terms.Count == 1 ? -terms[0] : TermBuilder.Sum(terms);
+        }
       case Multiplication: {
-        var terms = node.Subtrees.Select(ConvertToAutoDiff).ToList();
+          var terms = node.Subtrees.Select(ConvertToAutoDiff).ToList();
 
-        return terms.Count == 1 ? terms[0] : terms.Aggregate((a, b) => new Product(a, b));
-      }
-      case Division: {
-        var terms = node.Subtrees.Select(ConvertToAutoDiff).ToList();
-        if (terms.Count == 1) {
-          return 1.0 / terms[0];
+          return terms.Count == 1 ? terms[0] : terms.Aggregate((a, b) => new Product(a, b));
         }
+      case Division: {
+          var terms = node.Subtrees.Select(ConvertToAutoDiff).ToList();
+          if (terms.Count == 1) {
+            return 1.0 / terms[0];
+          }
 
-        return terms.Aggregate((a, b) => new Product(a, 1.0 / b));
-      }
+          return terms.Aggregate((a, b) => new Product(a, 1.0 / b));
+        }
       case Absolute: {
-        var x1 = ConvertToAutoDiff(node[0]);
+          var x1 = ConvertToAutoDiff(node[0]);
 
-        return Abs(x1);
-      }
+          return Abs(x1);
+        }
       case AnalyticQuotient: {
-        var x1 = ConvertToAutoDiff(node[0]);
-        var x2 = ConvertToAutoDiff(node[1]);
+          var x1 = ConvertToAutoDiff(node[0]);
+          var x2 = ConvertToAutoDiff(node[1]);
 
-        return x1 / TermBuilder.Power(1 + x2 * x2, 0.5);
-      }
+          return x1 / TermBuilder.Power(1 + x2 * x2, 0.5);
+        }
       case Logarithm:
         return TermBuilder.Log(
           ConvertToAutoDiff(node[0]));
@@ -188,16 +188,16 @@ public class TreeToAutoDiffTermConverter
       case CubeRoot:
         return Cbrt(ConvertToAutoDiff(node[0]));
       case Power: {
-        if (node[1] is not NumberTreeNode powerNode) {
-          throw new NotSupportedException("Only numeric powers are allowed in parameter optimization. Try to use exp() and log() instead of the power symbol.");
-        }
-        var intPower = Math.Truncate(powerNode.Value);
-        if (Math.Abs(intPower - powerNode.Value) > 1e-15) {
-          throw new NotSupportedException("Only integer powers are allowed in parameter optimization. Try to use exp() and log() instead of the power symbol.");
-        }
+          if (node[1] is not NumberTreeNode powerNode) {
+            throw new NotSupportedException("Only numeric powers are allowed in parameter optimization. Try to use exp() and log() instead of the power symbol.");
+          }
+          var intPower = Math.Truncate(powerNode.Value);
+          if (Math.Abs(intPower - powerNode.Value) > 1e-15) {
+            throw new NotSupportedException("Only integer powers are allowed in parameter optimization. Try to use exp() and log() instead of the power symbol.");
+          }
 
-        return TermBuilder.Power(ConvertToAutoDiff(node[0]), intPower);
-      }
+          return TermBuilder.Power(ConvertToAutoDiff(node[0]), intPower);
+        }
       case Sine:
         return Sin(
           ConvertToAutoDiff(node[0]));
@@ -305,21 +305,12 @@ public class TreeToAutoDiffTermConverter
 
   public class ConversionException : Exception
   {
-    public ConversionException() {}
+    public ConversionException() { }
 
-    public ConversionException(string message) : base(message) {}
+    public ConversionException(string message) : base(message) { }
 
-    public ConversionException(string message, Exception inner) : base(message, inner) {}
+    public ConversionException(string message, Exception inner) : base(message, inner) { }
   }
-
-  #endregion
-
-  #region derivations of functions
-
-  // create function factory for arctangent
-  private static readonly Func<Term, UnaryFunc> Arctan = UnaryFunc.Factory(
-    Math.Atan,
-    diff: x => 1 / (1 + x * x));
 
   private static readonly Func<Term, UnaryFunc> Sin = UnaryFunc.Factory(
     Math.Sin,

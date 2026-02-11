@@ -12,7 +12,7 @@ public sealed class Constant() : Symbol(0, 0, 0)
 public sealed class ConstantTreeNode : SymbolicExpressionTreeNode
 {
 
-  public ConstantTreeNode(Constant numberSymbol) : base(numberSymbol) {}
+  public ConstantTreeNode(Constant numberSymbol) : base(numberSymbol) { }
 
   public ConstantTreeNode(ConstantTreeNode original) : base(original) => Value = original.Value;
 

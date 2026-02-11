@@ -279,74 +279,74 @@ public class GeneticAlgorithmTests
   //   public Objective Objective => SingleObjective.Minimize;
   //   public RealVectorSearchSpace ProblemContext => new RealVectorSearchSpace(3, -5, +5);
   // }
-// 
-//   [Fact]
-//   public async Task GeneticAlgorithm_WithMultiChromosomeGenotype() {
-//     var randomSource = new RandomSource(42);
-//     var realVectorSearchSpace = new RealVectorSearchSpace(5, -5, +5);
-//     var permutationSearchSpace = new PermutationSearchSpace(3);
-//     var multiGenotypeSearchSpace = new MultiGenotypeSearchSpace(realVectorSearchSpace, permutationSearchSpace);
-//     
-//     var creator = new MultiGenotypeCreator(new UniformDistributedCreator(null, null), new RandomPermutationCreator());
-//     var crossover = new MultiGenotypeCrossover(new SinglePointCrossover(), new OrderCrossover());
-//     var mutator = new MultiGenotypeMutator(new GaussianMutator(0.1, 0.1), new SwapMutator());
-//     var DirectEvaluator = new MultiGenotypeEvaluator();
-//     var selector = new RandomSelector<MultiGenotype, Fitness, Goal>();
-//     var replacement = new ElitismReplacer<MultiGenotype>(0);
-//     var terminationCriterion = Terminator.OnGeneration(10);
-//     
-//     var ga = new GeneticAlgorithm<MultiGenotype, MultiGenotypeSearchSpace>(searchSpace, 5, creator, crossover, mutator, 0.05, DirectEvaluator, Goal.Minimize, selector, replacement, randomSource, terminationCriterion);
-// 
-//     var finalState = ga.Execute();
-// 
-//     await Verify(finalState);
-//   }
-// 
-//   private record MultiGenotypeSearchSpace(RealVectorSearchSpace RealVectorSearchSpace, PermutationSearchSpace PermutationSearchSpace) : ISearchSpace<MultiGenotype, MultiGenotypeSearchSpace>> {
-// 
-//     public bool IsValidGenotype(MultiGenotype genotype) {
-//       return RealVectorSearchSpace.IsValidGenotype(genotype.RealVector) && PermutationSearchSpace.IsValidGenotype(genotype.Permutation);
-//     }
-//   }
-// 
-//   private record MultiGenotype(RealVector RealVector, Permutation Permutation);/* : IRecordGenotypeBase<MultiGenotype, RealVector, Permutation> {
-//     public static MultiGenotype Construct(RealVector realVector, Permutation permutation) => new MultiGenotype(realVector, permutation);
-//     public void Deconstruct(out RealVector realVector, out Permutation permutation) { realVector = RealVector; permutation = Permutation; }
-//   };*/
-//   private class MultiGenotypeCreator(ICreator<RealVector> realVectorCreator, ICreator<Permutation> permutationCreator) : CreatorBase<MultiGenotype> {
-//     public override MultiGenotype GetEvaluator() { return new MultiGenotype(realVectorCreator.GetEvaluator(), permutationCreator.GetEvaluator()); }
-//   }
-//   private class MultiGenotypeEvaluator : IEvaluator<MultiGenotype, Fitness> {
-//     public Fitness Evaluate(MultiGenotype Solution) { return Solution.RealVector.Sum() + Solution.Permutation.Count; }
-//   }
-//   private class MultiGenotypeCrossover(ICrossover<RealVector> realVectorCrossover, ICrossover<Permutation> permutationCrossover) : ICrossover<MultiGenotype> {
-//     public MultiGenotype Cross(MultiGenotype parent1, MultiGenotype parent2) {
-//       return new MultiGenotype(realVectorCrossover.Cross(parent1.RealVector, parent2.RealVector), permutationCrossover.Cross(parent1.Permutation, parent2.Permutation));
-//     }
-//   }
-//   private class MultiGenotypeMutator(IMutator<RealVector> realVectorMutator, IMutator<Permutation> permutationMutator) : IMutator<MultiGenotype> {
-//     public MultiGenotype Mutate(MultiGenotype genotype) {
-//       return new MultiGenotype(realVectorMutator.Mutate(genotype.RealVector), permutationMutator.Mutate(genotype.Permutation));
-//     }
-//   }
-// 
-//   [Fact]
-//   public async Task GeneticAlgorithm_WithMultiChromosomeGenotypeWithRecordOperators() {
-//     var randomSource = new RandomSource(42);
-//     var realVectorSearchSpace = new RealVectorSearchSpace(2, -5, +5);
-//     var permutationSearchSpace = new PermutationSearchSpace(3);
-//     var creator = new MultiGenotypeCreator(new UniformDistributedCreator(realVectorSearchSpace, null, null, randomSource), new RandomPermutationCreator(permutationSearchSpace, randomSource));
-//     var crossover = new RecordCrossover<MultiGenotype, RealVector, Permutation>(new SinglePointCrossover(realVectorSearchSpace, randomSource), new OrderCrossover(permutationSearchSpace, randomSource));
-//     var mutator = new MultiGenotypeMutator(new GaussianMutator(realVectorSearchSpace, 0.1, 0.1, randomSource), new SwapMutator(permutationSearchSpace, randomSource));
-//     var DirectEvaluator = new MultiGenotypeEvaluator();
-//     var selector = new RandomSelector<MultiGenotype, Fitness, Goal>(randomSource);
-//     var replacement = new ElitismReplacer<MultiGenotype>(0);
-//     var terminationCriterion = Terminator.OnGeneration(10);
-//     
-//     var ga = new GeneticAlgorithm<MultiGenotype>(5, creator, crossover, mutator, 0.05, DirectEvaluator, Goal.Minimize, selector, replacement, randomSource, terminationCriterion);
-// 
-//     var finalState = ga.Execute();
-// 
-//     await Verify(finalState);
-//   }
+  // 
+  //   [Fact]
+  //   public async Task GeneticAlgorithm_WithMultiChromosomeGenotype() {
+  //     var randomSource = new RandomSource(42);
+  //     var realVectorSearchSpace = new RealVectorSearchSpace(5, -5, +5);
+  //     var permutationSearchSpace = new PermutationSearchSpace(3);
+  //     var multiGenotypeSearchSpace = new MultiGenotypeSearchSpace(realVectorSearchSpace, permutationSearchSpace);
+  //     
+  //     var creator = new MultiGenotypeCreator(new UniformDistributedCreator(null, null), new RandomPermutationCreator());
+  //     var crossover = new MultiGenotypeCrossover(new SinglePointCrossover(), new OrderCrossover());
+  //     var mutator = new MultiGenotypeMutator(new GaussianMutator(0.1, 0.1), new SwapMutator());
+  //     var DirectEvaluator = new MultiGenotypeEvaluator();
+  //     var selector = new RandomSelector<MultiGenotype, Fitness, Goal>();
+  //     var replacement = new ElitismReplacer<MultiGenotype>(0);
+  //     var terminationCriterion = Terminator.OnGeneration(10);
+  //     
+  //     var ga = new GeneticAlgorithm<MultiGenotype, MultiGenotypeSearchSpace>(searchSpace, 5, creator, crossover, mutator, 0.05, DirectEvaluator, Goal.Minimize, selector, replacement, randomSource, terminationCriterion);
+  // 
+  //     var finalState = ga.Execute();
+  // 
+  //     await Verify(finalState);
+  //   }
+  // 
+  //   private record MultiGenotypeSearchSpace(RealVectorSearchSpace RealVectorSearchSpace, PermutationSearchSpace PermutationSearchSpace) : ISearchSpace<MultiGenotype, MultiGenotypeSearchSpace>> {
+  // 
+  //     public bool IsValidGenotype(MultiGenotype genotype) {
+  //       return RealVectorSearchSpace.IsValidGenotype(genotype.RealVector) && PermutationSearchSpace.IsValidGenotype(genotype.Permutation);
+  //     }
+  //   }
+  // 
+  //   private record MultiGenotype(RealVector RealVector, Permutation Permutation);/* : IRecordGenotypeBase<MultiGenotype, RealVector, Permutation> {
+  //     public static MultiGenotype Construct(RealVector realVector, Permutation permutation) => new MultiGenotype(realVector, permutation);
+  //     public void Deconstruct(out RealVector realVector, out Permutation permutation) { realVector = RealVector; permutation = Permutation; }
+  //   };*/
+  //   private class MultiGenotypeCreator(ICreator<RealVector> realVectorCreator, ICreator<Permutation> permutationCreator) : CreatorBase<MultiGenotype> {
+  //     public override MultiGenotype GetEvaluator() { return new MultiGenotype(realVectorCreator.GetEvaluator(), permutationCreator.GetEvaluator()); }
+  //   }
+  //   private class MultiGenotypeEvaluator : IEvaluator<MultiGenotype, Fitness> {
+  //     public Fitness Evaluate(MultiGenotype Solution) { return Solution.RealVector.Sum() + Solution.Permutation.Count; }
+  //   }
+  //   private class MultiGenotypeCrossover(ICrossover<RealVector> realVectorCrossover, ICrossover<Permutation> permutationCrossover) : ICrossover<MultiGenotype> {
+  //     public MultiGenotype Cross(MultiGenotype parent1, MultiGenotype parent2) {
+  //       return new MultiGenotype(realVectorCrossover.Cross(parent1.RealVector, parent2.RealVector), permutationCrossover.Cross(parent1.Permutation, parent2.Permutation));
+  //     }
+  //   }
+  //   private class MultiGenotypeMutator(IMutator<RealVector> realVectorMutator, IMutator<Permutation> permutationMutator) : IMutator<MultiGenotype> {
+  //     public MultiGenotype Mutate(MultiGenotype genotype) {
+  //       return new MultiGenotype(realVectorMutator.Mutate(genotype.RealVector), permutationMutator.Mutate(genotype.Permutation));
+  //     }
+  //   }
+  // 
+  //   [Fact]
+  //   public async Task GeneticAlgorithm_WithMultiChromosomeGenotypeWithRecordOperators() {
+  //     var randomSource = new RandomSource(42);
+  //     var realVectorSearchSpace = new RealVectorSearchSpace(2, -5, +5);
+  //     var permutationSearchSpace = new PermutationSearchSpace(3);
+  //     var creator = new MultiGenotypeCreator(new UniformDistributedCreator(realVectorSearchSpace, null, null, randomSource), new RandomPermutationCreator(permutationSearchSpace, randomSource));
+  //     var crossover = new RecordCrossover<MultiGenotype, RealVector, Permutation>(new SinglePointCrossover(realVectorSearchSpace, randomSource), new OrderCrossover(permutationSearchSpace, randomSource));
+  //     var mutator = new MultiGenotypeMutator(new GaussianMutator(realVectorSearchSpace, 0.1, 0.1, randomSource), new SwapMutator(permutationSearchSpace, randomSource));
+  //     var DirectEvaluator = new MultiGenotypeEvaluator();
+  //     var selector = new RandomSelector<MultiGenotype, Fitness, Goal>(randomSource);
+  //     var replacement = new ElitismReplacer<MultiGenotype>(0);
+  //     var terminationCriterion = Terminator.OnGeneration(10);
+  //     
+  //     var ga = new GeneticAlgorithm<MultiGenotype>(5, creator, crossover, mutator, 0.05, DirectEvaluator, Goal.Minimize, selector, replacement, randomSource, terminationCriterion);
+  // 
+  //     var finalState = ga.Execute();
+  // 
+  //     await Verify(finalState);
+  //   }
 }

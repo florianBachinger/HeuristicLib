@@ -179,95 +179,6 @@ public static class SymbolicRegressionParameterOptimization
     }
   }
 
-  private static (double[] cOpt, ExitCondition status) MathNetLevenbergMarquardt(int maxIterations, int n, double[] y, int m, double[,] x, TreeToAutoDiffTermConverter.ParametricFunction func, EvaluationsCounter rowEvaluationsCounter, TreeToAutoDiffTermConverter.ParametricFunctionGradient funcGrad, double[] c, int k)
-  {
-    #region math.net.numerics
-
-    var xIdx = Vector<double>.Build.Dense(n, init: i => i);
-    var yVec = Vector<double>.Build.DenseOfArray(y);
-    var wVec = Vector<double>.Build.Dense(n, 1.0);
-
-    // Model: parameters p -> vector of predicted y_i
-    Vector<double> ModelN(Vector<double> p, Vector<double> idx)
-    {
-      var predicted = Vector<double>.Build.Dense(idx.Count);
-      var xRow = new double[m];
-
-      for (var j = 0; j < idx.Count; j++) {
-        var i = (int)idx[j]; // observation index
-
-        for (var col = 0; col < m; col++) {
-          xRow[col] = x[i, col];
-        }
-
-        predicted[j] = func(p.ToArray(), xRow);
-        rowEvaluationsCounter.FunctionEvaluations++;
-      }
-
-      return predicted;
-    }
-
-    // Jacobian: J[i, q] = ∂f(c, x_i) / ∂c_q
-    Matrix<double> Jacobian(Vector<double> p, Vector<double> idx)
-    {
-      var J = Matrix<double>.Build.Dense(idx.Count, p.Count);
-      var xRow = new double[m];
-
-      for (var j = 0; j < idx.Count; j++) {
-        var i = (int)idx[j];
-
-        for (var col = 0; col < m; col++) {
-          xRow[col] = x[i, col];
-        }
-
-        var (gradArr, _) = funcGrad(p.ToArray(), xRow);
-
-        for (var q = 0; q < p.Count; q++) {
-          J[j, q] = gradArr[q];
-        }
-
-        rowEvaluationsCounter.GradientEvaluations++;
-      }
-
-      return J;
-    }
-
-    var objective =
-      ObjectiveFunction.NonlinearModel(
-        ModelN,
-        Jacobian,
-        xIdx, // "X" (here just indices; real X is in closure)
-        yVec, // observed Y
-        wVec // weights
-      );
-
-// Bounds/scales: “no bounds, all free”
-    var scales = Enumerable.Repeat(1.0, k).ToArray();
-    var isFixed = Enumerable.Repeat(false, k).ToArray();
-
-// Configure LM similarly to your ALGLIB maxIterations limit
-    var lm = new LevenbergMarquardtMinimizer(
-      1e-3,
-      1e-12,
-      1e-12,
-      1e-12,
-      maxIterations
-    );
-
-// Solve
-    var result = lm.FindMinimum(objective,
-      c, // initialGuess
-      scales: scales,
-      isFixed: isFixed);
-
-    var cOpt = result.MinimizingPoint.ToArray();
-    var status = result.ReasonForExit; // similar to retVal
-
-    #endregion
-
-    return (cOpt, status);
-  }
-
   private static void UpdateParameters(SymbolicExpressionTree tree, double[] parameters, bool updateVariableWeights)
   {
     var i = 0;
@@ -284,14 +195,14 @@ public static class SymbolicRegressionParameterOptimization
 
           break;
         case VariableTreeNodeBase: {
-          if (node is FactorVariableTreeNode { Weights: not null } factorVarTreeNode) {
-            for (var j = 0; j < factorVarTreeNode.Weights.Length; j++) {
-              factorVarTreeNode.Weights[j] = parameters[i++];
+            if (node is FactorVariableTreeNode { Weights: not null } factorVarTreeNode) {
+              for (var j = 0; j < factorVarTreeNode.Weights.Length; j++) {
+                factorVarTreeNode.Weights[j] = parameters[i++];
+              }
             }
-          }
 
-          break;
-        }
+            break;
+          }
       }
     }
   }

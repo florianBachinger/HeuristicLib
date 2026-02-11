@@ -6,8 +6,8 @@ namespace HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Ma
 public sealed class LaggedVariableTreeNode : VariableTreeNodeBase
 {
 
-  public LaggedVariableTreeNode(LaggedVariableTreeNode other) : base(other) {}
-  public LaggedVariableTreeNode(LaggedVariable variableSymbol) : base(variableSymbol) {}
+  public LaggedVariableTreeNode(LaggedVariableTreeNode other) : base(other) { }
+  public LaggedVariableTreeNode(LaggedVariable variableSymbol) : base(variableSymbol) { }
   public new LaggedVariable Symbol => (LaggedVariable)base.Symbol;
 
   public int Lag { get; set; }

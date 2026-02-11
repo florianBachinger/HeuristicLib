@@ -91,18 +91,18 @@ public sealed class SymbolicDataAnalysisExpressionMatlabFormatter : ISymbolicExp
       case StartSymbol:
         return FormatRecursively(node.GetSubtree(0));
       case Addition: {
-        stringBuilder.Append('(');
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          if (i > 0) {
-            stringBuilder.Append('+');
+          stringBuilder.Append('(');
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            if (i > 0) {
+              stringBuilder.Append('+');
+            }
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
           }
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+
+          stringBuilder.Append(')');
+
+          break;
         }
-
-        stringBuilder.Append(')');
-
-        break;
-      }
       case Absolute:
         stringBuilder.Append($"abs({FormatRecursively(node.GetSubtree(0))})");
 
@@ -112,44 +112,44 @@ public sealed class SymbolicDataAnalysisExpressionMatlabFormatter : ISymbolicExp
 
         break;
       case And: {
-        stringBuilder.Append("((");
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          if (i > 0) {
-            stringBuilder.Append('&');
-          }
           stringBuilder.Append("((");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
-          stringBuilder.Append(")>0)");
-        }
-
-        stringBuilder.Append(")-0.5)*2");
-
-        // MATLAB maps false and true to 0 and 1, resp., we map this result to -1.0 and +1.0, resp.
-        break;
-      }
-      case Average: {
-        stringBuilder.Append("(1/");
-        stringBuilder.Append(node.SubtreeCount);
-        stringBuilder.Append(")*(");
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          if (i > 0) {
-            stringBuilder.Append("+");
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            if (i > 0) {
+              stringBuilder.Append('&');
+            }
+            stringBuilder.Append("((");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            stringBuilder.Append(")>0)");
           }
-          stringBuilder.Append("(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
-          stringBuilder.Append(")");
+
+          stringBuilder.Append(")-0.5)*2");
+
+          // MATLAB maps false and true to 0 and 1, resp., we map this result to -1.0 and +1.0, resp.
+          break;
         }
+      case Average: {
+          stringBuilder.Append("(1/");
+          stringBuilder.Append(node.SubtreeCount);
+          stringBuilder.Append(")*(");
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            if (i > 0) {
+              stringBuilder.Append("+");
+            }
+            stringBuilder.Append("(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            stringBuilder.Append(")");
+          }
 
-        stringBuilder.Append(")");
+          stringBuilder.Append(")");
 
-        break;
-      }
+          break;
+        }
       case Number: {
-        var numberTreeNode = (NumberTreeNode)node;
-        stringBuilder.Append(numberTreeNode.Value.ToString(CultureInfo.InvariantCulture));
+          var numberTreeNode = (NumberTreeNode)node;
+          stringBuilder.Append(numberTreeNode.Value.ToString(CultureInfo.InvariantCulture));
 
-        break;
-      }
+          break;
+        }
       case Cosine:
         stringBuilder.Append("cos(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -162,19 +162,19 @@ public sealed class SymbolicDataAnalysisExpressionMatlabFormatter : ISymbolicExp
 
         break;
       case Division: {
-        stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-        stringBuilder.Append("/(");
-        for (var i = 1; i < node.SubtreeCount; i++) {
-          if (i > 1) {
-            stringBuilder.Append("*");
+          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+          stringBuilder.Append("/(");
+          for (var i = 1; i < node.SubtreeCount; i++) {
+            if (i > 1) {
+              stringBuilder.Append("*");
+            }
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
           }
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+
+          stringBuilder.Append(")");
+
+          break;
         }
-
-        stringBuilder.Append(")");
-
-        break;
-      }
       case Exponential:
         stringBuilder.Append("exp(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -227,15 +227,15 @@ public sealed class SymbolicDataAnalysisExpressionMatlabFormatter : ISymbolicExp
 
         break;
       case LaggedVariable: {
-        // this if must be checked before if(symbol is LaggedVariable)
-        var laggedVariableTreeNode = (LaggedVariableTreeNode)node;
-        stringBuilder.Append(laggedVariableTreeNode.Weight.ToString(CultureInfo.InvariantCulture));
-        stringBuilder.Append('*');
-        stringBuilder.Append(laggedVariableTreeNode.VariableName +
-          LagToString(currentLag + laggedVariableTreeNode.Lag));
+          // this if must be checked before if(symbol is LaggedVariable)
+          var laggedVariableTreeNode = (LaggedVariableTreeNode)node;
+          stringBuilder.Append(laggedVariableTreeNode.Weight.ToString(CultureInfo.InvariantCulture));
+          stringBuilder.Append('*');
+          stringBuilder.Append(laggedVariableTreeNode.VariableName +
+            LagToString(currentLag + laggedVariableTreeNode.Lag));
 
-        break;
-      }
+          break;
+        }
       case LessThan:
         stringBuilder.Append("((");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -252,15 +252,15 @@ public sealed class SymbolicDataAnalysisExpressionMatlabFormatter : ISymbolicExp
 
         break;
       case Multiplication: {
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          if (i > 0) {
-            stringBuilder.Append("*");
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            if (i > 0) {
+              stringBuilder.Append("*");
+            }
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
           }
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
-        }
 
-        break;
-      }
+          break;
+        }
       case Not:
         stringBuilder.Append("~(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -268,21 +268,21 @@ public sealed class SymbolicDataAnalysisExpressionMatlabFormatter : ISymbolicExp
 
         break;
       case Or: {
-        stringBuilder.Append("((");
-        for (var i = 0; i < node.SubtreeCount; i++) {
-          if (i > 0) {
-            stringBuilder.Append("|");
-          }
           stringBuilder.Append("((");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
-          stringBuilder.Append(")>0)");
+          for (var i = 0; i < node.SubtreeCount; i++) {
+            if (i > 0) {
+              stringBuilder.Append("|");
+            }
+            stringBuilder.Append("((");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            stringBuilder.Append(")>0)");
+          }
+
+          stringBuilder.Append(")-0.5)*2");
+
+          // MATLAB maps false and true to 0 and 1, resp., we map this result to -1.0 and +1.0, resp.
+          break;
         }
-
-        stringBuilder.Append(")-0.5)*2");
-
-        // MATLAB maps false and true to 0 and 1, resp., we map this result to -1.0 and +1.0, resp.
-        break;
-      }
       case Sine:
         stringBuilder.Append("sin(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -290,22 +290,22 @@ public sealed class SymbolicDataAnalysisExpressionMatlabFormatter : ISymbolicExp
 
         break;
       case Subtraction: {
-        stringBuilder.Append("(");
-        if (node.SubtreeCount == 1) {
-          stringBuilder.Append("-");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-        } else {
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          for (var i = 1; i < node.SubtreeCount; i++) {
+          stringBuilder.Append("(");
+          if (node.SubtreeCount == 1) {
             stringBuilder.Append("-");
-            stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+          } else {
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            for (var i = 1; i < node.SubtreeCount; i++) {
+              stringBuilder.Append("-");
+              stringBuilder.Append(FormatRecursively(node.GetSubtree(i)));
+            }
           }
+
+          stringBuilder.Append(")");
+
+          break;
         }
-
-        stringBuilder.Append(")");
-
-        break;
-      }
       case Tangent:
         stringBuilder.Append("tan(");
         stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
@@ -319,131 +319,131 @@ public sealed class SymbolicDataAnalysisExpressionMatlabFormatter : ISymbolicExp
 
         break;
       default: {
-        if (node.Symbol is AiryA) {
-          stringBuilder.Append("airy(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is AiryB) {
-          stringBuilder.Append("airy(2, ");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is Bessel) {
-          stringBuilder.Append("besseli(0.0,");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is CosineIntegral) {
-          stringBuilder.Append("cosint(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is Dawson) {
-          stringBuilder.Append("dawson(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is Erf) {
-          stringBuilder.Append("erf(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is ExponentialIntegralEi) {
-          stringBuilder.Append("expint(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is FresnelCosineIntegral) {
-          stringBuilder.Append("FresnelC(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is FresnelSineIntegral) {
-          stringBuilder.Append("FresnelS(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is Gamma) {
-          stringBuilder.Append("gamma(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is HyperbolicCosineIntegral) {
-          stringBuilder.Append("Chi(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is HyperbolicSineIntegral) {
-          stringBuilder.Append("Shi(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is Norm) {
-          stringBuilder.Append("normpdf(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is Psi) {
-          stringBuilder.Append("psi(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (node.Symbol is SineIntegral) {
-          stringBuilder.Append("sinint(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")");
-        } else if (symbol is Variable) {
-          var variableTreeNode = (VariableTreeNode)node;
-          stringBuilder.Append(variableTreeNode.Weight.ToString(CultureInfo.InvariantCulture));
-          stringBuilder.Append("*");
-          stringBuilder.Append(variableTreeNode.VariableName + LagToString(currentLag));
-        } else if (symbol is FactorVariable) {
-          var factorNode = (FactorVariableTreeNode)node;
-          var weights = string.Join(" ", factorNode.Weights!.Select(w => w.ToString("G17", CultureInfo.InvariantCulture)));
-          stringBuilder.Append($"switch_{factorNode.VariableName}(\"{factorNode.VariableName}\",[{weights}])")
-            .AppendLine();
-        } else if (symbol is BinaryFactorVariable) {
-          var factorNode = (BinaryFactorVariableTreeNode)node;
-          stringBuilder.Append(CultureInfo.InvariantCulture,
-            $"((strcmp({factorNode.VariableName},\"{factorNode.VariableValue}\")==1) * {factorNode.Weight:G17})");
-        } else if (symbol is Power) {
-          stringBuilder.Append('(');
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")^round(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(1)));
-          stringBuilder.Append(')');
-        } else if (symbol is Root) {
-          stringBuilder.Append('(');
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(")^(1 / round(");
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(1)));
-          stringBuilder.Append("))");
-        } else if (symbol is Derivative) {
-          stringBuilder.Append("fivePoint(");
-          // f0
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(", ");
-          // f1
-          currentLag--;
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(", ");
-          // f3
-          currentLag -= 2;
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(", ");
-          currentLag--;
-          // f4
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          stringBuilder.Append(')');
-          currentLag += 4;
-        } else if (symbol is Integral) {
-          var laggedNode = (LaggedTreeNode)node;
-          var prevCounterVariable = CurrentIndexVariable;
-          var counterVariable = AllocateIndexVariable();
-          stringBuilder.AppendLine(" sum (map(@(" + counterVariable + ") " + FormatRecursively(node.GetSubtree(0)) +
-            ", (" + prevCounterVariable + "+" + laggedNode.Lag + "):" + prevCounterVariable +
-            "))");
-          ReleaseIndexVariable();
-        } else if (symbol is TimeLag) {
-          var laggedNode = (LaggedTreeNode)node;
-          currentLag += laggedNode.Lag;
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-          currentLag -= laggedNode.Lag;
-        } else if (symbol is SubFunctionSymbol) {
-          stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
-        } else {
-          stringBuilder.Append("ERROR");
-        }
+          if (node.Symbol is AiryA) {
+            stringBuilder.Append("airy(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is AiryB) {
+            stringBuilder.Append("airy(2, ");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is Bessel) {
+            stringBuilder.Append("besseli(0.0,");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is CosineIntegral) {
+            stringBuilder.Append("cosint(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is Dawson) {
+            stringBuilder.Append("dawson(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is Erf) {
+            stringBuilder.Append("erf(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is ExponentialIntegralEi) {
+            stringBuilder.Append("expint(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is FresnelCosineIntegral) {
+            stringBuilder.Append("FresnelC(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is FresnelSineIntegral) {
+            stringBuilder.Append("FresnelS(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is Gamma) {
+            stringBuilder.Append("gamma(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is HyperbolicCosineIntegral) {
+            stringBuilder.Append("Chi(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is HyperbolicSineIntegral) {
+            stringBuilder.Append("Shi(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is Norm) {
+            stringBuilder.Append("normpdf(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is Psi) {
+            stringBuilder.Append("psi(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (node.Symbol is SineIntegral) {
+            stringBuilder.Append("sinint(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")");
+          } else if (symbol is Variable) {
+            var variableTreeNode = (VariableTreeNode)node;
+            stringBuilder.Append(variableTreeNode.Weight.ToString(CultureInfo.InvariantCulture));
+            stringBuilder.Append("*");
+            stringBuilder.Append(variableTreeNode.VariableName + LagToString(currentLag));
+          } else if (symbol is FactorVariable) {
+            var factorNode = (FactorVariableTreeNode)node;
+            var weights = string.Join(" ", factorNode.Weights!.Select(w => w.ToString("G17", CultureInfo.InvariantCulture)));
+            stringBuilder.Append($"switch_{factorNode.VariableName}(\"{factorNode.VariableName}\",[{weights}])")
+              .AppendLine();
+          } else if (symbol is BinaryFactorVariable) {
+            var factorNode = (BinaryFactorVariableTreeNode)node;
+            stringBuilder.Append(CultureInfo.InvariantCulture,
+              $"((strcmp({factorNode.VariableName},\"{factorNode.VariableValue}\")==1) * {factorNode.Weight:G17})");
+          } else if (symbol is Power) {
+            stringBuilder.Append('(');
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")^round(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(1)));
+            stringBuilder.Append(')');
+          } else if (symbol is Root) {
+            stringBuilder.Append('(');
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(")^(1 / round(");
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(1)));
+            stringBuilder.Append("))");
+          } else if (symbol is Derivative) {
+            stringBuilder.Append("fivePoint(");
+            // f0
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(", ");
+            // f1
+            currentLag--;
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(", ");
+            // f3
+            currentLag -= 2;
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(", ");
+            currentLag--;
+            // f4
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            stringBuilder.Append(')');
+            currentLag += 4;
+          } else if (symbol is Integral) {
+            var laggedNode = (LaggedTreeNode)node;
+            var prevCounterVariable = CurrentIndexVariable;
+            var counterVariable = AllocateIndexVariable();
+            stringBuilder.AppendLine(" sum (map(@(" + counterVariable + ") " + FormatRecursively(node.GetSubtree(0)) +
+              ", (" + prevCounterVariable + "+" + laggedNode.Lag + "):" + prevCounterVariable +
+              "))");
+            ReleaseIndexVariable();
+          } else if (symbol is TimeLag) {
+            var laggedNode = (LaggedTreeNode)node;
+            currentLag += laggedNode.Lag;
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+            currentLag -= laggedNode.Lag;
+          } else if (symbol is SubFunctionSymbol) {
+            stringBuilder.Append(FormatRecursively(node.GetSubtree(0)));
+          } else {
+            stringBuilder.Append("ERROR");
+          }
 
-        break;
-      }
+          break;
+        }
     }
 
     return stringBuilder.ToString();

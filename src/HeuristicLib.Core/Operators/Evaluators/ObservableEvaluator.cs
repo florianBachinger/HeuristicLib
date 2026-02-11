@@ -27,7 +27,7 @@ public partial record ObservableEvaluator<TG, TS, TP>
 
   public IEvaluatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
     return new ObservableEvaluatorInstance(evaluatorInstance, Observers);
   }
 

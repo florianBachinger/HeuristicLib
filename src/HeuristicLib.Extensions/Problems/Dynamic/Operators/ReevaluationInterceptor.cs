@@ -25,7 +25,7 @@ public record ReevaluationInterceptor<T, TR, TE, TP>
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var evaluatorInstance = instanceRegistry.GetOrCreate(evaluator);
+    var evaluatorInstance = instanceRegistry.Resolve(evaluator);
     return new Instance(evaluatorInstance, problem);
   }
 

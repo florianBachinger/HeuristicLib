@@ -23,13 +23,13 @@ public record NSGA2<TGenotype, TSearchSpace, TProblem>
 
   public override NSGA2Instance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var interceptorInstance = Interceptor is not null ? instanceRegistry.GetOrCreate(Interceptor) : null;
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
-    var creatorInstance = instanceRegistry.GetOrCreate(Creator);
-    var crossoverInstance = instanceRegistry.GetOrCreate(Crossover);
-    var mutatorInstance = instanceRegistry.GetOrCreate(Mutator);
-    var selectorInstance = instanceRegistry.GetOrCreate(Selector);
-    var replacerInstance = instanceRegistry.GetOrCreate(Replacer);
+    var interceptorInstance = Interceptor is not null ? instanceRegistry.Resolve(Interceptor) : null;
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
+    var creatorInstance = instanceRegistry.Resolve(Creator);
+    var crossoverInstance = instanceRegistry.Resolve(Crossover);
+    var mutatorInstance = instanceRegistry.Resolve(Mutator);
+    var selectorInstance = instanceRegistry.Resolve(Selector);
+    var replacerInstance = instanceRegistry.Resolve(Replacer);
 
     return new NSGA2Instance<TGenotype, TSearchSpace, TProblem>(
       interceptorInstance,
@@ -96,10 +96,13 @@ public static class NSGA2
     ICreator<TGenotype, TSearchSpace, TProblem> creator,
     ICrossover<TGenotype, TSearchSpace, TProblem> crossover,
     IMutator<TGenotype, TSearchSpace, TProblem> mutator, bool dominateOnEquals = true)
-    where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace> where TGenotype : class => new() {
-    Mutator = mutator,
-    Crossover = crossover,
-    Creator = creator,
-    Selector = new ParetoCrowdingTournamentSelector<TGenotype>(dominateOnEquals)
-  };
+    where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace> where TGenotype : class
+  {
+    return new() {
+      Mutator = mutator,
+      Crossover = crossover,
+      Creator = creator,
+      Selector = new ParetoCrowdingTournamentSelector<TGenotype>(dominateOnEquals)
+    };
+  }
 }

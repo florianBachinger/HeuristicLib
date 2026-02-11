@@ -58,7 +58,7 @@ public sealed record RemoveBranchManipulation : SymbolicExpressionTreeManipulato
     var possibleSymbols = (from s in searchSpace.Grammar.GetAllowedChildSymbols(parent.Symbol, childIndex)
                            where s.InitialFrequency > 0.0
                            group s by searchSpace.Grammar.GetMinimumExpressionLength(s)
-                           into g
+      into g
                            orderby g.Key
                            select g).First().ToList();
     var weights = possibleSymbols.Select(x => x.InitialFrequency).ToList();

@@ -44,7 +44,7 @@ public partial record MultiMutator<TGenotype, TSearchSpace, TProblem>
     }
 
     Mutators = mutator;
-    Weights = weights ?? [..Enumerable.Repeat(1.0, mutator.Length)];
+    Weights = weights ?? [.. Enumerable.Repeat(1.0, mutator.Length)];
 
     cumulativeSumWeights = new double[Weights.Length];
     for (var i = 0; i < Weights.Length; i++) {
@@ -55,7 +55,7 @@ public partial record MultiMutator<TGenotype, TSearchSpace, TProblem>
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var mutatorInstances = Mutators.Select(instanceRegistry.GetOrCreate).ToArray();
+    var mutatorInstances = Mutators.Select(instanceRegistry.Resolve).ToArray();
     return new Instance(mutatorInstances, cumulativeSumWeights, sumWeights);
   }
 

@@ -24,7 +24,7 @@ public class ObservableAlgorithm<TG, TS, TP, TR>
   public IAlgorithmInstance<TG, TS, TP, TR> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     return new ObservableAlgorithmInstance<TG, TS, TP, TR>(
-      algorithm.CreateExecutionInstance(instanceRegistry), // ToDo: think if this is correct
+      instanceRegistry.Resolve(algorithm),
       observers
     );
   }

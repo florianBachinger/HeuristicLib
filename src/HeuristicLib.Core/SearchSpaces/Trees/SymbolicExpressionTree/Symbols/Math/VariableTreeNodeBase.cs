@@ -8,7 +8,7 @@ namespace HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Ma
 public abstract class VariableTreeNodeBase : SymbolicExpressionTreeNode
 {
 
-  protected VariableTreeNodeBase(VariableBase variableSymbol) : base(variableSymbol) {}
+  protected VariableTreeNodeBase(VariableBase variableSymbol) : base(variableSymbol) { }
 
   protected VariableTreeNodeBase(VariableTreeNodeBase other) : base(other)
   {

@@ -30,7 +30,7 @@ public record LimitEvaluator<TG, TS, TP>
   {
     var countedEvaluator = evaluator.CountInvocations(out var counter);
 
-    var evaluatorInstance = instanceRegistry.GetOrCreate(countedEvaluator);
+    var evaluatorInstance = instanceRegistry.Resolve(countedEvaluator);
     return new Instance(evaluatorInstance, counter, maxEvaluations, alternativeValue, strict);
   }
 

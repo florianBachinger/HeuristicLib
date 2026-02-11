@@ -44,7 +44,7 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
     }
 
     Crossovers = crossovers;
-    Weights = weights ?? [..Enumerable.Repeat(1.0, crossovers.Length)];
+    Weights = weights ?? [.. Enumerable.Repeat(1.0, crossovers.Length)];
 
     cumulativeSumWeights = new double[Weights.Length];
     for (var i = 0; i < Weights.Length; i++) {
@@ -55,7 +55,7 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var crossoverInstances = Crossovers.Select(instanceRegistry.GetOrCreate).ToArray();
+    var crossoverInstances = Crossovers.Select(instanceRegistry.Resolve).ToArray();
     return new Instance(crossoverInstances, cumulativeSumWeights, sumWeights);
   }
 

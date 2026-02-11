@@ -359,25 +359,25 @@ public sealed class InfixExpressionParser
     while (next.StrVal == "+" || next.StrVal == "-") {
       switch (next.StrVal) {
         case "+": {
-          tokens.Dequeue();
-          var right = ParseTerm(tokens);
-          var op = GetSymbol("+").CreateTreeNode();
-          op.AddSubtree(left);
-          op.AddSubtree(right);
-          left = op;
+            tokens.Dequeue();
+            var right = ParseTerm(tokens);
+            var op = GetSymbol("+").CreateTreeNode();
+            op.AddSubtree(left);
+            op.AddSubtree(right);
+            left = op;
 
-          break;
-        }
+            break;
+          }
         case "-": {
-          tokens.Dequeue();
-          var right = ParseTerm(tokens);
-          var op = GetSymbol("-").CreateTreeNode();
-          op.AddSubtree(left);
-          op.AddSubtree(right);
-          left = op;
+            tokens.Dequeue();
+            var right = ParseTerm(tokens);
+            var op = GetSymbol("-").CreateTreeNode();
+            op.AddSubtree(left);
+            op.AddSubtree(right);
+            left = op;
 
-          break;
-        }
+            break;
+          }
       }
 
       next = tokens.Peek();
@@ -404,26 +404,26 @@ public sealed class InfixExpressionParser
     while (next.StrVal is "*" or "/") {
       switch (next.StrVal) {
         case "*": {
-          tokens.Dequeue();
-          var right = ParseFact(tokens);
+            tokens.Dequeue();
+            var right = ParseFact(tokens);
 
-          var op = GetSymbol("*").CreateTreeNode();
-          op.AddSubtree(left);
-          op.AddSubtree(right);
-          left = op;
+            var op = GetSymbol("*").CreateTreeNode();
+            op.AddSubtree(left);
+            op.AddSubtree(right);
+            left = op;
 
-          break;
-        }
+            break;
+          }
         case "/": {
-          tokens.Dequeue();
-          var right = ParseFact(tokens);
-          var op = GetSymbol("/").CreateTreeNode();
-          op.AddSubtree(left);
-          op.AddSubtree(right);
-          left = op;
+            tokens.Dequeue();
+            var right = ParseFact(tokens);
+            var op = GetSymbol("/").CreateTreeNode();
+            op.AddSubtree(left);
+            op.AddSubtree(right);
+            left = op;
 
-          break;
-        }
+            break;
+          }
       }
 
       next = tokens.Peek();
@@ -505,28 +505,28 @@ public sealed class InfixExpressionParser
     var next = tokens.Peek();
     switch (next.TokenType) {
       case TokenType.LeftPar: {
-        var initPar = tokens.Dequeue(); // match par type
-        var expr = ParseExpr(tokens);
-        var rPar = tokens.Dequeue();
-        if (rPar.TokenType != TokenType.RightPar) {
-          throw new ArgumentException("expected closing parenthesis");
+          var initPar = tokens.Dequeue(); // match par type
+          var expr = ParseExpr(tokens);
+          var rPar = tokens.Dequeue();
+          if (rPar.TokenType != TokenType.RightPar) {
+            throw new ArgumentException("expected closing parenthesis");
+          }
+
+          return initPar.StrVal switch {
+            "(" when rPar.StrVal == "}" => throw new ArgumentException("expected closing )"),
+            "{" when rPar.StrVal == ")" => throw new ArgumentException("expected closing }"),
+            _ => expr
+          };
         }
-
-        return initPar.StrVal switch {
-          "(" when rPar.StrVal == "}" => throw new ArgumentException("expected closing )"),
-          "{" when rPar.StrVal == ")" => throw new ArgumentException("expected closing }"),
-          _ => expr
-        };
-      }
       case TokenType.Identifier: {
-        var idTok = tokens.Dequeue();
+          var idTok = tokens.Dequeue();
 
-        return tokens.Peek().TokenType == TokenType.LeftPar
-          ?
-          // function identifier or LAG
-          ParseFunctionOrLaggedVariable(tokens, idTok)
-          : ParseVariable(tokens, idTok);
-      }
+          return tokens.Peek().TokenType == TokenType.LeftPar
+            ?
+            // function identifier or LAG
+            ParseFunctionOrLaggedVariable(tokens, idTok)
+            : ParseVariable(tokens, idTok);
+        }
       case TokenType.LeftAngleBracket:
         // '<' 'num' [ '=' ['+'|'-'] number ] '>'
         return ParseNumber(tokens);
@@ -545,10 +545,10 @@ public sealed class InfixExpressionParser
 
           return numNode;
         case ConstantTreeNode constNode: {
-          var constSy = new Constant { Value = -constNode.Value };
+            var constSy = new Constant { Value = -constNode.Value };
 
-          return constSy.CreateTreeNode();
-        }
+            return constSy.CreateTreeNode();
+          }
         case VariableTreeNode varNode:
           varNode.Weight *= -1;
 
@@ -709,34 +709,34 @@ public sealed class InfixExpressionParser
 
         break;
       case SubFunctionSymbol: { // SubFunction
-        var subFunction = (SubFunctionTreeNode)funcNode;
-        subFunction.Name = idTok.StrVal;
-        // input arguments
-        var args = ParseArgList(tokens);
-        IList<string> arguments = new List<string>();
-        foreach (var arg in args) {
-          if (arg is VariableTreeNode varTreeNode) {
-            arguments.Add(varTreeNode.VariableName);
+          var subFunction = (SubFunctionTreeNode)funcNode;
+          subFunction.Name = idTok.StrVal;
+          // input arguments
+          var args = ParseArgList(tokens);
+          IList<string> arguments = new List<string>();
+          foreach (var arg in args) {
+            if (arg is VariableTreeNode varTreeNode) {
+              arguments.Add(varTreeNode.VariableName);
+            }
           }
-        }
-        subFunction.Arguments = arguments;
+          subFunction.Arguments = arguments;
 
-        break;
-      }
+          break;
+        }
       default: {
-        // functions
-        var args = ParseArgList(tokens);
-        // check number of arguments
-        if (funcNode.Symbol.MinimumArity > args.Length || funcNode.Symbol.MaximumArity < args.Length) {
-          throw new ArgumentException($"Symbol {funcId} requires between {funcNode.Symbol.MinimumArity} and  {funcNode.Symbol.MaximumArity} arguments.");
-        }
+          // functions
+          var args = ParseArgList(tokens);
+          // check number of arguments
+          if (funcNode.Symbol.MinimumArity > args.Length || funcNode.Symbol.MaximumArity < args.Length) {
+            throw new ArgumentException($"Symbol {funcId} requires between {funcNode.Symbol.MinimumArity} and  {funcNode.Symbol.MaximumArity} arguments.");
+          }
 
-        foreach (var arg in args) {
-          funcNode.AddSubtree(arg);
-        }
+          foreach (var arg in args) {
+            funcNode.AddSubtree(arg);
+          }
 
-        break;
-      }
+          break;
+        }
     }
 
     var rPar = tokens.Dequeue();

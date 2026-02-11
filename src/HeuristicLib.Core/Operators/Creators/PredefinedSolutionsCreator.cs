@@ -24,7 +24,7 @@ public partial record PredefinedSolutionsCreator<TGenotype, TSearchSpace, TProbl
 
   public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var creatorForRemainingSolutionsInstance = instanceRegistry.GetOrCreate(CreatorForRemainingSolutions);
+    var creatorForRemainingSolutionsInstance = instanceRegistry.Resolve(CreatorForRemainingSolutions);
     return new Instance(PredefinedSolutions, creatorForRemainingSolutionsInstance);
   }
 

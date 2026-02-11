@@ -43,155 +43,155 @@ public class SymbolicDataAnalysisExpressionTreeBatchInterpreter : ISymbolicDataA
 
       switch (instr.Opcode) {
         case OpCodes.Variable: {
-          LoadData(instr, rows, rowIndex, batchSize);
+            LoadData(instr, rows, rowIndex, batchSize);
 
-          break;
-        }
+            break;
+          }
         case OpCodes.Constant: // fall through
         case OpCodes.Number:
           break; // nothing to do here, don't remove because we want to prevent falling into the default case here.
         case OpCodes.Add: {
-          Load(instr.Buf, childInstruction.Buf);
-          for (var j = 1; j < n; ++j) {
-            ref readonly var ch = ref code[c + j];
-            Add(instr.Buf, ch.Buf);
-          }
+            Load(instr.Buf, childInstruction.Buf);
+            for (var j = 1; j < n; ++j) {
+              ref readonly var ch = ref code[c + j];
+              Add(instr.Buf, ch.Buf);
+            }
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Sub: {
-          if (n == 1) {
-            Neg(instr.Buf, childInstruction.Buf);
-          } else {
-            Load(instr.Buf, childInstruction.Buf);
-            for (var j = 1; j < n; ++j) {
-              ref readonly var ch = ref code[c + j];
-              Sub(instr.Buf, ch.Buf);
+            if (n == 1) {
+              Neg(instr.Buf, childInstruction.Buf);
+            } else {
+              Load(instr.Buf, childInstruction.Buf);
+              for (var j = 1; j < n; ++j) {
+                ref readonly var ch = ref code[c + j];
+                Sub(instr.Buf, ch.Buf);
+              }
             }
-          }
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Mul: {
-          Load(instr.Buf, childInstruction.Buf);
-          for (var j = 1; j < n; ++j) {
-            ref readonly var ch = ref code[c + j];
-            Mul(instr.Buf, ch.Buf);
-          }
-
-          break;
-        }
-
-        case OpCodes.Div: {
-          if (n == 1) {
-            Inv(instr.Buf, childInstruction.Buf);
-          } else {
             Load(instr.Buf, childInstruction.Buf);
             for (var j = 1; j < n; ++j) {
               ref readonly var ch = ref code[c + j];
-              Div(instr.Buf, ch.Buf);
+              Mul(instr.Buf, ch.Buf);
             }
+
+            break;
           }
 
-          break;
-        }
+        case OpCodes.Div: {
+            if (n == 1) {
+              Inv(instr.Buf, childInstruction.Buf);
+            } else {
+              Load(instr.Buf, childInstruction.Buf);
+              for (var j = 1; j < n; ++j) {
+                ref readonly var ch = ref code[c + j];
+                Div(instr.Buf, ch.Buf);
+              }
+            }
+
+            break;
+          }
 
         case OpCodes.Square: {
-          Square(instr.Buf, childInstruction.Buf);
+            Square(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Root: {
-          Load(instr.Buf, childInstruction.Buf);
-          ref readonly var ch = ref code[c + 1];
-          Root(instr.Buf, ch.Buf);
+            Load(instr.Buf, childInstruction.Buf);
+            ref readonly var ch = ref code[c + 1];
+            Root(instr.Buf, ch.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.SquareRoot: {
-          Sqrt(instr.Buf, childInstruction.Buf);
+            Sqrt(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Cube: {
-          Cube(instr.Buf, childInstruction.Buf);
+            Cube(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
         case OpCodes.CubeRoot: {
-          CubeRoot(instr.Buf, childInstruction.Buf);
+            CubeRoot(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Power: {
-          Load(instr.Buf, childInstruction.Buf);
-          ref readonly var ch = ref code[c + 1];
-          Pow(instr.Buf, ch.Buf);
+            Load(instr.Buf, childInstruction.Buf);
+            ref readonly var ch = ref code[c + 1];
+            Pow(instr.Buf, ch.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Exp: {
-          Exp(instr.Buf, childInstruction.Buf);
+            Exp(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Log: {
-          Log(instr.Buf, childInstruction.Buf);
+            Log(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Sin: {
-          Sin(instr.Buf, childInstruction.Buf);
+            Sin(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Cos: {
-          Cos(instr.Buf, childInstruction.Buf);
+            Cos(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Tan: {
-          Tan(instr.Buf, childInstruction.Buf);
+            Tan(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Tanh: {
-          Tanh(instr.Buf, childInstruction.Buf);
+            Tanh(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.Absolute: {
-          Absolute(instr.Buf, childInstruction.Buf);
+            Absolute(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.AnalyticQuotient: {
-          Load(instr.Buf, childInstruction.Buf);
-          ref readonly var ch = ref code[c + 1];
-          AnalyticQuotient(instr.Buf, ch.Buf);
+            Load(instr.Buf, childInstruction.Buf);
+            ref readonly var ch = ref code[c + 1];
+            AnalyticQuotient(instr.Buf, ch.Buf);
 
-          break;
-        }
+            break;
+          }
 
         case OpCodes.SubFunction: {
-          Load(instr.Buf, childInstruction.Buf);
+            Load(instr.Buf, childInstruction.Buf);
 
-          break;
-        }
+            break;
+          }
         default:
           throw new NotSupportedException($"This interpreter does not support {(OpCode)instr.Opcode}");
       }
@@ -250,22 +250,22 @@ public class SymbolicDataAnalysisExpressionTreeBatchInterpreter : ISymbolicDataA
       double[] d = [];
       switch (node) {
         case VariableTreeNode variable: {
-          w = variable.Weight;
-          if (cachedData!.TryGetValue(variable.VariableName, out var value)) {
-            d = value;
-          } else {
-            d = dataset.GetDoubleValues(variable.VariableName).ToArray();
-            cachedData[variable.VariableName] = d;
+            w = variable.Weight;
+            if (cachedData!.TryGetValue(variable.VariableName, out var value)) {
+              d = value;
+            } else {
+              d = dataset.GetDoubleValues(variable.VariableName).ToArray();
+              cachedData[variable.VariableName] = d;
+            }
+
+            break;
           }
-
-          break;
-        }
         case NumberTreeNode numeric: {
-          v = numeric.Value;
-          Array.Fill(code[i].Buf, code[i].Value, 0, BatchSize);
+            v = numeric.Value;
+            Array.Fill(code[i].Buf, code[i].Value, 0, BatchSize);
 
-          break;
-        }
+            break;
+          }
       }
 
       code[i] = new BatchInstruction(opCodeMapper(node), (ushort)node.SubtreeCount, buf: new double[BatchSize], childIndex: c, weight: w, data: d, value: v);

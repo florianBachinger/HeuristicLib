@@ -125,8 +125,9 @@ public class HoeffdingsDependenceCalculator : IDependencyCalculator
         i++;
       } else {
         int j;
+        // how far does it go (<= effectively means == as w must be sorted, side-step equality for double values)
         for (j = i + 1; j < n && w[j] <= w[i]; j++) {
-          ; // how far does it go (<= effectively means == as w must be sorted, side-step equality for double values)
+
         }
         var rank = 1 + 0.5 * (i + j - 1);
         int k;

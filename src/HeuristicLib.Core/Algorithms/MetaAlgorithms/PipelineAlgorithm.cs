@@ -29,7 +29,7 @@ public partial record PipelineAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TPr
 
   public override PipelineAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    var evaluatorInstance = instanceRegistry.GetOrCreate(Evaluator);
+    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
 
     return new PipelineAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>(
       evaluatorInstance,

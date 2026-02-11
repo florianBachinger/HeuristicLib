@@ -7,7 +7,7 @@ namespace HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Ma
 public sealed class NumberTreeNode : SymbolicExpressionTreeNode
 {
 
-  public NumberTreeNode(Number numberSymbol) : base(numberSymbol) {}
+  public NumberTreeNode(Number numberSymbol) : base(numberSymbol) { }
 
   public NumberTreeNode(NumberTreeNode original) : base(original) => Value = original.Value;
 
