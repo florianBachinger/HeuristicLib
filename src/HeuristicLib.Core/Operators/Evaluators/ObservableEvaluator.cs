@@ -10,7 +10,7 @@ namespace HEAL.HeuristicLib.Operators.Evaluators;
 
 [Equatable]
 public partial record ObservableEvaluator<TG, TS, TP>
-  : IEvaluator<TG, TS, TP>
+  : Evaluator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
@@ -24,7 +24,7 @@ public partial record ObservableEvaluator<TG, TS, TP>
     Observers = observers;
   }
 
-  public IEvaluatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
     var evaluatorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();

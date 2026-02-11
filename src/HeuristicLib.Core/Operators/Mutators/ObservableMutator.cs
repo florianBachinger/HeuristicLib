@@ -23,7 +23,7 @@ public partial record ObservableMutator<TG, TS, TP>
     Observers = observers;
   }
 
-  public override IMutatorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var mutatorInstance = instanceRegistry.Resolve(Mutator);
     var mutatorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();

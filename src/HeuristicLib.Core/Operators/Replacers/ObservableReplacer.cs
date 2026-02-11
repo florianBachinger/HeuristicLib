@@ -24,7 +24,7 @@ public partial record ObservableReplacer<TG, TS, TP>
     Observers = observers;
   }
 
-  public override IReplacerInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var replacerInstance = instanceRegistry.Resolve(Replacer);
     var replacerObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();

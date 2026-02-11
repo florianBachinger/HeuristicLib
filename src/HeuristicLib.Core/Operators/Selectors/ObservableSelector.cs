@@ -25,7 +25,7 @@ public partial record ObservableSelector<TG, TS, TP>
     Observers = observers;
   }
 
-  public override ISelectorInstance<TG, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var selectorInstance = instanceRegistry.Resolve(Selector);
     var selectorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();

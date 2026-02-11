@@ -25,7 +25,7 @@ public partial record ObservableTerminator<TG, TR, TS, TP>
     Observers = observers;
   }
 
-  public override ITerminatorInstance<TG, TR, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var interceptorInstance = instanceRegistry.Resolve(Interceptor);
     var terminatorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();

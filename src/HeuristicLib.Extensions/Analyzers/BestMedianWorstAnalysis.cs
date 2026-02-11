@@ -1,4 +1,6 @@
-﻿using HEAL.HeuristicLib.Optimization;
+﻿using HEAL.HeuristicLib.Execution;
+using HEAL.HeuristicLib.Operators.Interceptors;
+using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
@@ -28,22 +30,28 @@ public record BestMedianWorstEntry<T>(ISolution<T> Best, ISolution<T> Median, IS
 //  //}
 // }
 
-public class BestMedianWorstAnalysis<TGenotype> : IInterceptorObserver<TGenotype, PopulationState<TGenotype>>
+public class BestMedianWorstAnalysis<T> : IInterceptorObserver<T, PopulationState<T>>
 {
-  private readonly List<BestMedianWorstEntry<TGenotype>> bestSolutions = [];
 
-  public IReadOnlyList<BestMedianWorstEntry<TGenotype>> BestSolutions => bestSolutions;
+  public IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => new Instance();
 
-  public void AfterInterception(PopulationState<TGenotype> newState, PopulationState<TGenotype> currentState, PopulationState<TGenotype>? previousState, ISearchSpace<TGenotype> searchSpace, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
+  public sealed class Instance : IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>
   {
-    var comp = problem.Objective.TotalOrderComparer is NoTotalOrderComparer ? new LexicographicComparer(problem.Objective.Directions) : problem.Objective.TotalOrderComparer;
-    var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();
-    if (ordered.Length == 0) {
-      bestSolutions.Add(null!);
+    private readonly List<BestMedianWorstEntry<T>> bestSolutions = [];
+    public IReadOnlyList<BestMedianWorstEntry<T>> BestSolutions => bestSolutions;
 
-      return;
+    public void AfterInterception(PopulationState<T> newState, PopulationState<T> currentState, PopulationState<T>? previousState, ISearchSpace<T> searchSpace, IProblem<T, ISearchSpace<T>> problem)
+    {
+      var comp = problem.Objective.TotalOrderComparer is NoTotalOrderComparer ? new LexicographicComparer(problem.Objective.Directions) : problem.Objective.TotalOrderComparer;
+      var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();
+      if (ordered.Length == 0) {
+        bestSolutions.Add(null!);
+
+        return;
+      }
+
+      bestSolutions.Add(new BestMedianWorstEntry<T>(ordered[0], ordered[ordered.Length / 2], ordered[^1]));
     }
-
-    bestSolutions.Add(new BestMedianWorstEntry<TGenotype>(ordered[0], ordered[ordered.Length / 2], ordered[^1]));
   }
+
 }

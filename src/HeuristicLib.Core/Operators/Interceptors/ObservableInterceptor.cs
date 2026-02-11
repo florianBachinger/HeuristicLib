@@ -25,7 +25,7 @@ public partial record ObservableInterceptor<TG, TR, TS, TP>
     Observers = observers;
   }
 
-  public override IInterceptorInstance<TG, TR, TS, TP> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     var interceptorInstance = instanceRegistry.Resolve(Interceptor);
     var interceptorObserverInstances = Observers.Select(instanceRegistry.Resolve).ToArray();
