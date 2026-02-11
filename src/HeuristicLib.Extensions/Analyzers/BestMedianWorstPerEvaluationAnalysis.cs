@@ -1,5 +1,4 @@
 ﻿using HEAL.HeuristicLib.Algorithms;
-using HEAL.HeuristicLib.Analyzers;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Evaluators;
 using HEAL.HeuristicLib.Optimization;
@@ -14,7 +13,7 @@ namespace HEAL.HeuristicLib.Analyzers;
 public class BestMedianWorstPerEvaluationAnalysis<TGenotype>
   : IEvaluatorObserver<TGenotype>,
     IInterceptorObserver<TGenotype, PopulationState<TGenotype>>
-//IAlgorithmObserver<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>
+// IAlgorithmObserver<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>
 {
   private int currentEvaluationsCount = 0;
   private readonly List<(int, BestMedianWorstEntry<TGenotype>)> bestSolutions = [];
@@ -41,7 +40,7 @@ public class BestMedianWorstPerEvaluationAnalysis<TGenotype>
   //   
   //   var comp = problem.Objective.TotalOrderComparer is NoTotalOrderComparer ? new LexicographicComparer(problem.Objective.Directions) : problem.Objective.TotalOrderComparer;
   //   var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();
-  //
+  // 
   //   bestSolutions.Add((currentEvaluationsCount, new BestMedianWorstEntry<TGenotype>(ordered[0], ordered[ordered.Length / 2], ordered[^1])));
   // }
 }

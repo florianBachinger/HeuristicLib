@@ -15,7 +15,8 @@ public partial record ObservableMutator<TG, TS, TP>
 {
   public IMutator<TG, TS, TP> Mutator { get; }
 
-  [OrderedEquality] public ImmutableArray<IMutatorObserver<TG, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<IMutatorObserver<TG, TS, TP>> Observers { get; }
 
   public ObservableMutator(IMutator<TG, TS, TP> mutator, params ImmutableArray<IMutatorObserver<TG, TS, TP>> observers)
   {

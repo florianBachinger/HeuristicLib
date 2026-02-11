@@ -16,7 +16,8 @@ public partial record ObservableSelector<TG, TS, TP>
 {
   public ISelector<TG, TS, TP> Selector { get; }
 
-  [OrderedEquality] public ImmutableArray<ISelectorObserver<TG, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<ISelectorObserver<TG, TS, TP>> Observers { get; }
 
   public ObservableSelector(ISelector<TG, TS, TP> selector, params ImmutableArray<ISelectorObserver<TG, TS, TP>> observers)
   {

@@ -103,7 +103,6 @@ public class EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem>
       var objectives = Evaluator.Evaluate(initialPopulation, random, problem.SearchSpace, problem);
       return new EvolutionStrategyState<TGenotype> {
         Population = Population.From(initialPopulation, objectives),
-        //CurrentIteration = 0,
         // ToDo: Actually, mutation strength is not used in initial population creation.
         MutationStrength = InitialMutationStrength
       };
@@ -127,7 +126,7 @@ public class EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem>
 
     var newMutationStrength = previousState.MutationStrength;
     if (Mutator is IVariableStrengthMutator<TGenotype, TSearchSpace, TProblem> vm) {
-      //adapt Mutation Strength based on 1/5th rule
+      // adapt Mutation Strength based on 1/5th rule
       var successes = parentQualities.Zip(fitnesses).Count(t => t.Item2.CompareTo(t.Item1, problem.Objective) == DominanceRelation.Dominates);
       var successRate = successes / (double)PopulationSize;
       newMutationStrength *= successRate switch {
@@ -143,7 +142,6 @@ public class EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem>
     var newPopulation = Replacer.Replace(previousState.Population.Solutions, population.Solutions, problem.Objective, random, problem.SearchSpace, problem);
     return new EvolutionStrategyState<TGenotype> {
       Population = Population.From(newPopulation),
-      //CurrentIteration = previousState.CurrentIteration + 1,
       MutationStrength = newMutationStrength
     };
   }

@@ -15,7 +15,8 @@ public partial record ObservableCreator<TG, TS, TP>
 {
   public ICreator<TG, TS, TP> Creator { get; }
 
-  [OrderedEquality] public ImmutableArray<ICreatorObserver<TG, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<ICreatorObserver<TG, TS, TP>> Observers { get; }
 
   public ObservableCreator(ICreator<TG, TS, TP> creator, params ImmutableArray<ICreatorObserver<TG, TS, TP>> observers)
   {
@@ -116,7 +117,7 @@ public static class ObservableCreatorExtensions
       throw new NotImplementedException();
       var newTiming = new InvocationTiming();
       timing = newTiming;
-      //return creator.ObserveWith(_ => ) 
+      // return creator.ObserveWith(_ => ) 
       // // ToDo: think if we want the actual timer as dependency
       // var start = Stopwatch.GetTimestamp();
       // var result = @operator.Execute(input, context);

@@ -17,7 +17,9 @@ public static class ExecutableExtensions
 {
   extension<TExecutionInstance>(IExecutable<TExecutionInstance> executable) where TExecutionInstance : class, IExecutionInstance
   {
-    public TExecutionInstance CreateNewExecutionInstance() => executable.CreateExecutionInstance(new ExecutionInstanceRegistry());
-    public TExecutionInstance CreateNewExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => instanceRegistry.GetOrCreate(executable);
+    public TExecutionInstance CreateNewExecutionInstance()
+    {
+      return executable.CreateExecutionInstance(new ExecutionInstanceRegistry());
+    }
   }
 }

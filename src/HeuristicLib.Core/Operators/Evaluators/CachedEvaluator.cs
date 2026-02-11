@@ -24,9 +24,6 @@ public record CachedEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   protected readonly Func<TGenotype, TKey> KeySelector;
   protected readonly long? SizeLimit;
 
-  public CachedEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, long? sizeLimit = null) : this(evaluator, x => x, sizeLimit)
-  { }
-
   public CachedEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
   {
     this.Evaluator = evaluator;

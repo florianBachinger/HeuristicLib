@@ -13,12 +13,17 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
-  [OrderedEquality] public ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> Crossovers { get; }
+  [OrderedEquality]
+  public ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> Crossovers { get; }
 
-  [OrderedEquality] public ImmutableArray<double> Weights { get; }
+  [OrderedEquality]
+  public ImmutableArray<double> Weights { get; }
 
-  [IgnoreEquality] private readonly double sumWeights;
-  [IgnoreEquality] private readonly double[] cumulativeSumWeights;
+  [IgnoreEquality]
+  private readonly double sumWeights;
+
+  [IgnoreEquality]
+  private readonly double[] cumulativeSumWeights;
 
   public MultiCrossover(ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> crossovers, ImmutableArray<double>? weights = null)
   {
@@ -106,7 +111,7 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
 
     // public override void Cross(ReadOnlySpan<TGenotype> parent1, ReadOnlySpan<TGenotype> parent2, IRandomNumberGenerator random, TSearchSpace encoding, TProblem problem, Span<TGenotype> offspring) {
     //   if (parent1.Length != parent2.Length || offspring.Length != parent1.Length) throw new ArgumentException("Parent arrays and offspring array must have the same length.", nameof(parent1));
-    //
+    // 
     //   // Compute cumulative weights for roulette wheel selection
     //   double[] cumulative = new double[Weights.Count];
     //   double sum = 0;
@@ -114,7 +119,7 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
     //     sum += Weights[i];
     //     cumulative[i] = sum;
     //   }
-    //
+    // 
     //   int n = offspring.Length;
     //   int[] operatorIndices = new int[n];
     //   for (int i = 0; i < n; i++) {
@@ -122,14 +127,14 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
     //     int idx = Array.FindIndex(cumulative, w => r < w);
     //     operatorIndices[i] = idx;
     //   }
-    //
+    // 
     //   // Batch indices by operator
     //   for (int op = 0; op < Crossovers.Count; op++) {
     //     // Find all indices for this operator
     //     var indices = Enumerable.Range(0, n).Where(i => operatorIndices[i] == op).ToArray();
-    //
+    // 
     //     if (indices.Length == 0) continue;
-    //
+    // 
     //     // GetEvaluator temporary arrays for this batch
     //     TGenotype[] p1 = new TGenotype[indices.Length];
     //     TGenotype[] p2 = new TGenotype[indices.Length];
@@ -138,9 +143,9 @@ public partial record MultiCrossover<TGenotype, TSearchSpace, TProblem> : Crosso
     //       p2[j] = parent2[indices[j]];
     //     }
     //     TGenotype[] off = new TGenotype[indices.Length];
-    //
+    // 
     //     Crossovers[op].Cross(p1, p2, random, encoding, problem, off);
-    //
+    // 
     //     for (int j = 0; j < indices.Length; j++) {
     //       offspring[indices[j]] = off[j];
     //     }

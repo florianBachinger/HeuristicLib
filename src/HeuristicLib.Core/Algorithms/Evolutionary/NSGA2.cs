@@ -73,8 +73,7 @@ public class NSGA2Instance<TGenotype, TSearchSpace, TProblem>
       var initialSolutions = Creator.Create(PopulationSize, random, problem.SearchSpace, problem);
       var initialFitnesses = Evaluator.Evaluate(initialSolutions, random, problem.SearchSpace, problem);
       return new PopulationState<TGenotype> {
-        Population = Population.From(initialSolutions, initialFitnesses),
-        //CurrentIteration = 0
+        Population = Population.From(initialSolutions, initialFitnesses)
       };
     }
 
@@ -86,8 +85,7 @@ public class NSGA2Instance<TGenotype, TSearchSpace, TProblem>
     var nextPop = Replacer.Replace(previousState.Population.Solutions, newPop.Solutions, problem.Objective, random, problem.SearchSpace, problem);
 
     return new PopulationState<TGenotype> {
-      Population = Population.From(nextPop),
-      //CurrentIteration = previousState.CurrentIteration + 1
+      Population = Population.From(nextPop)
     };
   }
 }

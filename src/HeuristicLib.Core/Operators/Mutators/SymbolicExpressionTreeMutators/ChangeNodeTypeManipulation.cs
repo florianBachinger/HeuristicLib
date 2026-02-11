@@ -32,9 +32,9 @@ public record ChangeNodeTypeManipulation : SymbolicExpressionTreeManipulator
       foreach (var symbol in grammar.GetAllowedChildSymbols(parent.Symbol, childIndex)) {
         // check basic properties that the new symbol must have
         if (symbol == child.Symbol ||
-            symbol.InitialFrequency <= 0 ||
-            existingSubtreeCount > grammar.GetMinimumSubtreeCount(symbol) ||
-            existingSubtreeCount < grammar.GetMaximumSubtreeCount(symbol)) {
+          symbol.InitialFrequency <= 0 ||
+          existingSubtreeCount > grammar.GetMinimumSubtreeCount(symbol) ||
+          existingSubtreeCount < grammar.GetMaximumSubtreeCount(symbol)) {
           continue;
         }
 

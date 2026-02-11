@@ -16,7 +16,8 @@ public partial record ObservableCrossover<TG, TS, TP>
 {
   public ICrossover<TG, TS, TP> Crossover { get; }
 
-  [OrderedEquality] public ImmutableArray<ICrossoverObserver<TG, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<ICrossoverObserver<TG, TS, TP>> Observers { get; }
 
   public ObservableCrossover(ICrossover<TG, TS, TP> crossover, params ImmutableArray<ICrossoverObserver<TG, TS, TP>> observers)
   {

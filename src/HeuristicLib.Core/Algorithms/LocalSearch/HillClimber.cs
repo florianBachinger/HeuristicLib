@@ -66,8 +66,7 @@ public class HillClimberInstance<TGenotype, TSearchSpace, TProblem>
       var initialSolution = Creator.Create(1, random, problem.SearchSpace, problem)[0];
       var initialFitness = Evaluator.Evaluate([initialSolution], random, problem.SearchSpace, problem)[0];
       return new SingleSolutionState<TGenotype> {
-        Population = Population.From([initialSolution], [initialFitness]),
-        //CurrentIteration = 0
+        Population = Population.From([initialSolution], [initialFitness])
       };
     }
 
@@ -85,15 +84,13 @@ public class HillClimberInstance<TGenotype, TSearchSpace, TProblem>
       newISolution = new Solution<TGenotype>(child[best], res[best]);
       if (Direction == LocalSearchDirection.FirstImprovement) {
         return new SingleSolutionState<TGenotype> {
-          Population = Population.From([newISolution.Genotype], [newISolution.ObjectiveVector]),
-          //CurrentIteration = previousState.CurrentIteration + 1
+          Population = Population.From([newISolution.Genotype], [newISolution.ObjectiveVector])
         };
       }
     }
 
     return new SingleSolutionState<TGenotype> {
-      Population = Population.From([newISolution.Genotype], [newISolution.ObjectiveVector]),
-      //CurrentIteration = previousState.CurrentIteration + 1
+      Population = Population.From([newISolution.Genotype], [newISolution.ObjectiveVector])
     };
   }
 }

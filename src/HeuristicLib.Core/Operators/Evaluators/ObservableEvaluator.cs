@@ -16,7 +16,8 @@ public partial record ObservableEvaluator<TG, TS, TP>
 {
   public IEvaluator<TG, TS, TP> Evaluator { get; }
 
-  [OrderedEquality] public ImmutableArray<IEvaluatorObserver<TG, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<IEvaluatorObserver<TG, TS, TP>> Observers { get; }
 
   public ObservableEvaluator(IEvaluator<TG, TS, TP> evaluator, params ImmutableArray<IEvaluatorObserver<TG, TS, TP>> observers)
   {

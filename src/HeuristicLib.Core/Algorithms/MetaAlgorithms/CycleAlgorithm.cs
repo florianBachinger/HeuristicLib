@@ -19,7 +19,8 @@ public partial record CycleAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TProbl
   where TAlgorithmState : class, IAlgorithmState
   where TAlgorithm : IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
 {
-  [OrderedEquality] public ImmutableArray<TAlgorithm> Algorithms { get; }
+  [OrderedEquality]
+  public ImmutableArray<TAlgorithm> Algorithms { get; }
 
   // ToDo: think if better place outside and keep CycleAlgorithm as infinite cycles?
   public int? MaximumCycles { get; init; }

@@ -16,7 +16,8 @@ public partial record ObservableTerminator<TG, TR, TS, TP>
 {
   public ITerminator<TG, TR, TS, TP> Interceptor { get; }
 
-  [OrderedEquality] public ImmutableArray<ITerminatorObserver<TG, TR, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<ITerminatorObserver<TG, TR, TS, TP>> Observers { get; }
 
   public ObservableTerminator(ITerminator<TG, TR, TS, TP> interceptor, params ImmutableArray<ITerminatorObserver<TG, TR, TS, TP>> observers)
   {

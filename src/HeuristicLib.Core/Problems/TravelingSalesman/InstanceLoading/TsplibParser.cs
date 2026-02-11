@@ -435,8 +435,8 @@ public class TsplibParser
         var node = int.Parse(nodeString, CultureInfo.InvariantCulture.NumberFormat);
         if (node == -1) {
           finished = tours.Count > 0 && tours[^1].Count == 0 // -1 followed by -1
-                     || source.BaseStream.CanSeek && source.Peek() == -1
-                     || source.Peek() == 'E';
+            || source.BaseStream.CanSeek && source.Peek() == -1
+            || source.Peek() == 'E';
           if (finished) {
             break;
           }
@@ -524,7 +524,7 @@ public class TsplibParser
             if (rowWise) {
               dim2++;
               if ((!diagonal || dim2 != dim1 + 1)
-                  && (diagonal || dim2 != dim1)) {
+                && (diagonal || dim2 != dim1)) {
                 continue;
               }
 
@@ -597,7 +597,7 @@ public class TsplibParser
     LOWER_DIAG_ROW = 6,
     UPPER_COLUMN = 7,
 
-    //LowerColumn = 8,
+    // LowerColumn = 8,
     Upper_Diag_Column = 9,
     Lower_Diag_Column = 10
   }

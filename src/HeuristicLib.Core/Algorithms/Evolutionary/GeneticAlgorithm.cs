@@ -100,8 +100,7 @@ public class GeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>
       var initialSolutions = Creator.Create(PopulationSize, random, problem.SearchSpace, problem);
       var initialFitnesses = Evaluator.Evaluate(initialSolutions, random, problem.SearchSpace, problem);
       return new PopulationState<TGenotype> {
-        Population = Population.From(initialSolutions, initialFitnesses),
-        //CurrentIteration = 0
+        Population = Population.From(initialSolutions, initialFitnesses)
       };
     }
 
@@ -116,8 +115,7 @@ public class GeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>
     var newPopulation = Replacer.Replace(oldPopulation, Population.From(population, fitnesses).Solutions, problem.Objective, random, problem.SearchSpace, problem);
 
     return new PopulationState<TGenotype> {
-      Population = Population.From(newPopulation),
-      //CurrentIteration = previousState.CurrentIteration + 1
+      Population = Population.From(newPopulation)
     };
   }
 }
@@ -149,8 +147,7 @@ public static class GeneticAlgorithm
       Replacer = replacer,
       PopulationSize = populationSize,
       Evaluator = evaluator,
-      Interceptor = interceptor,
-      //Terminator = terminator
+      Interceptor = interceptor
     };
   }
 

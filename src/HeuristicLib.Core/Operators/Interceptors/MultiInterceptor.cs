@@ -43,20 +43,3 @@ public partial record MultiInterceptor<TGenotype, TAlgorithmState, TSearchSpace,
     }
   }
 }
-
-// public static class MultiInterceptor
-// {
-//   public static MultiInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>? Create<TGenotype, TAlgorithmState, TSearchSpace, TProblem>(
-//     IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>? interceptor)
-//     where TSearchSpace : class, ISearchSpace<TGenotype>
-//     where TProblem : class, IProblem<TGenotype, TSearchSpace>
-//     where TAlgorithmState : class, IAlgorithmState
-//   {
-//     var list = new List<IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>>();
-//     if (interceptor != null) {
-//       list.Add(interceptor);
-//     }
-//
-//     return list.Count == 0 ? null : new MultiInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>(list);
-//   }
-// }

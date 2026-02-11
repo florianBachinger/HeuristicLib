@@ -125,7 +125,6 @@ public static class Sbx
 
       // skip fixed variables (equal bounds)
 #pragma warning disable S1244
-      // ReSharper disable once CompareOfFloatsByEqualityOperator
       if (xl[v % xl.Count] == xu[v % xu.Count]) {
 #pragma warning restore S1244
         continue;

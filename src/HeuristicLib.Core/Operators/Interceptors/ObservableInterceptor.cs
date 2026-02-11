@@ -16,7 +16,8 @@ public partial record ObservableInterceptor<TG, TR, TS, TP>
 {
   public IInterceptor<TG, TR, TS, TP> Interceptor { get; }
 
-  [OrderedEquality] public ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> Observers { get; }
 
   public ObservableInterceptor(IInterceptor<TG, TR, TS, TP> interceptor, params ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> observers)
   {

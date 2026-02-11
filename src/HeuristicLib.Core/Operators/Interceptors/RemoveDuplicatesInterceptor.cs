@@ -8,7 +8,6 @@ public record RemoveDuplicatesInterceptor<TGenotype, TAlgorithmState>
   where TAlgorithmState : PopulationState<TGenotype>
 {
   private readonly IEqualityComparer<TGenotype> comparer;
-
   public RemoveDuplicatesInterceptor(IEqualityComparer<TGenotype> comparer)
   {
     this.comparer = comparer;

@@ -54,8 +54,11 @@ public static class GridAlgorithmExtensions
     where TSearchSpace : class, ISearchSpace<TGenotype>
     where TProblem : class, IProblem<TGenotype, TSearchSpace>
     where TAlgorithmState : class, IAlgorithmState
-    where TAlgorithm : class, IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>;
-
+    where TAlgorithm : class, IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
+  {
+   
+  }
+  
   // extension<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>(IMetaAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm> executor)
   //   where TSearchSpace : class, ISearchSpace<TGenotype>
   //   where TProblem : class, IProblem<TGenotype, TSearchSpace>
@@ -74,18 +77,3 @@ public static class GridAlgorithmExtensions
   // }
 }
 
-// public static class GridExecutor
-// {
-//   public static GridExecutor<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm> Create<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>(
-//     TAlgorithm algorithm, Grid<TAlgorithm> grid
-//   )
-////     where TSearchSpace : class, ISearchSpace<TGenotype>
-//     where TProblem : class, IProblem<TGenotype, TSearchSpace>
-//     where TAlgorithmState : class, IAlgorithmState
-//     where TAlgorithm : class, IAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
-//   {
-//     return new GridExecutor<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm> {
-//       ParameterGrid = grid
-//     };
-//   }
-// }

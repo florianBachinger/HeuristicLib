@@ -10,7 +10,7 @@ public record NormalDistributedCreator(RealVector means, RealVector sigmas)
   public RealVector Means { get; set; } = means;
   public RealVector Sigmas { get; set; } = sigmas;
 
-  //if (!RealVector.AreCompatible(searchSpace.Length, means, sigmas, searchSpace.Minimum, searchSpace.Maximum)) throw new ArgumentException("Vectors must have compatible lengths");
+  // if (!RealVector.AreCompatible(searchSpace.Length, means, sigmas, searchSpace.Minimum, searchSpace.Maximum)) throw new ArgumentException("Vectors must have compatible lengths");
 
   public override RealVector Create(IRandomNumberGenerator random, RealVectorSearchSpace searchSpace)
   {

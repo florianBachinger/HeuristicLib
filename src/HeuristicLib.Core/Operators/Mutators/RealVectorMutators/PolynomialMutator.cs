@@ -77,7 +77,10 @@ public record PolynomialMutator : SingleSolutionStatelessMutator<RealVector, Rea
 
     // Do not mutate fixed variables (xl == xu)
     for (var j = 0; j < nVar; j++) {
+#pragma warning disable S1244
+      // ReSharper disable once CompareOfFloatsByEqualityOperator
       if (xl[j % xl.Count] == xu[j % xu.Count]) {
+#pragma warning restore S1244
         mut[j] = false;
       }
     }
@@ -85,10 +88,12 @@ public record PolynomialMutator : SingleSolutionStatelessMutator<RealVector, Rea
     // If nothing mutates, still run the (cheap) repair for consistency and return
     var any = false;
     for (var j = 0; j < nVar; j++) {
-      if (mut[j]) {
-        any = true;
-        break;
+      if (!mut[j]) {
+        continue;
       }
+
+      any = true;
+      break;
     }
 
     if (!any)
@@ -109,8 +114,10 @@ public record PolynomialMutator : SingleSolutionStatelessMutator<RealVector, Rea
       var ub = xu[j % xu.Count];
       var denom = ub - lb;
 
-      // Safety (shouldn�t happen because fixed variables got masked out)
+      // Safety (shouldn't happen because fixed variables got masked out)
+#pragma warning disable S1244
       if (denom == 0.0) {
+#pragma warning restore S1244
         xp[j] = xj;
         continue;
       }
@@ -119,19 +126,19 @@ public record PolynomialMutator : SingleSolutionStatelessMutator<RealVector, Rea
       var delta2 = (ub - xj) / denom;
 
       var r = random.NextDouble();
-      double deltaq;
+      double deltaQ;
 
       if (r <= 0.5) {
         var xy = 1.0 - delta1;
         var val = (2.0 * r) + ((1.0 - (2.0 * r)) * Math.Pow(xy, eta + 1.0));
-        deltaq = Math.Pow(val, mutPow) - 1.0;
+        deltaQ = Math.Pow(val, mutPow) - 1.0;
       } else {
         var xy = 1.0 - delta2;
         var val = (2.0 * (1.0 - r)) + (2.0 * (r - 0.5) * Math.Pow(xy, eta + 1.0));
-        deltaq = 1.0 - Math.Pow(val, mutPow);
+        deltaQ = 1.0 - Math.Pow(val, mutPow);
       }
 
-      var y = xj + (deltaq * denom);
+      var y = xj + (deltaQ * denom);
 
       // Clamp to [lb, ub] (floating-point drift)
       if (y < lb) {

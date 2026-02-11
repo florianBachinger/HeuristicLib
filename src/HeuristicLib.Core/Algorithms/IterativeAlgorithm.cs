@@ -14,14 +14,7 @@ public abstract record IterativeAlgorithm<TGenotype, TSearchSpace, TProblem, TAl
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
 {
-  //public int? MaximumIterations { get; init; }
-  //public ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem> Terminator { get; init; } = new NeverTerminator<TGenotype>();
   public IInterceptor<TGenotype, TAlgorithmState, TSearchSpace, TProblem>? Interceptor { get; init; }
-
-  // private ValueTask<TAlgorithmState> ExecuteStepAsync(TProblem problem, TAlgorithmState? previousState, IRandomNumberGenerator random)
-  // {
-  //   return new ValueTask<TAlgorithmState>(ExecuteStep(problem, previousState, random));
-  // }
 }
 
 public abstract class IterativeAlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
@@ -38,11 +31,6 @@ public abstract class IterativeAlgorithmInstance<TGenotype, TSearchSpace, TProbl
   {
     Interceptor = interceptor;
   }
-
-  // public override TAlgorithmState Transform(TAlgorithmState? state, IRandomNumberGenerator randomNumberGenerator, TSearchSpace searchSpace, TProblem problem)
-  // {
-  //   return ExecuteStep(state, problem, randomNumberGenerator);
-  // }
 
   public abstract TAlgorithmState ExecuteStep(TAlgorithmState? previousState, TProblem problem, IRandomNumberGenerator random);
 
