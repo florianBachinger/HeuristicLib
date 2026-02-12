@@ -5,7 +5,11 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Algorithms.Evolutionary;
 
-public record EvolutionStrategyBuilder<TG, TS, TP> : AlgorithmBuilder<TG, TS, TP, EvolutionStrategyState<TG>, EvolutionStrategy<TG, TS, TP>, EvolutionStrategyBuildSpec<TG, TS, TP>>
+public record EvolutionStrategyBuilder<TG, TS, TP>
+  : AlgorithmBuilder<TG, TS, TP, EvolutionStrategyState<TG>, EvolutionStrategy<TG, TS, TP>>,
+    IBuilderWithCreator<TG, TS, TP>,
+    IBuilderWithMutator<TG, TS, TP>,
+    IBuilderWithSelector<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
@@ -18,20 +22,16 @@ public record EvolutionStrategyBuilder<TG, TS, TP> : AlgorithmBuilder<TG, TS, TP
   public int NumberOfChildren { get; set; } = 100;
   public required ICreator<TG, TS, TP> Creator { get; set; }
 
-  public override EvolutionStrategyBuildSpec<TG, TS, TP> CreateBuildSpec() => new(
-    Evaluator, Interceptor, PopulationSize, Strategy, Mutator, InitialMutationStrength, Crossover, Selector, NumberOfChildren, Creator
-  );
-
-  public override EvolutionStrategy<TG, TS, TP> BuildFromSpec(EvolutionStrategyBuildSpec<TG, TS, TP> spec) => new() {
-    PopulationSize = spec.PopulationSize,
-    Strategy = spec.Strategy,
-    Creator = spec.Creator,
-    Mutator = spec.Mutator,
-    Crossover = spec.Crossover,
-    Selector = spec.Selector,
-    Evaluator = spec.Evaluator,
-    InitialMutationStrength = spec.InitialMutationStrength,
-    Interceptor = spec.Interceptor,
-    NumberOfChildren = spec.NumberOfChildren
+  public override EvolutionStrategy<TG, TS, TP> Build() => new() {
+    PopulationSize = PopulationSize,
+    Strategy = Strategy,
+    Creator = Creator,
+    Mutator = Mutator,
+    Crossover = Crossover,
+    Selector = Selector,
+    Evaluator = Evaluator,
+    InitialMutationStrength = InitialMutationStrength,
+    Interceptor = Interceptor,
+    NumberOfChildren = NumberOfChildren
   };
 }

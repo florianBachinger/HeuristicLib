@@ -136,98 +136,39 @@ public class OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotyp
     };
   }
 
-  // AlgorithmBuilder<TG, TS, TP, PopulationState<TG>, GeneticAlgorithm<TG, TS, TP>, GeneticAlgorithmBuildSpec<TG, TS, TP>>
-  public record Builder : AlgorithmBuilder<
-    TGenotype,
-    TSearchSpace,
-    TProblem,
-    PopulationState<TGenotype>,
-    OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TGenotype, TSearchSpace, TProblem>,
-    OERAPGABuildSpec<TGenotype, TSearchSpace, TProblem>>
-  {
-    public double MutationRate { get; set; } = 0.05;
-    public int Elites { get; set; } = 1;
-    public required int MaxEffort { get; set; }
-    public required ICreator<TGenotype, TSearchSpace, TProblem> Creator { get; set; }
-    public required ICrossover<TGenotype, TSearchSpace, TProblem> Crossover { get; set; }
-    public required IMutator<TGenotype, TSearchSpace, TProblem> Mutator { get; set; }
-    public int PopulationSize { get; set; } = 100;
-    public ISelector<TGenotype, TSearchSpace, TProblem> Selector { get; set; } = new TournamentSelector<TGenotype>(2);
 
-    public override OERAPGABuildSpec<TGenotype, TSearchSpace, TProblem> CreateBuildSpec() => new(
-      Evaluator, Interceptor, PopulationSize, Selector, Creator, Crossover, Mutator, MutationRate, Elites, MaxEffort
-    );
-
-    public override OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TGenotype, TSearchSpace, TProblem> BuildFromSpec(OERAPGABuildSpec<TGenotype, TSearchSpace, TProblem> spec) =>
-      new OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TGenotype, TSearchSpace, TProblem>() {
-        // ToDo: how to prevent accidentally reading from the builder instead of the spec here?
-        PopulationSize = spec.PopulationSize,
-        Creator = spec.Creator,
-        Crossover = spec.Crossover,
-        Selector = spec.Selector,
-        Evaluator = spec.Evaluator,
-        Interceptor = spec.Interceptor,
-        Mutator = spec.Mutator.WithRate(spec.MutationRate),
-        MaxEffort = spec.MaxEffort
-      };
-  }
 }
 
-#pragma warning disable S101
-public sealed record OERAPGABuildSpec<TG, TS, TP>
-#pragma warning restore S101
-#pragma warning restore S101
-  : AlgorithmBuildSpec<TG, TS, TP, PopulationState<TG>>,
-    ISpecWithCreator<TG, TS, TP>,
-    ISpecWithSelector<TG, TS, TP>,
-    ISpecWithCrossover<TG, TS, TP>,
-    ISpecWithMutator<TG, TS, TP>
+// ReSharper disable once IdentifierTypo
+public record OerapgaBuildBuilder<TG, TS, TP>
+  : AlgorithmBuilder<TG, TS, TP, PopulationState<TG>, OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TG, TS, TP>>,
+  IBuilderWithCreator<TG, TS, TP>,
+  IBuilderWithSelector<TG, TS, TP>,
+  IBuilderWithCrossover<TG, TS, TP>,
+  IBuilderWithMutator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
-  public int PopulationSize { get; set; }
-  public ISelector<TG, TS, TP> Selector { get; set; }
-  public ICreator<TG, TS, TP> Creator { get; set; }
-  public ICrossover<TG, TS, TP> Crossover { get; set; }
-  public IMutator<TG, TS, TP> Mutator { get; set; }
-  public double MutationRate { get; set; }
-  public int Elites { get; set; }
-  public int MaxEffort { get; set; }
+  public double MutationRate { get; set; } = 0.05;
+  public int Elites { get; set; } = 1;
+  public required int MaxEffort { get; set; }
+  public required ICreator<TG, TS, TP> Creator { get; set; }
+  public required ICrossover<TG, TS, TP> Crossover { get; set; }
+  public required IMutator<TG, TS, TP> Mutator { get; set; }
+  public int PopulationSize { get; set; } = 100;
+  public ISelector<TG, TS, TP> Selector { get; set; } = new TournamentSelector<TG>(2);
 
-  public OERAPGABuildSpec(
-    IEvaluator<TG, TS, TP> Evaluator,
-    IInterceptor<TG, PopulationState<TG>, TS, TP>? Interceptor,
-    int PopulationSize,
-    ISelector<TG, TS, TP> Selector,
-    ICreator<TG, TS, TP> Creator,
-    ICrossover<TG, TS, TP> Crossover,
-    IMutator<TG, TS, TP> Mutator,
-    double MutationRate,
-    int Elites,
-    int MaxEffort)
-    : base(Evaluator, Interceptor)
+  public override OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TG, TS, TP> Build()
   {
-    this.PopulationSize = PopulationSize;
-    this.Selector = Selector;
-    this.Creator = Creator;
-    this.Crossover = Crossover;
-    this.Mutator = Mutator;
-    this.MutationRate = MutationRate;
-    this.Elites = Elites;
-    this.MaxEffort = MaxEffort;
+    return new OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TG, TS, TP>() {
+      PopulationSize = PopulationSize,
+      Creator = Creator,
+      Crossover = Crossover,
+      Selector = Selector,
+      Evaluator = Evaluator,
+      Interceptor = Interceptor,
+      Mutator = Mutator.WithRate(MutationRate),
+      MaxEffort = MaxEffort
+    };
   }
 }
-
-// public static class OpenEndedRelevantAllelesPreservingGeneticAlgorithm
-// {
-//   public static OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TGenotype, TSearchSpace, TProblem>.Builder GetBuilder<TGenotype, TSearchSpace, TProblem>(
-//     ICreator<TGenotype, TSearchSpace, TProblem> creator,
-//     ICrossover<TGenotype, TSearchSpace, TProblem> crossover,
-//     IMutator<TGenotype, TSearchSpace, TProblem> mutator)
-//     where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace> where TGenotype : class => new() {
-//     Mutator = mutator,
-//     Crossover = crossover,
-//     Creator = creator,
-//     MaxEffort = 200
-//   };
-// }

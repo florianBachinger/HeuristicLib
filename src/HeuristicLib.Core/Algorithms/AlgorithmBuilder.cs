@@ -6,39 +6,17 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.Algorithms;
 
-public abstract record AlgorithmBuilder<TG, TS, TP, TR, TAlg, TBuildSpec> : IAlgorithmBuilder<TG, TS, TP, TR, TAlg, TBuildSpec>
+public abstract record AlgorithmBuilder<TG, TS, TP, TR, TAlg>
+  : IAlgorithmBuilder<TG, TS, TP, TR, TAlg>,
+    IBuilderWithEvaluator<TG, TS, TP>, IBuilderWithInterceptor<TG, TR, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
   where TR : class, IAlgorithmState
   where TAlg : IAlgorithm<TG, TS, TP, TR>
-  where TBuildSpec : IBuildSpec
 {
-  public List<IAlgorithmBuilderRewriter<TBuildSpec>> Rewriters { get; } = [];
-
   public IEvaluator<TG, TS, TP> Evaluator { get; set; } = new DirectEvaluator<TG>();
 
   public IInterceptor<TG, TR, TS, TP>? Interceptor { get; set; }
 
-  public void AddRewriter<TRewriter>(TRewriter rewriter)
-    where TRewriter : IAlgorithmBuilderRewriter<TBuildSpec>
-  {
-    Rewriters.Add(rewriter);
-  }
-
-  public TAlg Build()
-  {
-    var spec = CreateBuildSpec();
-    ApplyRewriters(spec);
-    return BuildFromSpec(spec);
-  }
-
-  public abstract TBuildSpec CreateBuildSpec();
-  public abstract TAlg BuildFromSpec(TBuildSpec buildSpec);
-
-  private void ApplyRewriters(TBuildSpec buildSpec)
-  {
-    foreach (var rewriter in Rewriters) {
-      rewriter.Rewrite(buildSpec);
-    }
-  }
+  public abstract TAlg Build();
 }

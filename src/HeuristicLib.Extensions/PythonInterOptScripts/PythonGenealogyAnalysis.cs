@@ -2,7 +2,10 @@
 using HEAL.HeuristicLib.Algorithms.Evolutionary;
 using HEAL.HeuristicLib.Algorithms.LocalSearch;
 using HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
+using HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
+using HEAL.HeuristicLib.Analyzers;
 using HEAL.HeuristicLib.Execution;
+using HEAL.HeuristicLib.GenealogyAnalysis;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Genotypes.Vectors;
 using HEAL.HeuristicLib.Operators.Creators.PermutationCreators;
@@ -11,6 +14,7 @@ using HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
 using HEAL.HeuristicLib.Operators.Crossovers.PermutationCrossovers;
 using HEAL.HeuristicLib.Operators.Crossovers.RealVectorCrossovers;
 using HEAL.HeuristicLib.Operators.Crossovers.SymbolicExpressionTreeCrossovers;
+using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Operators.Mutators;
 using HEAL.HeuristicLib.Operators.Mutators.PermutationMutators;
 using HEAL.HeuristicLib.Operators.Mutators.RealVectorMutators;
@@ -21,10 +25,6 @@ using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.SearchSpaces.Trees;
 using HEAL.HeuristicLib.States;
-using HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
-using HEAL.HeuristicLib.Analyzers;
-using HEAL.HeuristicLib.GenealogyAnalysis;
-using HEAL.HeuristicLib.Operators.Interceptors;
 
 #pragma warning disable S1104
 #pragma warning disable S1104
@@ -215,15 +215,14 @@ public class PythonGenealogyAnalysis
     }
   }
 
-  private static MyAnalyzers<T> AddAnalyzers<T, TE, TP, TRes, TA, TBS>(
+  private static MyAnalyzers<T> AddAnalyzers<T, TE, TP, TRes, TA>(
     Action<TRes>? callback,
-    AlgorithmBuilder<T, TE, TP, TRes, TA, TBS> builder,
+    AlgorithmBuilder<T, TE, TP, TRes, TA> builder,
     ExperimentParameters<T, TE> parameters)
     where TRes : PopulationState<T>
     where T : class
     where TE : class, ISearchSpace<T>
     where TP : class, IProblem<T, TE>
-    where TBS : AlgorithmBuildSpec<T, TE, TP, TRes>
     where TA : IAlgorithm<T, TE, TP, TRes>
   {
     var qualities = new BestMedianWorstAnalysis<T>();
@@ -232,13 +231,15 @@ public class PythonGenealogyAnalysis
       builder.AttachObserver(new ActionInterceptorObserver<T, TRes, TE, TP>((y, _, _, _, _) => callback(y)));
 
     var rankAnalysis = parameters.TrackGenealogy ? new RankAnalysis<T>() : null;
-    if (rankAnalysis is not null) builder.AttachObserver(rankAnalysis);
+    if (rankAnalysis is not null)
+      builder.AttachObserver(rankAnalysis);
 
     var qc = new QualityCurveAnalysis<T>();
     builder.AttachObserver(qc);
 
     var apt = parameters.TrackPopulations ? new AllPopulationsTracker<T>() : null;
-    if (apt is not null) builder.AttachObserver(apt);
+    if (apt is not null)
+      builder.AttachObserver(apt);
 
     return new MyAnalyzers<T>(qualities, rankAnalysis, qc, apt);
   }

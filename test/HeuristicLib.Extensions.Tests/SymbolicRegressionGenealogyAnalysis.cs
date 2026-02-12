@@ -83,7 +83,6 @@ public class GenealogyGraphTests
     ga.Selector = new TournamentSelector<SymbolicExpressionTree>(3);
     ga.Elites = 1;
     //ga.Terminator = new AfterIterationsTerminator<SymbolicExpressionTree>(gens);
-    ga.CreateBuildSpec();
 
     var evalQualities = new QualityCurveAnalysis<SymbolicExpressionTree>();
     var qualities = new BestMedianWorstAnalysis<SymbolicExpressionTree>();

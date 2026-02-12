@@ -86,18 +86,3 @@ public static class LimitEvaluatorExtensions
     }
   }
 }
-
-// public class LimitingEvaluatorRewriter<TBuildSpec, TG, TS, TP>(int maxEvaluations, bool preventOverBudget)
-//   : IAlgorithmBuilderRewriter<TBuildSpec>
-//   where TBuildSpec : class, ISpecWithEvaluator<TG, TS, TP>
-//   where TS : class, ISearchSpace<TG>
-//   where TP : class, IProblem<TG, TS>
-// {
-//   public void Rewrite(TBuildSpec buildSpec)
-//   {
-//     var countedEvaluator = buildSpec.Evaluator.AsCountedEvaluator();
-//     // ToDo: think about only using the limit evaluator if prevenOverBudget is true
-//     var limitEvaluator = new LimitEvaluator<TG, TS, TP>(countedEvaluator, maxEvaluations, preventOverBudget);
-//     buildSpec.Evaluator = limitEvaluator;
-//   }
-// }

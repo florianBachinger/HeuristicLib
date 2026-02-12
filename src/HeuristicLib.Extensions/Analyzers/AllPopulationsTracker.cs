@@ -11,10 +11,10 @@ public class AllPopulationsTracker<T> : IInterceptorObserver<T, PopulationState<
   where T : class
 {
 
-  public IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) 
+  public IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
     => new Instance();
 
-  public sealed class Instance : IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>,PopulationState<T>>
+  public sealed class Instance : IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>
   {
     public List<ISolution<T>[]> AllSolutions { get; } = [];
     public void AfterInterception(PopulationState<T> newState, PopulationState<T> currentState, PopulationState<T>? previousState, ISearchSpace<T> searchSpace, IProblem<T, ISearchSpace<T>> problem)
