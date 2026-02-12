@@ -15,6 +15,7 @@ public record TerminatableAlgorithm<TG, TS, TP, TR>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
   where TR : class, IAlgorithmState
+  where TG : class
 {
   public required IAlgorithm<TG, TS, TP, TR> Algorithm { get; init; }
   public required ITerminator<TG, TR, TS, TP> Terminator { get; init; }
@@ -71,6 +72,7 @@ public static class TerminatableAlgorithmExtensions
     where TS : class, ISearchSpace<TG>
     where TP : class, IProblem<TG, TS>
     where TR : class, IAlgorithmState
+    where TG : class
   {
     public TerminatableAlgorithm<TG, TS, TP, TR> WithMaxIterations(int maxIterations)
     {

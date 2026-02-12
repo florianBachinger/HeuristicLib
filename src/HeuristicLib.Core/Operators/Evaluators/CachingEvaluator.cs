@@ -18,10 +18,10 @@ public record CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   protected readonly Func<TGenotype, TKey> KeySelector;
   protected readonly long? SizeLimit;
 
-  public CachingEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
+  public CachingEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, Func<TGenotype, TKey> keySelector, long? sizeLimit = null)
   {
     this.Evaluator = evaluator;
-    this.KeySelector = keySelector ?? (g => (TKey)(object)g);
+    this.KeySelector = keySelector;
     this.SizeLimit = sizeLimit;
   }
 
@@ -46,39 +46,56 @@ public record CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
       Cache = new MemoryCache(cacheOptions);
     }
 
-    public override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+    public override IReadOnlyList<ObjectiveVector> Evaluate(
+      IReadOnlyList<TGenotype> genotypes,
+      IRandomNumberGenerator random,
+      TSearchSpace searchSpace,
+      TProblem problem)
     {
-      var keys = genotypes.Select(KeySelector).ToList();
-      var results = new ObjectiveVector[genotypes.Count];
+      var n = genotypes.Count;
+      var results = new ObjectiveVector[n];
 
-      var uncachedSolutions = new List<TGenotype>();
-      var uncachedSolutionIndices = new List<int>();
+      // Distinct uncached items in evaluation order
+      var uncachedGenotypes = new List<TGenotype>();
+      var uncachedKeys = new List<TKey>();
+      var uncachedMap = new Dictionary<TKey, (int j, List<int> indices)>();
 
-      for (int i = 0; i < genotypes.Count; i++) {
-        var genotype = genotypes[i];
-        var key = keys[i];
-        if (Cache.TryGetValue(key, out ObjectiveVector? cachedObjective)) {
-          results[i] = cachedObjective!;
+      for (int i = 0; i < n; i++) {
+        var g = genotypes[i];
+        var key = KeySelector(g);
+
+        if (Cache.TryGetValue(key, out ObjectiveVector? cached)) {
+          results[i] = cached!;
+          continue;
+        }
+
+        if (!uncachedMap.TryGetValue(key, out var entry)) {
+          int j = uncachedGenotypes.Count;
+          uncachedGenotypes.Add(g);
+          uncachedKeys.Add(key);
+          var indices = new List<int>(capacity: 1) { i };
+          uncachedMap.Add(key, (j, indices));
         } else {
-          uncachedSolutions.Add(genotype);
-          uncachedSolutionIndices.Add(i);
+          entry.indices.Add(i);
         }
       }
 
-      if (uncachedSolutions.Count <= 0)
+      if (uncachedGenotypes.Count == 0)
         return results;
 
-      //TODO only evaluate the unique uncached solutions and then map back to the original list.
-      var newObjectives = Evaluator.Evaluate(uncachedSolutions, random, searchSpace, problem);
-      for (int i = 0; i < uncachedSolutions.Count; i++) {
-        var objective = newObjectives[i];
+      var newObjectives = Evaluator.Evaluate(uncachedGenotypes, random, searchSpace, problem);
 
-        var originalIndex = uncachedSolutionIndices[i];
-        var key = keys[originalIndex];
+      for (int k = 0; k < uncachedKeys.Count; k++) {
+        var key = uncachedKeys[k];
+        var obj = newObjectives[k];
 
-        Cache.Set(key, objective, new MemoryCacheEntryOptions { Size = 1 });
+        Cache.Set(key, obj, new MemoryCacheEntryOptions { Size = 1 });
+      }
 
-        results[originalIndex] = objective;
+      foreach (var (_, entry) in uncachedMap) {
+        var obj = newObjectives[entry.j];
+        foreach (var i in entry.indices)
+          results[i] = obj;
       }
 
       return results;
@@ -102,15 +119,10 @@ public static class CachedEvaluatorExtensions
     where TSearchSpace : class, ISearchSpace<TGenotype>
     where TProblem : class, IProblem<TGenotype, TSearchSpace>
   {
-    public CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey> WithCache<TKey>(Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
-      where TKey : notnull
-    {
-      return new CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>(evaluator, keySelector, sizeLimit);
-    }
+    public CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey> WithCache<TKey>(Func<TGenotype, TKey> keySelector, long? sizeLimit = null) where TKey : notnull
+      => new(evaluator, keySelector, sizeLimit);
 
-    public CachingEvaluator<TGenotype, TSearchSpace, TProblem, TGenotype> WithCache(long? sizeLimit = null)
-    {
-      return new CachingEvaluator<TGenotype, TSearchSpace, TProblem, TGenotype>(evaluator, sizeLimit: sizeLimit);
-    }
+    public CachingEvaluator<TGenotype, TSearchSpace, TProblem> WithCache(long? sizeLimit = null)
+      => new(evaluator, sizeLimit);
   }
 }

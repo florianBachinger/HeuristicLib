@@ -30,7 +30,7 @@ public record AfterIterationsTerminator<TGenotype>
 
     public override bool ShouldTerminate()
     {
-      return currentCounter++ >= maximumIterations;
+      return ++currentCounter >= maximumIterations;
     }
   }
 }
