@@ -152,7 +152,7 @@ public static class EvolutionStrategy
   public static EvolutionStrategyBuilder<TGenotype, TSearchSpace, TProblem> GetBuilder<TGenotype, TSearchSpace, TProblem>(
     ICreator<TGenotype, TSearchSpace, TProblem> creator,
     IMutator<TGenotype, TSearchSpace, TProblem> mutator)
-    where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace> where TGenotype : class
+    where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace>
   {
     return new() {
       Mutator = mutator,

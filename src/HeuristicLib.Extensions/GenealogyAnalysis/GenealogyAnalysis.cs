@@ -15,7 +15,7 @@ public class GenealogyAnalysis<T>(IEqualityComparer<T>? equality = null, bool sa
   ICrossoverObserver<T>,
   IMutatorObserver<T>,
   IInterceptorObserver<T, PopulationState<T>>
-  where T : class
+  where T : notnull
 {
   public class Instance(IEqualityComparer<T>? equality = null, bool saveSpace = false) : ICrossoverObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>, IMutatorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>, IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>
   {
@@ -57,7 +57,8 @@ public class GenealogyAnalysis<T>(IEqualityComparer<T>? equality = null, bool sa
     .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => CreateExecutionInstance();
 }
 
-public class RankAnalysis<T>(IEqualityComparer<T>? equality = null) : GenealogyAnalysis<T>(equality) where T : class
+public class RankAnalysis<T>(IEqualityComparer<T>? equality = null) : GenealogyAnalysis<T>(equality)
+  where T : notnull
 {
   public new class Instance(IEqualityComparer<T>? equality = null) : GenealogyAnalysis<T>.Instance(equality)
   {

@@ -11,7 +11,7 @@ public record DynamicCachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   : CachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : DynamicProblem<TGenotype, TSearchSpace>
-  where TGenotype : class
+  where TGenotype : notnull
   where TKey : notnull
 {
   private readonly TProblem problem;
@@ -19,7 +19,7 @@ public record DynamicCachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
   public DynamicCachingEvaluator(
     IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator,
     TProblem problem,
-    Func<TGenotype, TKey>? keySelector = null, long? sizeLimit = null)
+    Func<TGenotype, TKey> keySelector, long? sizeLimit = null)
     : base(evaluator, keySelector, sizeLimit)
   {
     this.problem = problem;
@@ -98,7 +98,7 @@ public static class DynamicCachedEvaluatorExtension
   public static DynamicCachingEvaluator<TGenotype, TSearchSpace, TProblem, TKey>
     WithCache<TGenotype, TSearchSpace, TProblem, TKey>(this IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator,
                                                        TProblem problem,
-                                                       Func<TGenotype, TKey>? keySelector = null)
+                                                       Func<TGenotype, TKey> keySelector)
     where TSearchSpace : class, ISearchSpace<TGenotype>
     where TProblem : DynamicProblem<TGenotype, TSearchSpace>
     where TGenotype : class

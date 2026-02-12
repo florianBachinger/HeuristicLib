@@ -8,7 +8,6 @@ using HEAL.HeuristicLib.States;
 namespace HEAL.HeuristicLib.Analyzers;
 
 public class AllPopulationsTracker<T> : IInterceptorObserver<T, PopulationState<T>>
-  where T : class
 {
 
   public IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)

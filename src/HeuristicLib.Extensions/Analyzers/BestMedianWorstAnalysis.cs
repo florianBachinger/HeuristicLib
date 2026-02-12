@@ -9,7 +9,7 @@ namespace HEAL.HeuristicLib.Analyzers;
 
 public record BestMedianWorstEntry<T>(ISolution<T> Best, ISolution<T> Median, ISolution<T> Worst);
 
-// public class MyAnalyzer<T> : IEvaluatorObserver<T> where T : class
+// public class MyAnalyzer<T> : IEvaluatorObserver<T>
 // {
 //  public void AfterEvaluation(IReadOnlyList<T> genotypes,
 //                              IReadOnlyList<ObjectiveVector> values,

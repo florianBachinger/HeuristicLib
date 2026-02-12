@@ -3,7 +3,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Problems.Dynamic.Analysis;
 
-public class InvalidPerEpochAnalysis<TGenotype>(IDynamicProblem<TGenotype, ISearchSpace<TGenotype>> problem) : DynamicAnalysis<TGenotype>(problem) where TGenotype : class
+public class InvalidPerEpochAnalysis<TGenotype>(IDynamicProblem<TGenotype, ISearchSpace<TGenotype>> problem) : DynamicAnalysis<TGenotype>(problem)
 {
 
   private readonly Dictionary<int, int> invalidPerEpoch = [];

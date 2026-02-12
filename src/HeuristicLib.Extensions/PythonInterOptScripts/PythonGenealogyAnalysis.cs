@@ -39,7 +39,6 @@ public class PythonGenealogyAnalysis
   #region BatchRuns
   private static ExperimentResult<T>[]
     RunConfigurableRepeated<T>(int repetitions, Func<int, ExperimentResult<T>> experiment, int seed)
-    where T : class
   {
     return BatchExecution.Parallel<ExperimentResult<T>>(repetitions, r => experiment(r.NextInt()), RandomNumberGenerator.Create(seed), maxDegreeOfParallelism: -1)
                          .ToArray();
@@ -118,7 +117,7 @@ public class PythonGenealogyAnalysis
   public static ExperimentResult<T> RunAlgorithmConfigurable<T, TE>(
     IProblem<T, TE> problem,
     Action<PopulationState<T>>? callback,
-    ExperimentParameters<T, TE> parameters) where TE : class, ISearchSpace<T> where T : class
+    ExperimentParameters<T, TE> parameters) where T : notnull where TE : class, ISearchSpace<T>
   {
     //var terminator = new AfterIterationsTerminator<T>(parameters.Iterations);
     if (parameters.NoChildren < 0) {
@@ -196,7 +195,8 @@ public class PythonGenealogyAnalysis
     BestMedianWorstAnalysis<T> Qualities,
     RankAnalysis<T>? RankAnalysis,
     QualityCurveAnalysis<T> QualityCurve,
-    AllPopulationsTracker<T>? AllPopulations) where T : class
+    AllPopulationsTracker<T>? AllPopulations)
+    where T : notnull
   {
     public ExperimentResult<T> ToExperimentResult(ExecutionInstanceRegistry registry)
     {
@@ -219,8 +219,8 @@ public class PythonGenealogyAnalysis
     Action<TRes>? callback,
     AlgorithmBuilder<T, TE, TP, TRes, TA> builder,
     ExperimentParameters<T, TE> parameters)
+    where T : notnull
     where TRes : PopulationState<T>
-    where T : class
     where TE : class, ISearchSpace<T>
     where TP : class, IProblem<T, TE>
     where TA : IAlgorithm<T, TE, TP, TRes>

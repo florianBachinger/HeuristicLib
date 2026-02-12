@@ -12,7 +12,6 @@ public record ReevaluationInterceptor<T, TR, TE, TP>
   where TR : PopulationState<T>
   where TE : class, ISearchSpace<T>
   where TP : DynamicProblem<T, TE>
-  where T : class
 {
   private readonly IEvaluator<T, TE, TP> evaluator;
   private readonly TP problem;
@@ -65,7 +64,6 @@ public record ReevaluationInterceptor<T, TR, TE, TP>
 //   where TR : PopulationState<T>
 //   where TE : class, ISearchSpace<T>
 //   where TP : DynamicProblem<T, TE>
-//   where T : class
 // {
 //   private readonly IEvaluator<T, TE, TP> evaluator;
 //   private readonly IInterceptor<T, TR, TE, TP>? inner;

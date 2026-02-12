@@ -78,7 +78,7 @@ public record LimitEvaluator<TG, TS, TP>
 
 public static class LimitEvaluatorExtensions
 {
-  extension<TG, TS, TP>(IEvaluator<TG, TS, TP> evaluator) where TG : class where TS : class, ISearchSpace<TG> where TP : class, IProblem<TG, TS>
+  extension<TG, TS, TP>(IEvaluator<TG, TS, TP> evaluator) where TS : class, ISearchSpace<TG> where TP : class, IProblem<TG, TS>
   {
     public LimitEvaluator<TG, TS, TP> LimitEvaluations(int maxEvaluations, ObjectiveVector? alternativeValue = null, bool strict = false)
     {

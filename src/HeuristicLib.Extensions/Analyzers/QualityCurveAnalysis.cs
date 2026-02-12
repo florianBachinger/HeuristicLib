@@ -7,7 +7,7 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Analyzers;
 
-public class QualityCurveAnalysis<TGenotype> : IEvaluatorObserver<TGenotype> where TGenotype : class
+public class QualityCurveAnalysis<TGenotype> : IEvaluatorObserver<TGenotype>
 {
   public IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
     => new Instance();

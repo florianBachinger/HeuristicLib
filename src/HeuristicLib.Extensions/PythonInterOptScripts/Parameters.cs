@@ -11,7 +11,7 @@ namespace HEAL.HeuristicLib.PythonInterOptScripts;
 
 #region Parameters
 
-public class ExperimentParameters<T, TE> where TE : class, ISearchSpace<T> where T : class
+public class ExperimentParameters<T, TE> where TE : class, ISearchSpace<T>
 {
   public string AlgorithmName = "ga";
   public ICreator<T, TE, IProblem<T, TE>>? Creator;

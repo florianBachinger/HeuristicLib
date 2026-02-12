@@ -232,9 +232,9 @@ public record IndependentAlgorithm<TGenotype, TSearchSpace, TProblem> : Algorith
 }
 
 public record IndependentAlgorithm<TGenotype, TSearchSpace> : IndependentAlgorithm<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
-  where TGenotype : class where TSearchSpace : class, ISearchSpace<TGenotype>;
+  where TSearchSpace : class, ISearchSpace<TGenotype>;
 
-public record IndependentAlgorithm<TGenotype> : IndependentAlgorithm<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> where TGenotype : class;
+public record IndependentAlgorithm<TGenotype> : IndependentAlgorithm<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>;
 
 public record PermutationEncodingSpecificAlgorithm<TProblem> : Algorithm<Permutation, PermutationSearchSpace, TProblem, AlgorithmState<Permutation>>
   where TProblem : class, IProblem<Permutation, PermutationSearchSpace>
