@@ -5,7 +5,7 @@ namespace HEAL.HeuristicLib.PythonInterOptScripts;
 
 public record ExperimentResult<T>(
   string Graph,
-  List<List<double>> ChildRanks,
-  List<BestMedianWorstEntry<T>> BestMedianWorst,
-  List<ISolution<T>[]> AllPopulations)
+  IReadOnlyList<List<double>> ChildRanks,
+  IReadOnlyList<BestMedianWorstEntry<T>> BestMedianWorst,
+  IReadOnlyList<ISolution<T>[]> AllPopulations)
   where T : class;

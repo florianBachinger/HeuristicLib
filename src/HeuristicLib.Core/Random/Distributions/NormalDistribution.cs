@@ -19,19 +19,6 @@ public sealed class NormalDistribution(double mu = 0, double sigma = 1) : IDistr
     s = Math.Sqrt(-2.0 * Math.Log(s) / s);
     return mu + (sigma * u * s);
   }
-
-  [Obsolete("This should probably be at the RealVector level rather than here.")]
-  public static RealVector NextSphere(IRandomNumberGenerator uniformRandom, double[] mu, double[] sigma, int dim, bool surface = true)
-  {
-    var d = new RealVector(Enumerable.Range(0, dim).Select(_ => NextDouble(uniformRandom)));
-    if (surface) {
-      d /= d.Norm();
-    }
-
-    d *= sigma;
-    d += mu;
-    return d.ToArray();
-  }
 }
 
 public static class NormalExtensions

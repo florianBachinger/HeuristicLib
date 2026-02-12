@@ -25,7 +25,7 @@ using RandomNumberGenerator = HEAL.HeuristicLib.Random.RandomNumberGenerator;
 
 namespace HEAL.HeuristicLib.Extensions.Tests;
 
-public class UnitTest1
+public class GenealogyGraphTests
 {
   private static MultiMutator<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace, IProblem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>> CreateSymRegAllMutator()
   {

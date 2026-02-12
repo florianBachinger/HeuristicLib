@@ -17,7 +17,8 @@ public partial record ObservableInterceptor<TG, TR, TS, TP>
 {
   public IInterceptor<TG, TR, TS, TP> Interceptor { get; }
 
-  [OrderedEquality] public ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> Observers { get; }
+  [OrderedEquality]
+  public ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> Observers { get; }
 
   public ObservableInterceptor(IInterceptor<TG, TR, TS, TP> interceptor, params ImmutableArray<IInterceptorObserver<TG, TR, TS, TP>> observers)
   {
@@ -61,15 +62,14 @@ public interface IInterceptorObserverInstance<in TG, in TS, in TP, in TR> : IExe
   void AfterInterception(TR newState, TR currentState, TR? previousState, TS searchSpace, TP problem);
 }
 
-// ToDo: rename to make it clear that this is not a base-class to be inherited from
-public class InterceptorObserver<TG, TR, TS, TP> : IInterceptorObserver<TG, TR, TS, TP>, IInterceptorObserverInstance<TG, TS, TP, TR>
+public class ActionInterceptorObserver<TG, TR, TS, TP> : IInterceptorObserver<TG, TR, TS, TP>, IInterceptorObserverInstance<TG, TS, TP, TR>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
   where TR : class, IAlgorithmState
 {
   private readonly Action<TR, TR, TR?, TS, TP> afterInterception;
 
-  public InterceptorObserver(Action<TR, TR, TR?, TS, TP> afterInterception)
+  public ActionInterceptorObserver(Action<TR, TR, TR?, TS, TP> afterInterception)
   {
     this.afterInterception = afterInterception;
   }
@@ -101,13 +101,13 @@ public static class ObservableInterceptorExtensions
 
     public IInterceptor<TG, TR, TS, TP> ObserveWith(Action<TR, TR, TR?, TS, TP> afterInterception)
     {
-      var observer = new InterceptorObserver<TG, TR, TS, TP>(afterInterception);
+      var observer = new ActionInterceptorObserver<TG, TR, TS, TP>(afterInterception);
       return interceptor.ObserveWith(observer);
     }
 
     public IInterceptor<TG, TR, TS, TP> ObserveWith(Action<TR> afterInterception)
     {
-      var observer = new InterceptorObserver<TG, TR, TS, TP>((newState, _, _, _, _) => afterInterception(newState));
+      var observer = new ActionInterceptorObserver<TG, TR, TS, TP>((newState, _, _, _, _) => afterInterception(newState));
       return interceptor.ObserveWith(observer);
     }
 

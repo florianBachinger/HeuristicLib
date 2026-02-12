@@ -7,8 +7,10 @@ using HEAL.HeuristicLib.Operators.Mutators;
 using HEAL.HeuristicLib.Operators.Mutators.RealVectorMutators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
+using HEAL.HeuristicLib.Problems.DataAnalysis.OnlineCalculators;
 using HEAL.HeuristicLib.Problems.TestFunctions;
 using HEAL.HeuristicLib.Random;
+using HEAL.HeuristicLib.Random.Distributions;
 using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.PythonInterOptScripts;
@@ -29,20 +31,35 @@ public static class PythonCorrelationAnalysis
     return res;
   }
 
-  // public static double[] GetCorrelations(IReadOnlyList<RealVector> solutions, RealVectorProblem problem, double[] delta, int count, int seed = 0) {
-  //   var random = new SystemRandomNumberGenerator(seed);
-  //   var evaluator = new DirectEvaluator<RealVector>();
-  //   return solutions.ParallelSelect(random, (i, solution, r) => {
-  //     var n = Enumerable.Range(0, count).Select(_ =>
-  //       r.NextSphere(solution.ToArray(), delta, solution.Count, false)).ToArray();
-  //     var objectives = evaluator.Evaluate(n, r, problem.SearchSpace, problem);
-  //     var d = OnlinePearsonsRCalculator.Calculate(
-  //       objectives.Select(x => x[0]),
-  //       objectives.Select(x => x[1]),
-  //       out _);
-  //     return d;
-  //   }).ToArray();
-  // }
+  public static double[] GetCorrelations(IReadOnlyList<RealVector> solutions, RealVectorProblem problem, double[] delta, int count, int seed = 0)
+  {
+    var random = RandomNumberGenerator.Create(seed);
+    var evaluator = new DirectEvaluator<RealVector>();
+    var res = new double[solutions.Count];
+    Parallel.ForEach(solutions, (vector, state, i) => {
+      var r = random.Fork(i);
+      var n = Enumerable.Range(0, count).Select(_ => NextSphere(r, vector, delta, vector.Count, false)).ToArray();
+      var objectives = evaluator.Evaluate(n, r, problem.SearchSpace, problem);
+      var d = OnlinePearsonsRCalculator.Calculate(
+        objectives.Select(x => x[0]),
+        objectives.Select(x => x[1]), out _);
+      res[i] = d;
+    });
+
+    return res;
+  }
+
+  public static RealVector NextSphere(IRandomNumberGenerator uniformRandom, RealVector mu, RealVector sigma, int dim, bool surface = true)
+  {
+    var d = new RealVector(Enumerable.Range(0, dim).Select(_ => uniformRandom.NextGaussian()));
+    if (surface) {
+      d /= d.Norm();
+    }
+
+    d *= sigma;
+    d += mu;
+    return d.ToArray();
+  }
 
   public static ObjectiveVector[] GetQualities(IReadOnlyList<RealVector> solutions, RealVectorProblem problem)
   {
@@ -54,19 +71,6 @@ public static class PythonCorrelationAnalysis
 
   public static ExperimentResult<RealVector> RunCorrelationNsga2(GenerationCallback? callback, int generations, int populationSize, RealVectorProblem problem, int seed = 0)
   {
-    // var prob = SphereRastriginProblem(dimensions, min, max);
-
-    // var proto = Nsga2.GetBuilder(
-    //  //new UniformDistributedCreator(),
-    //  //new SelfAdaptiveSimulatedBinaryCrossover { Eta = 15 }.WithProbability(0.9),
-    //  //new PolynomialMutator().WithRate(0.9)
-    //  );
-
-    // proto.Terminator = new AfterIterationsTerminator<RealVector>(generations);
-    // proto.RandomSeed = seed;
-    // proto.PopulationSize = populationSize;
-    // proto.MutationRate = 1;
-
     var res = PythonGenealogyAnalysis.RunAlgorithmConfigurable(problem, callback is null ? null : r => callback(r, problem),
       new TestFunctionExperimentParameters {
         AlgorithmName = "nsga2",
