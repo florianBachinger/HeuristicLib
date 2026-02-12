@@ -35,8 +35,8 @@ public static class BatchExecution
 
   public static IReadOnlyList<TOut> Parallel<TOut>(int count, Func<IRandomNumberGenerator, TOut> func, IRandomNumberGenerator random, int maxDegreeOfParallelism)
   {
-    ArgumentOutOfRangeException.ThrowIfLessThan(maxDegreeOfParallelism, 1);
-
+    ArgumentOutOfRangeException.ThrowIfZero(maxDegreeOfParallelism);
+    ArgumentOutOfRangeException.ThrowIfLessThan(maxDegreeOfParallelism, -1);
     if (maxDegreeOfParallelism == 1) {
       return Sequential(count, func, random);
     }
