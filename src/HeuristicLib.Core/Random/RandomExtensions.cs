@@ -10,6 +10,7 @@ public static class RandomExtensions
 
     public bool NextBool(double probability = 0.5) => random.NextDouble() < probability;
 
+    public double NextDouble(double low, double high) => random.NextDouble() * (high - low) + low;
 
     public double[] NextDoubles(int length)
     {

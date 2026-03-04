@@ -9,6 +9,7 @@ public record RealVectorSearchSpace : SearchSpace<RealVector>
   public RealVector Maximum { get; }
   // public IRepairer<RealVector> OutOfBoundsRepairer { get; }
 
+  public RealVectorSearchSpace(int length, double minimum, double maximum) : this(length, new RealVector(minimum), new RealVector(maximum)){}
   public RealVectorSearchSpace(int length, RealVector minimum, RealVector maximum /*, OutOfBoundsStrategy outOfBoundsRepairer = OutOfBoundsStrategy.Clamp*/)
   {
     if (!RealVector.AreCompatible(length, minimum, maximum)) {

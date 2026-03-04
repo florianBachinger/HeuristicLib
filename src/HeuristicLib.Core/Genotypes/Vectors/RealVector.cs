@@ -133,7 +133,7 @@ public sealed class RealVector(params IEnumerable<double> elements) : IReadOnlyL
     }
 
     return ReferenceEquals(this, other)
-      || elements.SequenceEqual(other.elements);
+           || elements.SequenceEqual(other.elements);
   }
 
   public override bool Equals(object? obj)
@@ -387,5 +387,15 @@ public sealed class RealVector(params IEnumerable<double> elements) : IReadOnlyL
     }
 
     return Math.Sqrt(sumSquares);
+  }
+
+  public IntegerVector AsIntegerVector()
+  {
+    var iElements = new int[elements.Length];
+    for (int i = 0; i < elements.Length; i++) {
+      iElements[i] = (int)Math.Round(elements[i]);
+    }
+
+    return iElements;
   }
 }

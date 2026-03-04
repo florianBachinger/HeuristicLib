@@ -106,7 +106,7 @@ public class GeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>
 
     var offspringCount = Replacer.GetOffspringCount(PopulationSize);
     var oldPopulation = previousState.Population.Solutions;
-    var parents = Selector.Select(oldPopulation, problem.Objective, offspringCount * 2, random, problem.SearchSpace, problem).ToGenotypePairs();
+    var parents = Selector.Select(oldPopulation, problem.Objective, offspringCount * 2, random, problem.SearchSpace, problem).ToParents(problem.Objective);
     var population = Crossover.Cross(parents, random, problem.SearchSpace, problem);
 
     population = Mutator.Mutate(population, random, problem.SearchSpace, problem);

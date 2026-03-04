@@ -100,19 +100,19 @@ public class OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotyp
       newPop = CreateInitialPopulation(problem, random).Population.Solutions;
     } else {
       var selected = Selector.Select(oldPopulation, problem.Objective, MaxEffort * 2, random, problem.SearchSpace, problem);
-      var population = Crossover.Cross(selected.ToGenotypePairs(), random, problem.SearchSpace, problem);
+      var population = Crossover.Cross(selected.ToParents(problem.Objective), random, problem.SearchSpace, problem);
       population = Mutator.Mutate(population, random, problem.SearchSpace, problem);
       var fitnesses = Evaluator.Evaluate(population, random, problem.SearchSpace, problem);
 
       // Offspring Selection
       newPop = Population
-        .From(population, fitnesses)
-        .Solutions
-        .Zip(selected.ToSolutionPairs())
-        .Where(f =>
-          f.Item1.ObjectiveVector.Dominates(Combine(f.Item2, problem.Objective, Strictness), problem.Objective))
-        .Select(f => f.Item1)
-        .ToArray();
+               .From(population, fitnesses)
+               .Solutions
+               .Zip(selected.ToSolutionPairs())
+               .Where(f =>
+                 f.Item1.ObjectiveVector.Dominates(Combine(f.Item2, problem.Objective, Strictness), problem.Objective))
+               .Select(f => f.Item1)
+               .ToArray();
     }
 
     var r = new ElitismReplacer<TGenotype>(Elites, Elites + newPop.Count);
@@ -135,17 +135,15 @@ public class OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotyp
       _ => new ObjectiveVector(o1.Zip(o2).Select(pair => pair.Item1 * strictness + pair.Item2 * (1.0 - strictness)).ToArray())
     };
   }
-
-
 }
 
 // ReSharper disable once IdentifierTypo
 public record OerapgaBuildBuilder<TG, TS, TP>
   : AlgorithmBuilder<TG, TS, TP, PopulationState<TG>, OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TG, TS, TP>>,
-  IBuilderWithCreator<TG, TS, TP>,
-  IBuilderWithSelector<TG, TS, TP>,
-  IBuilderWithCrossover<TG, TS, TP>,
-  IBuilderWithMutator<TG, TS, TP>
+    IBuilderWithCreator<TG, TS, TP>,
+    IBuilderWithSelector<TG, TS, TP>,
+    IBuilderWithCrossover<TG, TS, TP>,
+    IBuilderWithMutator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {

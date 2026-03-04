@@ -117,7 +117,7 @@ public class EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem>
       parentQualities = parentSolutions.Select(x => x.ObjectiveVector).ToArray();
     } else {
       var parentSolutions = Selector.Select(previousState.Population.Solutions, problem.Objective, NumberOfChildren * 2, random, problem.SearchSpace, problem);
-      parents = Crossover!.Cross(parentSolutions.ToGenotypePairs(), random, problem.SearchSpace, problem);
+      parents = Crossover!.Cross(parentSolutions.ToParents(problem.Objective), random, problem.SearchSpace, problem);
       parentQualities = parentSolutions.Where((_, i) => i % 2 == 0).Select(x => x.ObjectiveVector).ToArray();
     }
 

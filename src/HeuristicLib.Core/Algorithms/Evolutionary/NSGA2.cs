@@ -82,7 +82,7 @@ public class NSGA2Instance<TGenotype, TSearchSpace, TProblem>
     }
 
     var offspringCount = Replacer.GetOffspringCount(PopulationSize);
-    var parents = Selector.Select(previousState.Population.Solutions, problem.Objective, offspringCount * 2, random, problem.SearchSpace, problem).ToGenotypePairs();
+    var parents = Selector.Select(previousState.Population.Solutions, problem.Objective, offspringCount * 2, random, problem.SearchSpace, problem).ToParents(problem.Objective);
     var children = Crossover.Cross(parents, random, problem.SearchSpace, problem);
     var mutants = Mutator.Mutate(children, random, problem.SearchSpace, problem);
     var newPop = Population.From(mutants, Evaluator.Evaluate(mutants, random, problem.SearchSpace, problem));
