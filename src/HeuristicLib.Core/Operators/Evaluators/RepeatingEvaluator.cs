@@ -6,6 +6,22 @@ using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Operators.Evaluators;
 
+public static class RepeatingEvaluator
+{
+  public static RepeatingEvaluator<TGenotype, TSearchSpace, TProblem> AsRepeatingAggregating<TGenotype, TSearchSpace, TProblem>(
+    this IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator,
+    int repeats,
+    Func<ObjectiveVector, ObjectiveVector, ObjectiveVector> aggregator)
+    where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace> => new(evaluator, repeats, aggregator);
+
+  public static RepeatedEvaluator<TGenotype, TSearchSpace, TProblem> AsRepeated<TGenotype, TSearchSpace, TProblem>(
+    this IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator,
+    int repeats,
+    Func<ObjectiveVector[], ObjectiveVector> aggregator, int maxDegreeOfParallelism = -1)
+    where TSearchSpace : class, ISearchSpace<TGenotype> where TProblem : class, IProblem<TGenotype, TSearchSpace>
+    => new(evaluator, repeats, aggregator, maxDegreeOfParallelism);
+}
+
 public record RepeatingEvaluator<TGenotype, TSearchSpace, TProblem>
   : Evaluator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -24,7 +40,7 @@ public record RepeatingEvaluator<TGenotype, TSearchSpace, TProblem>
 
   public override IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
-    // ToDo: think about if we want a fresh evaluation or the the same evaluation instance as the base for the repeated evaluations. 
+    // ToDo: think about if we want a fresh evaluation or the same evaluation instance as the base for the repeated evaluations. 
     // Currently we use the same instance to maintain state such as caches.
     var evaluatorInstance = instanceRegistry.Resolve(evaluator);
     return new Instance(evaluatorInstance, repeats, aggregator);
@@ -55,6 +71,56 @@ public record RepeatingEvaluator<TGenotype, TSearchSpace, TProblem>
       }
 
       return results;
+    }
+  }
+}
+
+public record RepeatedEvaluator<TGenotype, TSearchSpace, TProblem>
+  : Evaluator<TGenotype, TSearchSpace, TProblem>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  private readonly IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator;
+  private readonly int repeats;
+  private readonly Func<ObjectiveVector[], ObjectiveVector> aggregator;
+  private readonly int maxDegreeOfParallelism;
+
+  public RepeatedEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator, int repeats, Func<ObjectiveVector[], ObjectiveVector> aggregator, int maxDegreeOfParallelism = -1)
+  {
+    this.evaluator = evaluator;
+    this.repeats = repeats;
+    this.aggregator = aggregator;
+    this.maxDegreeOfParallelism = maxDegreeOfParallelism;
+  }
+
+  public override Instance CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => new(instanceRegistry.Resolve(evaluator), repeats, aggregator, maxDegreeOfParallelism);
+
+  public new class Instance : Evaluator<TGenotype, TSearchSpace, TProblem>.Instance
+  {
+    private readonly IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator;
+    private readonly int repeats;
+    private readonly Func<ObjectiveVector[], ObjectiveVector> aggregator;
+    private readonly int maxDegreeOfParallelism;
+
+    public Instance(IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, int repeats, Func<ObjectiveVector[], ObjectiveVector> aggregator, int maxDegreeOfParallelism)
+    {
+      this.evaluator = evaluator;
+      this.repeats = repeats;
+      this.aggregator = aggregator;
+      this.maxDegreeOfParallelism = maxDegreeOfParallelism;
+    }
+
+    public override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+    {
+      var res = BatchExecution.Parallel(
+        repeats,
+        r => evaluator.Evaluate(genotypes, r, searchSpace, problem),
+        random,
+        maxDegreeOfParallelism: maxDegreeOfParallelism);
+      return Enumerable.Range(0, genotypes.Count)
+                       .Select(i => Enumerable.Range(0, repeats).Select(j => res[j][i]).ToArray())
+                       .Select(aggregator)
+                       .ToArray();
     }
   }
 }
