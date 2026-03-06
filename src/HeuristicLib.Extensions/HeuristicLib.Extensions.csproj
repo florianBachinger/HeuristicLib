@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Problems\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\HeuristicLib.Core\HeuristicLib.Core.csproj" />
   </ItemGroup>
 
