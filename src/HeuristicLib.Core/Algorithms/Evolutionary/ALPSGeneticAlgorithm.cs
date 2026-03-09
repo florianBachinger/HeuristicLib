@@ -100,7 +100,7 @@ public class AlpsGeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>
       };
     }
 
-    var offspringCount = agedReplacer.GetOffspringCount(PopulationSize);
+    var offspringCount = PopulationSize;
 
     // ToDo: implement actual ALPS logic with layers
 
@@ -123,7 +123,7 @@ public class AlpsGeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>
 
     var evaluatedPopulation = Population.From(population, fitnesses);
 
-    var newPopulation = agedReplacer.Replace(oldPopulation, evaluatedPopulation.ToList(), problem.Objective, random, agedSearchSpace, agedProblem);
+    var newPopulation = agedReplacer.Replace(oldPopulation, evaluatedPopulation.ToList(), problem.Objective, offspringCount, random, agedSearchSpace, agedProblem);
 
     var result = new AlpsState<TGenotype> {
       Population = [Population.From(newPopulation)],

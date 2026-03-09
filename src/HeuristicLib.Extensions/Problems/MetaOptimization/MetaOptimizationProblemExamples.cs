@@ -62,7 +62,7 @@ public static class MetaOptimizationProblemExamples
     IEvaluator<T, TE, TP>[] evaluators,
     IInterceptor<T, PopulationState<T>, TE, TP>[] interceptors,
     IMutator<T, TE, TP>[] mutators,
-    IReplacer<T, TE, TP>[] replacers,
+    (int min, int max) elites,
     ISelector<T, TE, TP>[] selectors,
     (int min, int max) populationSize,
     (double min, double max) mutationRate)
@@ -74,7 +74,7 @@ public static class MetaOptimizationProblemExamples
     var evaluatorsExtractor = b.AddChoiceParameter(evaluators);
     var interceptorsExtractor = b.AddChoiceParameter(interceptors);
     var mutatorsExtractor = b.AddChoiceParameter(mutators);
-    var replacersExtractor = b.AddChoiceParameter(replacers);
+    var elitesExtractor = b.AddIntegerParameter(elites);
     var selectorsExtractor = b.AddChoiceParameter(selectors);
     var popSizeExtractor = b.AddIntegerParameter(populationSize);
     var rateExtractor = b.AddRealParameter(mutationRate);
@@ -85,10 +85,10 @@ public static class MetaOptimizationProblemExamples
       Evaluator = evaluatorsExtractor(x),
       Interceptor = interceptorsExtractor(x),
       Mutator = mutatorsExtractor(x),
-      Replacer = replacersExtractor(x),
       Selector = selectorsExtractor(x),
       PopulationSize = popSizeExtractor(x),
-      MutationRate = rateExtractor(x)
+      MutationRate = rateExtractor(x),
+      Elites = elitesExtractor(x)
     });
   }
 

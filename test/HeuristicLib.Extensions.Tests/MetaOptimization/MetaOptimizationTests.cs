@@ -41,10 +41,8 @@ public class MetaOptimizationTests
       new SimulatedBinaryCrossover(),
       new GaussianMutator(0.5, 0.5), 0.25,
       new TournamentSelector<RealVector>(2),
-      new ElitismReplacer<RealVector>(1),
       100,
-      new DirectEvaluator<RealVector>(),
-      null);
+      new DirectEvaluator<RealVector>());
 
     //test these mutators
     //TODO c# can not infer array type 

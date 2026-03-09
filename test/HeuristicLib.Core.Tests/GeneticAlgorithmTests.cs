@@ -41,7 +41,7 @@ public class GeneticAlgorithmTests
       MutationRate = 0.15,
       Evaluator = new DummyEvaluator<RealVector, RealVectorSearchSpace, IProblem<RealVector, RealVectorSearchSpace>>(),
       Selector = new RandomSelector<RealVector>(),
-      Replacer = new PlusSelectionReplacer<RealVector>(),
+      Elites = 1
     };
 
     return Verify(ga);

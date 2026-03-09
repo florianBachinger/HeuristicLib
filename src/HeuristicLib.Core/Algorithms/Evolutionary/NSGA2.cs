@@ -81,12 +81,12 @@ public class NSGA2Instance<TGenotype, TSearchSpace, TProblem>
       };
     }
 
-    var offspringCount = Replacer.GetOffspringCount(PopulationSize);
+    var offspringCount = PopulationSize;
     var parents = Selector.Select(previousState.Population.Solutions, problem.Objective, offspringCount * 2, random, problem.SearchSpace, problem).ToParents(problem.Objective);
     var children = Crossover.Cross(parents, random, problem.SearchSpace, problem);
     var mutants = Mutator.Mutate(children, random, problem.SearchSpace, problem);
     var newPop = Population.From(mutants, Evaluator.Evaluate(mutants, random, problem.SearchSpace, problem));
-    var nextPop = Replacer.Replace(previousState.Population.Solutions, newPop.Solutions, problem.Objective, random, problem.SearchSpace, problem);
+    var nextPop = Replacer.Replace(previousState.Population.Solutions, newPop.Solutions, problem.Objective, PopulationSize, random, problem.SearchSpace, problem);
 
     return new PopulationState<TGenotype> {
       Population = Population.From(nextPop)

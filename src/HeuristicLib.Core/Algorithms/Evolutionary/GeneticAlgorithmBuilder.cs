@@ -35,7 +35,7 @@ public record GeneticAlgorithmBuilder<TG, TS, TP>
       Crossover = Crossover,
       Selector = Selector,
       Evaluator = Evaluator,
-      Replacer = new ElitismReplacer<TG>(Elites),
+      Elites = Elites,
       Interceptor = Interceptor,
       Mutator = Mutator.WithRate(MutationRate)
     };

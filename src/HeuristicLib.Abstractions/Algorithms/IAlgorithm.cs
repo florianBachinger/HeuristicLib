@@ -12,7 +12,6 @@ public interface IAlgorithm<TGenotype, in TSearchSpace, in TProblem, TAlgorithmS
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
 {
-  new IAlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry);
 }
 
 public interface IAlgorithmInstance<TGenotype, in TSearchSpace, in TProblem, TAlgorithmState>

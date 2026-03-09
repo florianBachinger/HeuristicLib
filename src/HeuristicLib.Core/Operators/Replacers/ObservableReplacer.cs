@@ -34,9 +34,9 @@ public partial record ObservableReplacer<TG, TS, TP>
   public new sealed class Instance(IReplacerInstance<TG, TS, TP> replacerInstance, IReadOnlyList<IReplacerObserverInstance<TG, TS, TP>> observers)
     : Replacer<TG, TS, TP>.Instance
   {
-    public override IReadOnlyList<ISolution<TG>> Replace(IReadOnlyList<ISolution<TG>> previousPopulation, IReadOnlyList<ISolution<TG>> offspringPopulation, Objective objective, IRandomNumberGenerator random, TS searchSpace, TP problem)
+    public override IReadOnlyList<ISolution<TG>> Replace(IReadOnlyList<ISolution<TG>> previousPopulation, IReadOnlyList<ISolution<TG>> offspringPopulation, Objective objective, int count, IRandomNumberGenerator random, TS searchSpace, TP problem)
     {
-      var result = replacerInstance.Replace(previousPopulation, offspringPopulation, objective, random, searchSpace, problem);
+      var result = replacerInstance.Replace(previousPopulation, offspringPopulation, objective, count, random, searchSpace, problem);
 
       foreach (var observer in observers) {
         observer.AfterReplacement(result, previousPopulation, offspringPopulation, objective, searchSpace, problem);
@@ -44,8 +44,6 @@ public partial record ObservableReplacer<TG, TS, TP>
 
       return result;
     }
-
-    public override int GetOffspringCount(int populationSize) => replacerInstance.GetOffspringCount(populationSize);
   }
 }
 

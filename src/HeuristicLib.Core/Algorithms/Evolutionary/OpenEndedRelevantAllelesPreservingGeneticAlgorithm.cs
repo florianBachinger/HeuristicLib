@@ -115,8 +115,9 @@ public class OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotyp
                .ToArray();
     }
 
-    var r = new ElitismReplacer<TGenotype>(Elites, Elites + newPop.Count);
-    var newPopulation = r.Replace(oldPopulation, newPop, problem.Objective, random);
+    var r = new ElitismReplacer<TGenotype>(Elites);
+    var targetPopsize = Elites + newPop.Count;
+    var newPopulation = r.Replace(oldPopulation, newPop, problem.Objective, targetPopsize, random);
 
     return new PopulationState<TGenotype> { Population = Population.From(newPopulation) };
   }

@@ -11,6 +11,7 @@ namespace HEAL.HeuristicLib.Execution;
 
 public static class BatchExecution
 {
+  // ToDo: Think about if we treat the "count-version" as "list-version" with the list being the generated indices.
   public static IReadOnlyList<TOut> Sequential<TOut>(int count, Func<IRandomNumberGenerator, TOut> func, IRandomNumberGenerator random)
   {
     var result = new TOut[count];

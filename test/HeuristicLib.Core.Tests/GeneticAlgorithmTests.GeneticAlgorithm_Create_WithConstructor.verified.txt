@@ -15,12 +15,10 @@
     MutationRate: 0.1,
     MutationStrength: 0.1
   },
+  Elites: 1,
   MutationRate: 0.15,
   Selector: {
     $type: RandomSelector<RealVector>
-  },
-  Replacer: {
-    $type: PlusSelectionReplacer<RealVector>
   },
   Interceptor: null,
   Evaluator: {

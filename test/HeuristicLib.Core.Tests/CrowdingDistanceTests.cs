@@ -118,7 +118,7 @@ public class CrowdingDistanceTests
     // Adjust this "objective" creation to your codebase (min/min assumed here)
     var objective = MultiObjective.Create(false, false);
 
-    var result = replacer.Replace(previous, offspring, objective, null!).ToList();
+    var result = replacer.Replace(previous, offspring, objective, previous.Length, null!).ToList();
 
     Assert.Equal(3, result.Count);
 

@@ -1,11 +1,11 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using HEAL.HeuristicLib.AlgorithmExecutions;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Operators.Mutators;
 using HEAL.HeuristicLib.Operators.Replacers;
-using HEAL.HeuristicLib.Optimization;
+using HEAL.HeuristicLib.Operators.Variations;
 using HEAL.HeuristicLib.Problems;
-using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
 
@@ -20,6 +20,7 @@ public record GeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
   public required ICreator<TGenotype, TSearchSpace, TProblem> Creator { get; init; }
   public required ICrossover<TGenotype, TSearchSpace, TProblem> Crossover { get; init; }
   public required IMutator<TGenotype, TSearchSpace, TProblem> Mutator { get; init; }
+  public int Elites { get; init; } = 1;
 
   public double MutationRate
   {
@@ -28,95 +29,30 @@ public record GeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
   } = 0.1;
 
   public required ISelector<TGenotype, TSearchSpace, TProblem> Selector { get; init; }
-  public IReplacer<TGenotype, TSearchSpace, TProblem> Replacer { get; init; } = new ElitismReplacer<TGenotype>(1);
+  //public IReplacer<TGenotype, TSearchSpace, TProblem> Replacer { get; init; } = new ElitismReplacer<TGenotype>(1);
 
-  public override GeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+  public override EvolutionaryAlgorithmExecution<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
   {
     // ToDo: think about if this is the right way or if we break the instantiation process because we create a new operator here.
     var mutator = MutationRate >= 1.0
       ? Mutator
       : Mutator.WithRate(MutationRate);
+    var crossover = Crossover; // ToDo: crossover probability
 
-    var interceptorInstance = Interceptor is not null ? instanceRegistry.Resolve(Interceptor) : null;
-    var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
-    var creatorInstance = instanceRegistry.Resolve(Creator);
-    var crossoverInstance = instanceRegistry.Resolve(Crossover);
-    var mutatorInstance = instanceRegistry.Resolve(mutator);
-    var selectorInstance = instanceRegistry.Resolve(Selector);
-    var replacerInstance = instanceRegistry.Resolve(Replacer);
+    var variation = new CrossoverAndMutationVariation<TGenotype, TSearchSpace, TProblem>(crossover, mutator);
+    
+    var replacer = new ElitismReplacer<TGenotype>(Elites);
 
-    return new GeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>(
+    return new EvolutionaryAlgorithmExecution<TGenotype, TSearchSpace, TProblem>(
       PopulationSize,
-      creatorInstance,
-      crossoverInstance,
-      mutatorInstance,
-      MutationRate,
-      selectorInstance,
-      replacerInstance,
-      evaluatorInstance,
-      interceptorInstance
+      offspringSize: PopulationSize * 2,
+      instanceRegistry.Resolve(Creator),
+      instanceRegistry.Resolve(Selector),
+      instanceRegistry.Resolve(variation),
+      instanceRegistry.Resolve(replacer),
+      instanceRegistry.Resolve(Evaluator),
+      Interceptor is not null ? instanceRegistry.Resolve(Interceptor) : null
     );
-  }
-}
-
-public class GeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>
-  : IterativeAlgorithmInstance<TGenotype, TSearchSpace, TProblem, PopulationState<TGenotype>>
-  where TSearchSpace : class, ISearchSpace<TGenotype>
-  where TProblem : class, IProblem<TGenotype, TSearchSpace>
-{
-  protected readonly int PopulationSize;
-  protected readonly ICreatorInstance<TGenotype, TSearchSpace, TProblem> Creator;
-  protected readonly ICrossoverInstance<TGenotype, TSearchSpace, TProblem> Crossover;
-  protected readonly IMutatorInstance<TGenotype, TSearchSpace, TProblem> Mutator;
-  protected readonly double MutationRate;
-  protected readonly ISelectorInstance<TGenotype, TSearchSpace, TProblem> Selector;
-  protected readonly IReplacerInstance<TGenotype, TSearchSpace, TProblem> Replacer;
-
-  public GeneticAlgorithmInstance(
-    int populationSize,
-    ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator,
-    ICrossoverInstance<TGenotype, TSearchSpace, TProblem> crossover,
-    IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator,
-    double mutationRate,
-    ISelectorInstance<TGenotype, TSearchSpace, TProblem> selector,
-    IReplacerInstance<TGenotype, TSearchSpace, TProblem> replacer,
-    IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator,
-    IInterceptorInstance<TGenotype, PopulationState<TGenotype>, TSearchSpace, TProblem>? interceptor
-  )
-    : base(interceptor, evaluator)
-  {
-    PopulationSize = populationSize;
-    Creator = creator;
-    Crossover = crossover;
-    Mutator = mutator;
-    MutationRate = mutationRate;
-    Selector = selector;
-    Replacer = replacer;
-  }
-
-  public override PopulationState<TGenotype> ExecuteStep(PopulationState<TGenotype>? previousState, TProblem problem, IRandomNumberGenerator random)
-  {
-    if (previousState is null) {
-      var initialSolutions = Creator.Create(PopulationSize, random, problem.SearchSpace, problem);
-      var initialFitnesses = Evaluator.Evaluate(initialSolutions, random, problem.SearchSpace, problem);
-      return new PopulationState<TGenotype> {
-        Population = Population.From(initialSolutions, initialFitnesses)
-      };
-    }
-
-    var offspringCount = Replacer.GetOffspringCount(PopulationSize);
-    var oldPopulation = previousState.Population.Solutions;
-    var parents = Selector.Select(oldPopulation, problem.Objective, offspringCount * 2, random, problem.SearchSpace, problem).ToParents(problem.Objective);
-    var population = Crossover.Cross(parents, random, problem.SearchSpace, problem);
-
-    population = Mutator.Mutate(population, random, problem.SearchSpace, problem);
-
-    var fitnesses = Evaluator.Evaluate(population, random, problem.SearchSpace, problem);
-    var newPopulation = Replacer.Replace(oldPopulation, Population.From(population, fitnesses).Solutions, problem.Objective, random, problem.SearchSpace, problem);
-
-    return new PopulationState<TGenotype> {
-      Population = Population.From(newPopulation)
-    };
   }
 }
 
@@ -130,9 +66,10 @@ public static class GeneticAlgorithm
   public static GeneticAlgorithm<TG, TS, TP> Create<TG, TS, TP>(
     ICreator<TG, TS, TP> creator, ICrossover<TG, TS, TP> crossover, IMutator<TG, TS, TP> mutator,
     double mutationRate,
-    ISelector<TG, TS, TP> selector, IReplacer<TG, TS, TP> replacer, int populationSize,
+    ISelector<TG, TS, TP> selector, int populationSize,
     IEvaluator<TG, TS, TP> evaluator,
-    Interceptor<TG, PopulationState<TG>, TS, TP>? interceptor
+    int elites = 1,
+    Interceptor<TG, PopulationState<TG>, TS, TP>? interceptor = null
   )
     where TS : class, ISearchSpace<TG>
     where TP : class, IProblem<TG, TS>
@@ -143,7 +80,8 @@ public static class GeneticAlgorithm
       Mutator = mutator,
       MutationRate = mutationRate,
       Selector = selector,
-      Replacer = replacer,
+      Elites = elites,
+      //Replacer = replacer,
       PopulationSize = populationSize,
       Evaluator = evaluator,
       Interceptor = interceptor

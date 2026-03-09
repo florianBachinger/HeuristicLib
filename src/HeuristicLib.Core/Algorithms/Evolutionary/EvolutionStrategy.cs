@@ -139,7 +139,7 @@ public class EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem>
 
     var population = Population.From(children, fitnesses);
 
-    var newPopulation = Replacer.Replace(previousState.Population.Solutions, population.Solutions, problem.Objective, random, problem.SearchSpace, problem);
+    var newPopulation = Replacer.Replace(previousState.Population.Solutions, population.Solutions, problem.Objective, NumberOfChildren, random, problem.SearchSpace, problem);
     return new EvolutionStrategyState<TGenotype> {
       Population = Population.From(newPopulation),
       MutationStrength = newMutationStrength
