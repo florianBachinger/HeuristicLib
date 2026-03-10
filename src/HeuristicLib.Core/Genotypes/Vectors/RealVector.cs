@@ -136,18 +136,7 @@ public sealed class RealVector(params IEnumerable<double> elements) : IReadOnlyL
            || elements.SequenceEqual(other.elements);
   }
 
-  public override bool Equals(object? obj)
-  {
-    if (obj is null) {
-      return false;
-    }
-
-    if (ReferenceEquals(this, obj)) {
-      return true;
-    }
-
-    return obj is Permutation other && Equals(other);
-  }
+  public override bool Equals(object? obj) => obj is RealVector other && Equals(other);
 
   public override int GetHashCode()
   {

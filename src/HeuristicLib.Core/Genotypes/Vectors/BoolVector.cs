@@ -2,7 +2,7 @@
 
 namespace HEAL.HeuristicLib.Genotypes.Vectors;
 
-public class BoolVector : IReadOnlyList<bool>
+public sealed class BoolVector : IReadOnlyList<bool>, IEquatable<BoolVector>
 {
   private readonly bool[] elements;
 
@@ -28,7 +28,6 @@ public class BoolVector : IReadOnlyList<bool>
 
   public static int BroadcastLength(BoolVector a, BoolVector b) => Math.Max(a.Count, b.Count);
 
-  // Boolean operations
   public static BoolVector And(BoolVector a, BoolVector b)
   {
     if (!AreCompatible(a, b)) {
@@ -94,18 +93,53 @@ public class BoolVector : IReadOnlyList<bool>
     return new BoolVector(result);
   }
 
-  // Operator overloads
   public static BoolVector operator &(BoolVector a, BoolVector b) => And(a, b);
   public static BoolVector operator |(BoolVector a, BoolVector b) => Or(a, b);
   public static BoolVector operator ^(BoolVector a, BoolVector b) => Xor(a, b);
   public static BoolVector operator !(BoolVector a) => Not(a);
 
-  // Utility methods
   public bool All() => elements.All(x => x);
 
   public bool Any() => elements.Any(x => x);
 
   public int TrueCount() => elements.Count(x => x);
+
+  public bool Equals(BoolVector? other)
+  {
+    if (other is null) {
+      return false;
+    }
+
+    return ReferenceEquals(this, other)
+           || elements.SequenceEqual(other.elements);
+  }
+
+  public override bool Equals(object? obj) => obj is BoolVector other && Equals(other);
+
+  public override int GetHashCode()
+  {
+    var hash = new HashCode();
+    foreach (var element in elements) {
+      hash.Add(element);
+    }
+
+    return hash.ToHashCode();
+  }
+
+  public static bool operator ==(BoolVector? a, BoolVector? b)
+  {
+    if (ReferenceEquals(a, b)) {
+      return true;
+    }
+
+    if (a is null || b is null) {
+      return false;
+    }
+
+    return a.Equals(b);
+  }
+
+  public static bool operator !=(BoolVector? a, BoolVector? b) => !(a == b);
 
   public override string ToString() => $"[{string.Join(", ", elements.Select(b => b ? "True" : "False"))}]";
 }

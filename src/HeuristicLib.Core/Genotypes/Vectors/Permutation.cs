@@ -7,7 +7,7 @@ public sealed record Permutation : IReadOnlyList<int>
 {
   private readonly ReadOnlyMemory<int> memory;
 
-  public Permutation(IEnumerable<int> elements)
+  public Permutation(params IEnumerable<int> elements)
   {
     memory = elements.ToArray();
     if (!IsValidPermutation(memory.Span)) {

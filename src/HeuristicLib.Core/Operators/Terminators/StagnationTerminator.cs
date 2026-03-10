@@ -27,7 +27,7 @@ public record StagnationTerminator<TGenotype>
     private readonly int window;
 
     private ObjectiveVector? bestQualitySoFar;
-    private int stagnationCounter = 0;
+    private int stagnationCounter;
 
     public Instance(int window)
     {

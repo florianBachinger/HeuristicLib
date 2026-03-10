@@ -2,7 +2,7 @@
 
 public sealed class InvocationCounter
 {
-  private int currentCount = 0;
+  private int currentCount;
 
   public int CurrentCount => currentCount;
 

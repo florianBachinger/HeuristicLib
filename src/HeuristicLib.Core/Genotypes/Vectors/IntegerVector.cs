@@ -21,8 +21,11 @@ public sealed class IntegerVector(params IEnumerable<int> elements) : IReadOnlyL
 
   IEnumerator IEnumerable.GetEnumerator() => elements.GetEnumerator();
 
-  public bool Equals(IntegerVector? other) => other is not null && (ReferenceEquals(this, other) || elements.SequenceEqual(other.elements));
-  public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is IntegerVector other && Equals(other);
+  public bool Equals(IntegerVector? other) =>
+    other is not null && (ReferenceEquals(this, other) || elements.SequenceEqual(other.elements));
+
+  public override bool Equals(object? obj) =>
+    obj is IntegerVector other && Equals(other);
 
   public override int GetHashCode()
   {
@@ -100,8 +103,20 @@ public sealed class IntegerVector(params IEnumerable<int> elements) : IReadOnlyL
     return new BoolVector(result);
   }
 
-  public static bool operator ==(IntegerVector a, IntegerVector b) => a.Equals(b);
-  public static bool operator !=(IntegerVector a, IntegerVector b) => !a.Equals(b);
+  public static bool operator ==(IntegerVector? a, IntegerVector? b)
+  {
+    if (ReferenceEquals(a, b)) {
+      return true;
+    }
+
+    if (a is null || b is null) {
+      return false;
+    }
+
+    return a.Equals(b);
+  }
+
+  public static bool operator !=(IntegerVector? a, IntegerVector? b) => !(a == b);
 
   public static bool AreCompatible(IntegerVector a, IntegerVector b) => a.Count == b.Count || a.Count == 1 || b.Count == 1;
 
@@ -119,7 +134,7 @@ public sealed class IntegerVector(params IEnumerable<int> elements) : IReadOnlyL
       throw new ArgumentException($"Integer vector and {b} is not compatible with length {length}");
   }
 
-  public static int BroadcastLength(RealVector a, RealVector b) => Math.Max(a.Count, b.Count);
+  public static int BroadcastLength(IntegerVector a, IntegerVector b) => Math.Max(a.Count, b.Count);
 
   public static IntegerVector CreateUniform(int length, IntegerVector low, IntegerVector high, IRandomNumberGenerator random)
   {
@@ -130,20 +145,6 @@ public sealed class IntegerVector(params IEnumerable<int> elements) : IReadOnlyL
       var min = low.Count == 1 ? low[0] : low[i];
       var max = high.Count == 1 ? high[0] : high[i];
       result[i] = random.NextInt(min, max, true);
-    }
-
-    return new IntegerVector(result);
-  }
-
-  public IntegerVector Clamp(IntegerVector low, IntegerVector high)
-  {
-    AssertComparable(this, low);
-    AssertComparable(this, high);
-    var result = new int[elements.Length];
-    for (var i = 0; i < elements.Length; i++) {
-      var min = low.Count == 1 ? low[0] : low[i];
-      var max = high.Count == 1 ? high[0] : high[i];
-      result[i] = Math.Max(min, Math.Max(max, elements[i]));
     }
 
     return new IntegerVector(result);
