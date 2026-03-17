@@ -6,24 +6,33 @@ using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols;
 
 namespace HEAL.HeuristicLib.Genotypes.Trees;
 
+public class NoSymbol : Symbol
+{
+  public static readonly NoSymbol Instance = new();
+
+  private NoSymbol() : base(0, 0, 0)
+  { }
+}
+
 public class SymbolicExpressionTreeNode
 {
-  private readonly List<SymbolicExpressionTreeNode>? subtrees;
+  private static readonly ImmutableList<SymbolicExpressionTreeNode> NoSubtrees = [];
+  private readonly IList<SymbolicExpressionTreeNode> subtrees;
 
   // cached values to prevent unnecessary tree iterations
   private ushort length;
   private ushort depth;
 
-  public Symbol Symbol { get; } = null!;
+  public Symbol Symbol { get; }
 
-  public SymbolicExpressionTreeNode? Parent { get; set; }
+  public SymbolicExpressionTreeNode? Parent { get; private set; }
 
-  public double NodeWeight { get; set; }
+  public double NodeWeight { get; init; }
 
   internal SymbolicExpressionTreeNode()
   {
-    // don't allocate subtrees list here!
-    // because we don't want to allocate it in terminal nodes
+    subtrees = NoSubtrees;
+    Symbol = NoSymbol.Instance;
   }
 
   public SymbolicExpressionTreeNode(Symbol symbol)
@@ -34,11 +43,16 @@ public class SymbolicExpressionTreeNode
 
   protected SymbolicExpressionTreeNode(SymbolicExpressionTreeNode node)
   {
-    subtrees = node.subtrees?.Select(x => {
-      var p = x.Clone();
-      p.Parent = this;
-      return p;
-    }).ToList();
+    if (ReferenceEquals(node.subtrees, NoSubtrees)) {
+      subtrees = NoSubtrees;
+    } else {
+      subtrees = node.subtrees.Select(x => {
+        var p = x.Clone();
+        p.Parent = this;
+        return p;
+      }).ToList();
+    }
+
     length = node.length;
     depth = node.depth;
     Symbol = node.Symbol;
@@ -49,39 +63,41 @@ public class SymbolicExpressionTreeNode
 
   public virtual bool HasLocalParameters => false;
 
-  public IEnumerable<SymbolicExpressionTreeNode> Subtrees => subtrees ?? [];
+  public IReadOnlyList<SymbolicExpressionTreeNode> Subtrees => subtrees.AsReadOnly();
 
-  public int GetLength()
+  public int GetLength() => GetLengthInner();
+
+  private ushort GetLengthInner()
   {
     if (length > 0) {
       return length;
     }
 
     ushort l = 1;
-    if (subtrees != null) {
-      for (var i = 0; i < subtrees.Count; i++) {
-        checked { l += (ushort)subtrees[i].GetLength(); }
-      }
+    for (var i = 0; i < subtrees.Count; i++) {
+      checked { l += subtrees[i].GetLengthInner(); }
     }
 
     length = l;
     return length;
   }
 
-  public int GetDepth()
+  public int GetDepth() => GetDepthInner();
+
+  private ushort GetDepthInner()
   {
-    if (depth > 0) {
+    if (depth > 0)
       return depth;
-    }
 
     ushort d = 0;
-    if (subtrees != null) {
-      for (var i = 0; i < subtrees.Count; i++) {
-        d = Math.Max(d, (ushort)subtrees[i].GetDepth());
-      }
+    for (var i = 0; i < subtrees.Count; i++) {
+      d = Math.Max(d, subtrees[i].GetDepthInner());
     }
 
-    d++;
+    checked {
+      d++;
+    }
+
     depth = d;
     return depth;
   }
@@ -104,57 +120,19 @@ public class SymbolicExpressionTreeNode
     return int.MaxValue;
   }
 
-  public virtual void ResetLocalParameters(IRandomNumberGenerator random) { }
-  public virtual void ShakeLocalParameters(IRandomNumberGenerator random, double shakingFactor) { }
+  public int SubtreeCount => subtrees.Count;
 
-  public int SubtreeCount => subtrees?.Count ?? 0;
+  public SymbolicExpressionTreeNode GetSubtree(int index) => subtrees[index];
 
-  public SymbolicExpressionTreeNode GetSubtree(int index) => subtrees![index];
+  public SymbolicExpressionTreeNode this[int key] => subtrees[key];
 
-  public SymbolicExpressionTreeNode this[int key]
+  public int IndexOfSubtree(SymbolicExpressionTreeNode tree)
   {
-    get => subtrees![key];
-    set => ReplaceSubtree(key, value);
-  }
+    for (int i = 0; i < subtrees.Count; i++) {
+      if (tree.Equals(subtrees[i])) return i;
+    }
 
-  public int IndexOfSubtree(SymbolicExpressionTreeNode tree) => subtrees!.IndexOf(tree);
-
-  public void AddSubtree(SymbolicExpressionTreeNode tree)
-  {
-    subtrees!.Add(tree);
-    tree.Parent = this;
-    ResetCachedValues();
-  }
-
-  public void InsertSubtree(int index, SymbolicExpressionTreeNode tree)
-  {
-    subtrees!.Insert(index, tree);
-    tree.Parent = this;
-    ResetCachedValues();
-  }
-
-  public void RemoveSubtree(int index)
-  {
-    subtrees![index].Parent = null;
-    subtrees.RemoveAt(index);
-    ResetCachedValues();
-  }
-
-  public void ReplaceSubtree(int index, SymbolicExpressionTreeNode repl)
-  {
-    subtrees![index].Parent = null;
-    subtrees[index] = repl;
-    repl.Parent = this;
-    ResetCachedValues();
-  }
-
-  public void ReplaceSubtree(SymbolicExpressionTreeNode old, SymbolicExpressionTreeNode repl)
-  {
-    var index = IndexOfSubtree(old);
-    subtrees![index].Parent = null;
-    subtrees[index] = repl;
-    repl.Parent = this;
-    ResetCachedValues();
+    return -1;
   }
 
   public IEnumerable<SymbolicExpressionTreeNode> IterateNodesBreadth()
@@ -182,10 +160,6 @@ public class SymbolicExpressionTreeNode
   public void ForEachNodePrefix(Action<SymbolicExpressionTreeNode> a)
   {
     a(this);
-    if (subtrees == null) {
-      return;
-    }
-
     // avoid linq to reduce memory pressure
     // ReSharper disable once ForCanBeConvertedToForeach
     for (var i = 0; i < subtrees.Count; i++) {
@@ -202,17 +176,48 @@ public class SymbolicExpressionTreeNode
 
   public void ForEachNodePostfix(Action<SymbolicExpressionTreeNode> a)
   {
-    if (subtrees != null)
-    // avoid linq to reduce memory pressure
-    // ReSharper disable once ForCanBeConvertedToForeach
-    {
-      for (var i = 0; i < subtrees.Count; i++) {
-        subtrees[i].ForEachNodePostfix(a);
-      }
+    for (var i = 0; i < subtrees.Count; i++) {
+      subtrees[i].ForEachNodePostfix(a);
     }
 
     a(this);
   }
+
+  #region mutation
+  public virtual void ResetLocalParameters(IRandomNumberGenerator random) { }
+  public virtual void ShakeLocalParameters(IRandomNumberGenerator random, double shakingFactor) { }
+
+  public void AddSubtree(SymbolicExpressionTreeNode tree)
+  {
+    subtrees.Add(tree);
+    tree.Parent = this;
+    ResetCachedValues();
+  }
+
+  public void InsertSubtree(int index, SymbolicExpressionTreeNode tree)
+  {
+    subtrees.Insert(index, tree);
+    tree.Parent = this;
+    ResetCachedValues();
+  }
+
+  public void RemoveSubtree(int index)
+  {
+    subtrees[index].Parent = null;
+    subtrees.RemoveAt(index);
+    ResetCachedValues();
+  }
+
+  public void ReplaceSubtree(int index, SymbolicExpressionTreeNode repl)
+  {
+    subtrees[index].Parent = null;
+    subtrees[index] = repl;
+    repl.Parent = this;
+    ResetCachedValues();
+  }
+
+  public void ReplaceSubtree(SymbolicExpressionTreeNode old, SymbolicExpressionTreeNode repl) => ReplaceSubtree(IndexOfSubtree(old), repl);
+  #endregion
 
   private void ResetCachedValues()
   {

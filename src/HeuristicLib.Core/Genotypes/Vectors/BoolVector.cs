@@ -6,15 +6,12 @@ public sealed class BoolVector : IReadOnlyList<bool>, IEquatable<BoolVector>
 {
   private readonly bool[] elements;
 
-  public BoolVector(IEnumerable<bool> elements) => this.elements = elements.ToArray();
-
-  public BoolVector(bool value) => elements = [value];
+  public BoolVector(params IEnumerable<bool> elements) => this.elements = elements.ToArray();
 
   public static implicit operator BoolVector(bool value) => new(value);
+  public static implicit operator BoolVector(bool[] values) => new(values);
 
   public bool this[int index] => elements[index];
-
-  public bool this[Index index] => elements[index];
 
   public IEnumerator<bool> GetEnumerator() => ((IEnumerable<bool>)elements).GetEnumerator();
 

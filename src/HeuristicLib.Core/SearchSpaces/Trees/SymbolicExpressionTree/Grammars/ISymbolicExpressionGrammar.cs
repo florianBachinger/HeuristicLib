@@ -29,13 +29,13 @@ public static class SymbolicExpressionGrammarExtensions
       if (rootNode.HasLocalParameters) {
         rootNode.ResetLocalParameters(random);
       }
+
       var startNode = grammar.StartSymbol.CreateTreeNode();
       if (startNode.HasLocalParameters) {
         startNode.ResetLocalParameters(random);
       }
-      rootNode.AddSubtree(startNode);
-      tree.Root = rootNode;
 
+      rootNode.AddSubtree(startNode);
       return tree;
     }
 
@@ -47,6 +47,7 @@ public static class SymbolicExpressionGrammarExtensions
         if (symbol.MaximumArity == 0) {
           continue;
         }
+
         foreach (var symbol1 in symbols) {
           grammar.AddAllowedChildSymbol(symbol, symbol1);
         }

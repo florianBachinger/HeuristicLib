@@ -41,7 +41,7 @@ public class TspTests
     ga.Elites = 1;
     // execute
     var resGa = ga.Build()
-                  .WithMaxIterations(1000)
+                  .WithMaxIterations(10)
                   .RunToCompletion(prob, RandomNumberGenerator.Create(42));
 
     // look at results

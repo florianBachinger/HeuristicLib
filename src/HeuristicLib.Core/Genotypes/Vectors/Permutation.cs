@@ -3,7 +3,7 @@ using HEAL.HeuristicLib.Random;
 
 namespace HEAL.HeuristicLib.Genotypes.Vectors;
 
-public sealed record Permutation : IReadOnlyList<int>
+public sealed class Permutation : IReadOnlyList<int>, IEquatable<Permutation>
 {
   private readonly ReadOnlyMemory<int> memory;
 
@@ -44,7 +44,7 @@ public sealed record Permutation : IReadOnlyList<int>
     return true;
   }
 
-  public static implicit operator Permutation(int[] elements) => new((IEnumerable<int>)elements);
+  public static implicit operator Permutation(int[] elements) => new(elements);
 
   public int this[int index] => Span[index];
 
@@ -94,7 +94,21 @@ public sealed record Permutation : IReadOnlyList<int>
 
   public bool Contains(int value) => memory.Span.Contains(value);
 
-  public bool Equals(Permutation? other) => other != null && memory.Equals(other.memory) && Span.SequenceEqual(other.memory.Span);
+  public bool Equals(Permutation? other) =>
+    other is not null && Span.SequenceEqual(other.Span);
 
-  public override int GetHashCode() => memory.GetHashCode();
+  public override bool Equals(object? obj) => obj is Permutation other && Equals(other);
+
+  public override int GetHashCode()
+  {
+    var hash = new HashCode();
+    foreach (var value in Span) {
+      hash.Add(value);
+    }
+
+    return hash.ToHashCode();
+  }
+
+  public static bool operator ==(Permutation? a, Permutation? b) => Equals(a, b);
+  public static bool operator !=(Permutation? a, Permutation? b) => !Equals(a, b);
 }

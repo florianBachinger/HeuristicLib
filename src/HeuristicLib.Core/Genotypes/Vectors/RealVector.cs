@@ -156,13 +156,10 @@ public sealed class RealVector(params IEnumerable<double> elements) : IReadOnlyL
 
   public static int BroadcastLength(RealVector a, RealVector b) => Math.Max(a.Count, b.Count);
 
-  public static int BroadcastLength(RealVector vector, IEnumerable<RealVector> others)
+  public static int BroadcastLength(RealVector vector, params IReadOnlyCollection<RealVector> others)
   {
-    if (!AreCompatible(vector, others)) {
-      throw new ArgumentException("Vectors must be compatible for broadcasting");
-    }
-
-    return others.Max(v => v.Count);
+    ArgumentNullException.ThrowIfNull(others);
+    return !AreCompatible(vector, others) ? throw new ArgumentException("Vectors must be compatible for broadcasting") : others.Append(vector).Max(v => v.Count);
   }
 
   public static RealVector CreateNormal(int length, RealVector mean, RealVector std, IRandomNumberGenerator random)
@@ -171,19 +168,35 @@ public sealed class RealVector(params IEnumerable<double> elements) : IReadOnlyL
       throw new ArgumentException("Vectors must be compatible for broadcasting");
     }
 
-    // Box-Muller transform to generate normal distributed random values
-    RealVector u1, u2;
-    do {
-      u1 = new RealVector(random.NextDoubles(length));
-    } while ((u1 <= 0.0).Any());
+    var result = new double[length];
 
-    u2 = new RealVector(random.NextDoubles(length));
+    for (var i = 0; i < length; i++) {
+      var mu = mean.Count == 1 ? mean[0] : mean[i];
+      var sigma = std.Count == 1 ? std[0] : std[i];
 
-    var mag = std * Sqrt(-2.0 * Log(u1));
-    // var z0 = mag * Cos(2.0 * Math.PI * u2) + mean;
-    var z1 = (mag * Sin(2.0 * Math.PI * u2)) + mean;
+      double u1 = 0.0;
+      double u2 = 0.0;
+      var success = false;
 
-    return z1;
+      for (var tries = 0; tries < 50; tries++) {
+        u1 = random.NextDouble();
+        if (u1 <= 0.0)
+          continue;
+
+        u2 = random.NextDouble();
+        success = true;
+        break;
+      }
+
+      if (!success) {
+        throw new InvalidOperationException("Random number generator produced invalid values for Box-Muller transform after 50 attempts.");
+      }
+
+      var mag = sigma * Math.Sqrt(-2.0 * Math.Log(u1));
+      result[i] = mu + mag * Math.Sin(2.0 * Math.PI * u2);
+    }
+
+    return new RealVector(result);
   }
 
   public static RealVector CreateUniform(int length, RealVector low, RealVector high, IRandomNumberGenerator random)
@@ -335,8 +348,8 @@ public sealed class RealVector(params IEnumerable<double> elements) : IReadOnlyL
     return new BoolVector(result);
   }
 
-  public static bool operator ==(RealVector a, RealVector b) => a.Equals(b);
-  public static bool operator !=(RealVector a, RealVector b) => !a.Equals(b);
+  public static bool operator ==(RealVector? a, RealVector? b) => Equals(a, b);
+  public static bool operator !=(RealVector? a, RealVector? b) => !Equals(a, b);
 
   public static RealVector Repeat(double value, int count) => new(Enumerable.Repeat(value, count));
 
@@ -363,7 +376,7 @@ public sealed class RealVector(params IEnumerable<double> elements) : IReadOnlyL
   public double Angle(RealVector other)
   {
     var r = Dot(other) / (Norm() * other.Norm());
-
+    r = Math.Clamp(r, -1.0, 1.0);
     return Math.Acos(r);
   }
 
