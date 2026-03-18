@@ -38,6 +38,7 @@ public partial record CycleAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TProbl
     var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
 
     return new CycleAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>(
+      instanceRegistry.Run,
       evaluatorInstance,
       Algorithms.ToList(),
       MaximumCycles,
@@ -59,8 +60,8 @@ public class CycleAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProble
 
   private readonly Dictionary<TAlgorithm, ExecutionInstanceRegistry> algorithmInstanceRegistries;
 
-  public CycleAlgorithmInstance(IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, IReadOnlyList<TAlgorithm> algorithms, int? maximumCycles, bool newExecutionInstancesPerCycle)
-    : base(evaluator)
+  public CycleAlgorithmInstance(Run run, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, IReadOnlyList<TAlgorithm> algorithms, int? maximumCycles, bool newExecutionInstancesPerCycle)
+    : base(run, evaluator)
   {
     Algorithms = algorithms;
     MaximumCycles = maximumCycles;
@@ -81,7 +82,7 @@ public class CycleAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProble
       var cycleRng = random.Fork(cycleCount);
       foreach (var (algorithm, algorithmIndex) in Algorithms.Select((a, i) => (a, i))) {
         var algorithmRng = cycleRng.Fork(algorithmIndex);
-        var registry = ExecutionInstanceRegistry(algorithm);
+        var registry = ExecutionInstanceRegistry(algorithm, Run);
         var algorithmInstance = algorithm.CreateExecutionInstance(registry);
 
         await foreach (var newState in algorithmInstance.RunStreamingAsync(problem, algorithmRng, state, ct)) {
@@ -92,17 +93,17 @@ public class CycleAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProble
     }
   }
 
-  private ExecutionInstanceRegistry ExecutionInstanceRegistry(TAlgorithm algorithm)
+  private ExecutionInstanceRegistry ExecutionInstanceRegistry(TAlgorithm algorithm, Run run)
   {
     if (NewExecutionInstancesPerCycle) {
-      return new ExecutionInstanceRegistry();
+      return new ExecutionInstanceRegistry(run);
     }
 
     if (algorithmInstanceRegistries.TryGetValue(algorithm, out var existingRegistry)) {
       return existingRegistry;
     }
 
-    var newRegistry = new ExecutionInstanceRegistry();
+    var newRegistry = new ExecutionInstanceRegistry(run);
     algorithmInstanceRegistries[algorithm] = newRegistry;
     return newRegistry;
   }

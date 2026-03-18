@@ -52,6 +52,7 @@ public record EvolutionStrategy<TGenotype, TSearchSpace, TProblem>
     var replacerInstance = instanceRegistry.Resolve(replacer);
 
     return new EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem>(
+      instanceRegistry.Run,
       interceptorInstance,
       evaluatorInstance,
       PopulationSize,
@@ -82,8 +83,8 @@ public class EvolutionStrategyInstance<TGenotype, TSearchSpace, TProblem>
   protected readonly double InitialMutationStrength;
   protected readonly IReplacerInstance<TGenotype, TSearchSpace, TProblem> Replacer;
 
-  public EvolutionStrategyInstance(IInterceptorInstance<TGenotype, TSearchSpace, TProblem, EvolutionStrategyState<TGenotype>>? interceptor, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, int populationSize, int numberOfChildren, EvolutionStrategyType strategy, ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator, IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator, ICrossoverInstance<TGenotype, TSearchSpace, TProblem>? crossover, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selector, double initialMutationStrength, IReplacerInstance<TGenotype, TSearchSpace, TProblem> replacer)
-    : base(interceptor, evaluator)
+  public EvolutionStrategyInstance(Run run, IInterceptorInstance<TGenotype, TSearchSpace, TProblem, EvolutionStrategyState<TGenotype>>? interceptor, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, int populationSize, int numberOfChildren, EvolutionStrategyType strategy, ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator, IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator, ICrossoverInstance<TGenotype, TSearchSpace, TProblem>? crossover, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selector, double initialMutationStrength, IReplacerInstance<TGenotype, TSearchSpace, TProblem> replacer)
+    : base(run, interceptor, evaluator)
   {
     PopulationSize = populationSize;
     NumberOfChildren = numberOfChildren;

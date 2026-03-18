@@ -38,7 +38,7 @@ public class ObservableAlgorithmInstance<TG, TS, TP, TR>
 {
   private readonly IAlgorithmInstance<TG, TS, TP, TR> algorithmInstance;
   private readonly IReadOnlyList<IAlgorithmObserver<TG, TS, TP, TR>> observers;
-
+  
   public ObservableAlgorithmInstance(IAlgorithmInstance<TG, TS, TP, TR> algorithmInstance, IReadOnlyList<IAlgorithmObserver<TG, TS, TP, TR>> observers)
   {
     this.algorithmInstance = algorithmInstance;

@@ -26,6 +26,7 @@ public record TerminatableAlgorithm<TG, TS, TP, TR>
     var algorithmInstance = instanceRegistry.Resolve(Algorithm);
 
     return new TerminatableAlgorithmInstance<TG, TS, TP, TR>(
+      instanceRegistry.Run, 
       evaluatorInstance,
       algorithmInstance,
       terminatorInstance
@@ -41,8 +42,8 @@ public class TerminatableAlgorithmInstance<TG, TS, TP, TR> : AlgorithmInstance<T
   protected readonly IAlgorithmInstance<TG, TS, TP, TR> Algorithm;
   protected readonly ITerminatorInstance<TG, TS, TP, TR> Terminator;
 
-  public TerminatableAlgorithmInstance(IEvaluatorInstance<TG, TS, TP> evaluator, IAlgorithmInstance<TG, TS, TP, TR> algorithm, ITerminatorInstance<TG, TS, TP, TR> terminator)
-    : base(evaluator)
+  public TerminatableAlgorithmInstance(Run run, IEvaluatorInstance<TG, TS, TP> evaluator, IAlgorithmInstance<TG, TS, TP, TR> algorithm, ITerminatorInstance<TG, TS, TP, TR> terminator)
+    : base(run, evaluator)
   {
     Algorithm = algorithm;
     Terminator = terminator;

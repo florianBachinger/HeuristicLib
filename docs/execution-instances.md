@@ -258,3 +258,4 @@ Effect on `StagnationTerminator` (again, assuming the inner algorithm uses `GetO
 
 - [Operators](operators.md)
 - [Execution model](execution-model.md)
+- [Analyzer architecture](analyzer-architecture.md)

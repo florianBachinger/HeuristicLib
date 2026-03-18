@@ -1,4 +1,5 @@
 ﻿using HEAL.HeuristicLib.Algorithms;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Evaluators;
@@ -12,11 +13,15 @@ namespace HEAL.HeuristicLib.Analyzers;
 
 // ToDo: think about interceptor is the right hook here. Algorithm would be more intuitive but it is also more cumbersome.
 public class BestMedianWorstPerEvaluationAnalysis<TGenotype>
-  : IEvaluatorObserver<TGenotype>,
+  : IAnalyzer<IReadOnlyList<(int evaluations, BestMedianWorstEntry<TGenotype> entry)>, BestMedianWorstPerEvaluationAnalysis<TGenotype>.Instance>,
+    IEvaluatorObserver<TGenotype>,
     IInterceptorObserver<TGenotype, PopulationState<TGenotype>>
 // IAlgorithmObserver<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>
 {
-  public sealed class Instance :
+  public Instance CreateAnalyzerInstance(Run run) => new(run, this);
+
+  public sealed class Instance(Run run, BestMedianWorstPerEvaluationAnalysis<TGenotype> analyzer) :
+    AnalyzerRunInstance<BestMedianWorstPerEvaluationAnalysis<TGenotype>, IReadOnlyList<(int evaluations, BestMedianWorstEntry<TGenotype> entry)>>(run, analyzer),
     IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>,
     IInterceptorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>
   {
@@ -38,18 +43,19 @@ public class BestMedianWorstPerEvaluationAnalysis<TGenotype>
       var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, comp).ToArray();
 
       bestSolutions.Add((currentEvaluationsCount, new BestMedianWorstEntry<TGenotype>(ordered[0], ordered[ordered.Length / 2], ordered[^1])));
+      PublishResult(bestSolutions.ToArray());
     }
   }
 
   IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
     IExecutable<IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>>
     .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
-    => new Instance();
+    => instanceRegistry.Run.ResolveAnalyzer(this);
 
   IInterceptorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>
     IExecutable<IInterceptorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>, PopulationState<TGenotype>>>
     .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
-    => new Instance();
+    => instanceRegistry.Run.ResolveAnalyzer(this);
 }
 
 public static class BestMedianWorstPerEvaluationAnalysis

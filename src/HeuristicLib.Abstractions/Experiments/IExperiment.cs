@@ -4,24 +4,24 @@ using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
 
-namespace HEAL.HeuristicLib.Algorithms;
+namespace HEAL.HeuristicLib.Experiments;
 
 // ToDo: either make a MultiStreamAlgorithm an Algorithm or provide an adapter that interleaves results, or take last, or any other of compression to a single stream.
-public interface IMultiStreamAlgorithm<TGenotype, in TSearchSpace, in TProblem, TAlgorithmState, TAlgorithmKey>
-  : IExecutable<IMultiStreamAlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithmKey>>
+public interface IExperiment<TGenotype, in TSearchSpace, in TProblem, TAlgorithmState, TAlgorithmKey>
+  : IExecutable<IExperimentInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithmKey>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
 {
+  
 }
 
-public interface IMultiStreamAlgorithmInstance<TGenotype, in TSearchSpace, in TProblem, TAlgorithmState, TAlgorithmKey>
+public interface IExperimentInstance<TGenotype, in TSearchSpace, in TProblem, TAlgorithmState, TAlgorithmKey>
   : IExecutionInstance
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
 {
-  // ToDo: Maybe rename to "ExecuteManyStreamingAsync"?
   IReadOnlyList<KeyValuePair<TAlgorithmKey, IAsyncEnumerable<TAlgorithmState>>> RunStreamingAsync(
     TProblem problem,
     IRandomNumberGenerator random,

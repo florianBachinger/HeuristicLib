@@ -1,4 +1,5 @@
 ﻿using HEAL.HeuristicLib.Algorithms;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators.Creators;
 using HEAL.HeuristicLib.Operators.Crossovers;
@@ -33,6 +34,15 @@ public interface IMutatorObserver<TGenotype> :
 
 public static class BuilderExtensions
 {
+  public static void AttachAnalyzer<TG, TS, TP, TR, TAnalyzer>(this IAlgorithmBuilder<TG, TS, TP, TR> builder, TAnalyzer analyzer)
+    where TAnalyzer : IAnalyzer, IExecutable<IExecutionInstance>
+    where TS : class, ISearchSpace<TG>
+    where TP : class, IProblem<TG, TS>
+    where TR : class, IAlgorithmState
+  {
+    builder.AttachObserver(analyzer);
+  }
+
   public static void AttachObserver<TG, TS, TP, TR>(this IAlgorithmBuilder<TG, TS, TP, TR> builder, IExecutable<IExecutionInstance> analysis)
     where TS : class, ISearchSpace<TG>
     where TP : class, IProblem<TG, TS>

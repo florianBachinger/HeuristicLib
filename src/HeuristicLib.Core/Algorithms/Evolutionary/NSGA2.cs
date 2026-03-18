@@ -34,6 +34,7 @@ public record NSGA2<TGenotype, TSearchSpace, TProblem>
     var replacerInstance = instanceRegistry.Resolve(Replacer);
 
     return new NSGA2Instance<TGenotype, TSearchSpace, TProblem>(
+      instanceRegistry.Run,
       interceptorInstance,
       evaluatorInstance,
       PopulationSize,
@@ -60,8 +61,8 @@ public class NSGA2Instance<TGenotype, TSearchSpace, TProblem>
   protected readonly ISelectorInstance<TGenotype, TSearchSpace, TProblem> Selector;
   protected readonly IReplacerInstance<TGenotype, TSearchSpace, TProblem> Replacer;
 
-  public NSGA2Instance(IInterceptorInstance<TGenotype, TSearchSpace, TProblem, PopulationState<TGenotype>>? interceptor, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, int populationSize, ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator, ICrossoverInstance<TGenotype, TSearchSpace, TProblem> crossover, IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selector, IReplacerInstance<TGenotype, TSearchSpace, TProblem> replacer)
-    : base(interceptor, evaluator)
+  public NSGA2Instance(Run run, IInterceptorInstance<TGenotype, TSearchSpace, TProblem, PopulationState<TGenotype>>? interceptor, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, int populationSize, ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator, ICrossoverInstance<TGenotype, TSearchSpace, TProblem> crossover, IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selector, IReplacerInstance<TGenotype, TSearchSpace, TProblem> replacer)
+    : base(run, interceptor, evaluator)
   {
     PopulationSize = populationSize;
     Creator = creator;

@@ -28,6 +28,7 @@ public record HillClimber<TGenotype, TSearchSpace, TProblem>
     var mutatorInstance = instanceRegistry.Resolve(Mutator);
 
     return new HillClimberInstance<TGenotype, TSearchSpace, TProblem>(
+      instanceRegistry.Run,
       interceptorInstance,
       evaluatorInstance,
       creatorInstance,
@@ -50,8 +51,8 @@ public class HillClimberInstance<TGenotype, TSearchSpace, TProblem>
   protected readonly int MaxNeighbors;
   protected readonly int BatchSize;
 
-  public HillClimberInstance(IInterceptorInstance<TGenotype, TSearchSpace, TProblem, SingleSolutionState<TGenotype>>? interceptor, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator, IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator, LocalSearchDirection direction, int maxNeighbors, int batchSize)
-    : base(interceptor, evaluator)
+  public HillClimberInstance(Run run, IInterceptorInstance<TGenotype, TSearchSpace, TProblem, SingleSolutionState<TGenotype>>? interceptor, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator, IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator, LocalSearchDirection direction, int maxNeighbors, int batchSize)
+    : base(run, interceptor, evaluator)
   {
     Creator = creator;
     Mutator = mutator;

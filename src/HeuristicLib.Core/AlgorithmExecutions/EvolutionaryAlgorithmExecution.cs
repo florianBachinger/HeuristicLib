@@ -1,4 +1,5 @@
 ﻿using HEAL.HeuristicLib.Algorithms;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
@@ -21,6 +22,7 @@ public class EvolutionaryAlgorithmExecution<TGenotype, TSearchSpace, TProblem>
   protected readonly IReplacerInstance<TGenotype, TSearchSpace, TProblem> Replacer;
 
   public EvolutionaryAlgorithmExecution(
+    Run run,
     int populationSize,
     int offspringSize,
     ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator,
@@ -29,7 +31,7 @@ public class EvolutionaryAlgorithmExecution<TGenotype, TSearchSpace, TProblem>
     IReplacerInstance<TGenotype, TSearchSpace, TProblem> replacer,
     IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator,
     IInterceptorInstance<TGenotype, TSearchSpace, TProblem, PopulationState<TGenotype>>? interceptor
-  ) : base(interceptor, evaluator)
+  ) : base(run, interceptor, evaluator)
   {
     PopulationSize = populationSize;
     OffspringSize = offspringSize;

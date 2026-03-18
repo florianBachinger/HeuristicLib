@@ -43,6 +43,7 @@ public record GeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
     var replacer = new ElitismReplacer<TGenotype>(Elites);
 
     return new EvolutionaryAlgorithmExecution<TGenotype, TSearchSpace, TProblem>(
+      instanceRegistry.Run,
       PopulationSize,
       offspringSize: PopulationSize * 2,
       instanceRegistry.Resolve(Creator),

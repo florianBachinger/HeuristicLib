@@ -36,6 +36,7 @@ public record OpenEndedRelevantAllelesPreservingGeneticAlgorithm<TGenotype, TSea
     var selectorInstance = instanceRegistry.Resolve(Selector);
 
     return new OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem>(
+      instanceRegistry.Run,
       interceptorInstance,
       evaluatorInstance,
       PopulationSize,
@@ -64,8 +65,8 @@ public class OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance<TGenotyp
   protected readonly int MaxEffort;
   protected readonly double Strictness;
 
-  public OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance(IInterceptorInstance<TGenotype, TSearchSpace, TProblem, PopulationState<TGenotype>>? interceptor, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, int populationSize, ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator, ICrossoverInstance<TGenotype, TSearchSpace, TProblem> crossover, IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selector, int elites, int maxEffort, double strictness)
-    : base(interceptor, evaluator)
+  public OpenEndedRelevantAllelesPreservingGeneticAlgorithmInstance(Run run, IInterceptorInstance<TGenotype, TSearchSpace, TProblem, PopulationState<TGenotype>>? interceptor, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, int populationSize, ICreatorInstance<TGenotype, TSearchSpace, TProblem> creator, ICrossoverInstance<TGenotype, TSearchSpace, TProblem> crossover, IMutatorInstance<TGenotype, TSearchSpace, TProblem> mutator, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selector, int elites, int maxEffort, double strictness)
+    : base(run, interceptor, evaluator)
   {
     PopulationSize = populationSize;
     Creator = creator;

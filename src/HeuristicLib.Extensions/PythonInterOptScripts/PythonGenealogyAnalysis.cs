@@ -18,6 +18,7 @@ using HEAL.HeuristicLib.Operators.Mutators;
 using HEAL.HeuristicLib.Operators.Mutators.PermutationMutators;
 using HEAL.HeuristicLib.Operators.Mutators.RealVectorMutators;
 using HEAL.HeuristicLib.Operators.Mutators.SymbolicExpressionTreeMutators;
+using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -123,7 +124,7 @@ public class PythonGenealogyAnalysis
     }
 
     MyAnalyzers<T> analyzers = null!;
-    ExecutionInstanceRegistry registry;
+    Run run = null!;
 
     switch (parameters.AlgorithmName.ToLower()) {
       case "ga":
@@ -136,8 +137,9 @@ public class PythonGenealogyAnalysis
         }
 
         analyzers = AddAnalyzers(callback, ga, parameters);
-        ga.Build().WithMaxIterations(parameters.Iterations).CreateExecutionInstance(out registry)
-          .RunToCompletion(problem, RandomNumberGenerator.Create(parameters.Seed));
+        var gaRun = ga.Build().WithMaxIterations(parameters.Iterations).CreateRun(problem);
+        gaRun.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
+        run = gaRun;
 
         break;
       case "es":
@@ -156,8 +158,9 @@ public class PythonGenealogyAnalysis
 
         analyzers = AddAnalyzers(callback, es, parameters);
 
-        es.Build().WithMaxIterations(parameters.Iterations).CreateExecutionInstance(out registry)
-          .RunToCompletion(problem, RandomNumberGenerator.Create(parameters.Seed));
+        var esRun = es.Build().WithMaxIterations(parameters.Iterations).CreateRun(problem);
+        esRun.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
+        run = esRun;
 
         break;
       case "ls":
@@ -166,8 +169,9 @@ public class PythonGenealogyAnalysis
         //ls.Terminator = terminator;
 
         // analyzers = AddAnalyzers(callback, ls, parameters);
-        ls.Build().WithMaxIterations(parameters.Iterations).CreateExecutionInstance(out registry)
-          .RunToCompletion(problem, RandomNumberGenerator.Create(parameters.Seed));
+        var lsRun = ls.Build().WithMaxIterations(parameters.Iterations).CreateRun(problem);
+        lsRun.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
+        run = lsRun;
 
         break;
       case "nsga2":
@@ -180,14 +184,15 @@ public class PythonGenealogyAnalysis
 
         //nsga2.Terminator = terminator;
         analyzers = AddAnalyzers(callback, nsga2, parameters);
-        _ = nsga2.Build().WithMaxIterations(parameters.Iterations).CreateExecutionInstance(out registry)
-                 .RunToCompletion(problem, RandomNumberGenerator.Create(parameters.Seed));
+        var nsga2Run = nsga2.Build().WithMaxIterations(parameters.Iterations).CreateRun(problem);
+        _ = nsga2Run.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
+        run = nsga2Run;
         break;
       default:
         throw new ArgumentException($"Algorithm '{parameters.AlgorithmName}' is not supported.");
     }
 
-    return analyzers.ToExperimentResult(registry);
+    return analyzers.ToExperimentResult(run);
   }
 
   private sealed record MyAnalyzers<T>(
@@ -197,18 +202,26 @@ public class PythonGenealogyAnalysis
     AllPopulationsTracker<T>? AllPopulations)
     where T : notnull
   {
-    public ExperimentResult<T> ToExperimentResult(ExecutionInstanceRegistry registry)
+    public ExperimentResult<T> ToExperimentResult(Run run)
     {
-      var qRes = (BestMedianWorstAnalysis<T>.Instance)Qualities.RetrieveAnalysis(registry);
-      var rRes = (RankAnalysis<T>.Instance?)RankAnalysis?.RetrieveAnalysis(registry);
-      var qcRes = (QualityCurveAnalysis<T>.Instance)QualityCurve.RetrieveAnalysis(registry);
-      var apRes = (AllPopulationsTracker<T>.Instance?)AllPopulations?.RetrieveAnalysis(registry);
+      var qRes = run.GetResult(Qualities);
+      var rankGraph = string.Empty;
+      IReadOnlyList<List<double>> rankLines = [];
+      if (RankAnalysis is not null && run.TryGetResult<RankAnalysisResult<T>>(RankAnalysis, out var rankResult)) {
+        rankGraph = rankResult.Graph.ToGraphViz();
+        rankLines = rankResult.Ranks.Select(x => x.ToList()).ToArray();
+      }
+
+      IReadOnlyList<ISolution<T>[]> apRes = [];
+      if (AllPopulations is not null && run.TryGetResult<IReadOnlyList<ISolution<T>[]>>(AllPopulations, out var populations)) {
+        apRes = populations;
+      }
 
       var experimentResult = new ExperimentResult<T>(
-        rRes?.Graph.ToGraphViz() ?? "",
-        rRes?.Ranks ?? [],
-        qRes.BestSolutions,
-        apRes?.AllSolutions ?? []
+        rankGraph,
+        rankLines,
+        qRes,
+        apRes
       );
       return experimentResult;
     }
@@ -225,20 +238,20 @@ public class PythonGenealogyAnalysis
     where TA : IAlgorithm<T, TE, TP, TRes>
   {
     var qualities = new BestMedianWorstAnalysis<T>();
-    builder.AttachObserver(qualities);
+    builder.AttachAnalyzer(qualities);
     if (callback != null)
       builder.AttachObserver(new ActionInterceptorObserver<T, TE, TP, TRes>((y, _, _, _, _) => callback(y)));
 
     var rankAnalysis = parameters.TrackGenealogy ? new RankAnalysis<T>() : null;
     if (rankAnalysis is not null)
-      builder.AttachObserver(rankAnalysis);
+      builder.AttachAnalyzer(rankAnalysis);
 
     var qc = new QualityCurveAnalysis<T>();
-    builder.AttachObserver(qc);
+    builder.AttachAnalyzer(qc);
 
     var apt = parameters.TrackPopulations ? new AllPopulationsTracker<T>() : null;
     if (apt is not null)
-      builder.AttachObserver(apt);
+      builder.AttachAnalyzer(apt);
 
     return new MyAnalyzers<T>(qualities, rankAnalysis, qc, apt);
   }

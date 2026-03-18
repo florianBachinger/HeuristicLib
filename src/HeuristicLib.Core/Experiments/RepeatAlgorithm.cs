@@ -7,7 +7,7 @@ using HEAL.HeuristicLib.States;
 namespace HEAL.HeuristicLib.Algorithms.MultiStreamAlgorithms;
 
 public record RepeatAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>
-  : MultiStreamAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, int>
+  : Experiment<TGenotype, TSearchSpace, TProblem, TAlgorithmState, int>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
@@ -23,7 +23,7 @@ public record RepeatAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState
 }
 
 public class RepeatedAlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>
-  : MultiStreamAlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState, int>
+  : ExperimentInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState, int>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
@@ -31,7 +31,7 @@ public class RepeatedAlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgor
 {
   protected readonly TAlgorithm Algorithm;
   protected readonly int Repetitions;
-
+  
   public RepeatedAlgorithmInstance(TAlgorithm algorithm, int repetitions)
   {
     Algorithm = algorithm;
@@ -59,14 +59,12 @@ public static class RepeatExecutionExtensions
   {
     public IAsyncEnumerable<KeyValuePair<(int Repetition, int Iteration), TAlgorithmState>> RunInterleavedStreamingAsync(TProblem problem, IRandomNumberGenerator random, TAlgorithmState? initialState = null, CancellationToken cancellationToken = default)
     {
-      var algorithmInstance = algorithm.CreateExecutionInstance(new ExecutionInstanceRegistry());
-      return algorithmInstance.RunInterleavedStreamingAsync(problem, random, initialState, cancellationToken);
+      return algorithm.RunInterleavedStreamingAsync(problem, random, initialState, cancellationToken);
     }
 
     public IEnumerable<KeyValuePair<(int Repetition, int Iteration), TAlgorithmState>> RunInterleavedStreaming(TProblem problem, IRandomNumberGenerator random, TAlgorithmState? initialState = null, CancellationToken cancellationToken = default)
     {
-      var algorithmInstance = algorithm.CreateExecutionInstance(new ExecutionInstanceRegistry());
-      return algorithmInstance.RunInterleavedStreaming(problem, random, initialState, cancellationToken);
+      return algorithm.RunInterleavedStreaming(problem, random, initialState, cancellationToken);
     }
   }
 

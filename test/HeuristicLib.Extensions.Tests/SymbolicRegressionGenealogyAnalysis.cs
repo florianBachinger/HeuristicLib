@@ -62,11 +62,11 @@ public class GenealogyGraphTests
 
     ga = ga with { Interceptor = wrappedInterceptor };
 
-    var algorithmInstance = ga.WithMaxIterations(100).CreateExecutionInstance(out var registry);
-    var res = algorithmInstance.RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed), ct: TestContext.Current.CancellationToken);
-    var ares = (BestMedianWorstAnalysis<SymbolicExpressionTree>.Instance)analysis.RetrieveAnalysis(registry);
+    var run = ga.WithMaxIterations(100).CreateRun(problem);
+    var res = run.RunToCompletion(RandomNumberGenerator.Create(AlgorithmRandomSeed), cancellationToken: TestContext.Current.CancellationToken);
+    var ares = run.GetResult(analysis);
 
-    Assert.Equal(100, ares.BestSolutions.Count);
+    Assert.Equal(100, ares.Count);
     Assert.Equal(100, res.Population.Solutions.Count());
   }
 
@@ -91,20 +91,18 @@ public class GenealogyGraphTests
     var genealogyAnalysis = new GenealogyAnalysis<SymbolicExpressionTree>();
     ga.AttachObserver(genealogyAnalysis);
 
-    var res = ga.Build()
-                .WithMaxIterations(gens)
-                .CreateExecutionInstance(out var registry)
-                .RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed), null, CancellationToken.None);
+    var run = ga.Build().WithMaxIterations(gens).CreateRun(problem);
+    var res = run.RunToCompletion(RandomNumberGenerator.Create(AlgorithmRandomSeed), null, CancellationToken.None);
 
-    var qres = (BestMedianWorstAnalysis<SymbolicExpressionTree>.Instance)qualities.RetrieveAnalysis(registry);
-    var eres = (QualityCurveAnalysis<SymbolicExpressionTree>.Instance)evalQualities.RetrieveAnalysis(registry);
-    var gres = (GenealogyAnalysis<SymbolicExpressionTree>.Instance)genealogyAnalysis.RetrieveAnalysis(registry);
+    var qres = run.GetResult(qualities);
+    var eres = run.GetResult(evalQualities);
+    var gres = run.GetResult(genealogyAnalysis);
 
-    Assert.Equal(gens, qres.BestSolutions.Count);
+    Assert.Equal(gens, qres.Count);
     Assert.Equal(popsize, res.Population.Solutions.Length);
-    var graphViz = gres.Graph.ToGraphViz();
+    var graphViz = gres.ToGraphViz();
     Assert.True(graphViz.Length > 0);
-    Assert.Equal(qres.BestSolutions[^1].Best.ObjectiveVector, eres.CurrentState[^1].best.ObjectiveVector);
+    Assert.Equal(qres[^1].Best.ObjectiveVector, eres[^1].best.ObjectiveVector);
   }
 
   [Fact]
@@ -115,11 +113,11 @@ public class GenealogyGraphTests
     //ga.RandomSeed = AlgorithmRandomSeed;
     var genealogy = new GenealogyAnalysis<SymbolicExpressionTree>();
     ga.AttachObserver(genealogy);
-    var ai = ga.Build().WithMaxIterations(100).CreateExecutionInstance(out var registry);
-    var res = ai.RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed), null, CancellationToken.None);
-    var gres = (GenealogyAnalysis<SymbolicExpressionTree>.Instance)genealogy.RetrieveAnalysis(registry);
+    var run = ga.Build().WithMaxIterations(100).CreateRun(problem);
+    var res = run.RunToCompletion(RandomNumberGenerator.Create(AlgorithmRandomSeed), null, CancellationToken.None);
+    var gres = run.GetResult(genealogy);
     Assert.Single(res.Population.Solutions);
-    var graphViz = gres.Graph.ToGraphViz();
+    var graphViz = gres.ToGraphViz();
     Assert.True(graphViz.Length > 0);
   }
 
@@ -143,13 +141,14 @@ public class GenealogyGraphTests
     var qualities = new BestMedianWorstAnalysis<SymbolicExpressionTree>();
     nsga2.AttachObserver(qualities);
 
-    var res = nsga2.Build().WithMaxIterations(maximumIterations).CreateExecutionInstance(out var registry).RunToCompletion(problem, RandomNumberGenerator.Create(AlgorithmRandomSeed), ct: TestContext.Current.CancellationToken);
-    var gres = (GenealogyAnalysis<SymbolicExpressionTree>.Instance)genealogy.RetrieveAnalysis(registry);
-    var qres = (BestMedianWorstAnalysis<SymbolicExpressionTree>.Instance)qualities.RetrieveAnalysis(registry);
+    var run = nsga2.Build().WithMaxIterations(maximumIterations).CreateRun(problem);
+    var res = run.RunToCompletion(RandomNumberGenerator.Create(AlgorithmRandomSeed), cancellationToken: TestContext.Current.CancellationToken);
+    var gres = run.GetResult(genealogy);
+    var qres = run.GetResult(qualities);
 
-    Assert.Equal(maximumIterations, qres.BestSolutions.Count);
+    Assert.Equal(maximumIterations, qres.Count);
     Assert.Equal(populationSize, res.Population.Solutions.Length);
-    var graphViz = gres.Graph.ToGraphViz();
+    var graphViz = gres.ToGraphViz();
     Assert.True(graphViz.Length > 0);
   }
 

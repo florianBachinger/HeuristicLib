@@ -1,4 +1,5 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using HEAL.HeuristicLib.Analysis;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
@@ -30,12 +31,18 @@ public record BestMedianWorstEntry<T>(ISolution<T> Best, ISolution<T> Median, IS
 //  //}
 // }
 
-public class BestMedianWorstAnalysis<T> : IInterceptorObserver<T, PopulationState<T>>
+public class BestMedianWorstAnalysis<T>
+  : IAnalyzer<IReadOnlyList<BestMedianWorstEntry<T>>, BestMedianWorstAnalysis<T>.Instance>,
+    IInterceptorObserver<T, PopulationState<T>>
 {
+  public Instance CreateAnalyzerInstance(Run run) => new(run, this);
 
-  public IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => new Instance();
+  public IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+    => instanceRegistry.Run.ResolveAnalyzer(this);
 
-  public sealed class Instance : IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>
+  public sealed class Instance(Run run, BestMedianWorstAnalysis<T> analyzer)
+    : AnalyzerRunInstance<BestMedianWorstAnalysis<T>, IReadOnlyList<BestMedianWorstEntry<T>>>(run, analyzer),
+      IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>
   {
     private readonly List<BestMedianWorstEntry<T>> bestSolutions = [];
     public IReadOnlyList<BestMedianWorstEntry<T>> BestSolutions => bestSolutions;
@@ -51,6 +58,7 @@ public class BestMedianWorstAnalysis<T> : IInterceptorObserver<T, PopulationStat
       }
 
       bestSolutions.Add(new BestMedianWorstEntry<T>(ordered[0], ordered[ordered.Length / 2], ordered[^1]));
+      PublishResult(bestSolutions.ToArray());
     }
   }
 

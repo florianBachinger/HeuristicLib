@@ -1,18 +1,24 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using HEAL.HeuristicLib.Analysis;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators.Evaluators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
-using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Analyzers;
 
-public class QualityCurveAnalysis<TGenotype> : IEvaluatorObserver<TGenotype>
+public class QualityCurveAnalysis<TGenotype>
+  : IAnalyzer<IReadOnlyList<(ISolution<TGenotype> best, int evalCount)>, QualityCurveAnalysis<TGenotype>.Instance>,
+    IEvaluatorObserver<TGenotype>
 {
-  public IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
-    => new Instance();
+  public Instance CreateAnalyzerInstance(Run run) => new(run, this);
 
-  public sealed class Instance : IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
+  public IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
+    => instanceRegistry.Run.ResolveAnalyzer(this);
+
+  public sealed class Instance(Run run, QualityCurveAnalysis<TGenotype> analyzer)
+    : AnalyzerRunInstance<QualityCurveAnalysis<TGenotype>, IReadOnlyList<(ISolution<TGenotype> best, int evalCount)>>(run, analyzer),
+      IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
   {
     public readonly List<(ISolution<TGenotype> best, int evalCount)> CurrentState = [];
     private ISolution<TGenotype>? best;
@@ -38,6 +44,7 @@ public class QualityCurveAnalysis<TGenotype> : IEvaluatorObserver<TGenotype>
 
         best = new Solution<TGenotype>(genotype, q);
         CurrentState.Add((best, evalCount));
+        PublishResult(CurrentState.ToArray());
       }
     }
   }

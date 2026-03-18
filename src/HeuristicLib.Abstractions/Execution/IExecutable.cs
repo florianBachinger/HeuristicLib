@@ -13,15 +13,15 @@ public static class ExecutableExtensions
   extension<TExecutionInstance>(IExecutable<TExecutionInstance> executable)
     where TExecutionInstance : class, IExecutionInstance
   {
-    public TExecutionInstance CreateExecutionInstance()
+    public TExecutionInstance CreateExecutionInstance(Run run)
     {
-      var registry = new ExecutionInstanceRegistry();
+      var registry = new ExecutionInstanceRegistry(run);
       return registry.Resolve(executable);
     }
 
-    public TExecutionInstance CreateExecutionInstance(out ExecutionInstanceRegistry registry)
+    public TExecutionInstance CreateExecutionInstance(Run run, out ExecutionInstanceRegistry registry)
     {
-      registry = new ExecutionInstanceRegistry();
+      registry = new ExecutionInstanceRegistry(run);
       return registry.Resolve(executable);
     }
   }

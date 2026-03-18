@@ -32,6 +32,7 @@ public partial record PipelineAlgorithm<TAlgorithm, TGenotype, TSearchSpace, TPr
     var evaluatorInstance = instanceRegistry.Resolve(Evaluator);
 
     return new PipelineAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProblem, TAlgorithmState>(
+      instanceRegistry.Run,
       evaluatorInstance,
       Algorithms
     );
@@ -47,16 +48,17 @@ public class PipelineAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TPro
 {
   protected readonly IReadOnlyList<TAlgorithm> Algorithms;
 
-  public PipelineAlgorithmInstance(IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, IReadOnlyList<TAlgorithm> algorithms)
-    : base(evaluator)
+  public PipelineAlgorithmInstance(Run run, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator, IReadOnlyList<TAlgorithm> algorithms)
+    : base(run, evaluator)
   {
     Algorithms = algorithms;
   }
 
   public PipelineAlgorithmInstance(
+    Run run,
     IReadOnlyList<TAlgorithm> algorithms,
     IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator)
-    : base(evaluator)
+    : base(run, evaluator)
   {
     Algorithms = algorithms;
   }

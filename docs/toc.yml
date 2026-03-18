@@ -26,5 +26,7 @@
       href: execution-instances.md
     - name: Observability & analysis
       href: observability-and-analysis.md
+    - name: Analyzer architecture
+      href: analyzer-architecture.md
     - name: Randomness (RNG) design
       href: randomness.md

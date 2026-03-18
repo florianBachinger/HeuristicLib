@@ -1,23 +1,31 @@
 ﻿using HEAL.HeuristicLib.Analyzers;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators.Crossovers;
 using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Operators.Mutators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
-using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.GenealogyAnalysis;
 
+public record RankAnalysisResult<T>(GenealogyGraph<T> Graph, IReadOnlyList<IReadOnlyList<double>> Ranks)
+  where T : notnull;
+
 public class GenealogyAnalysis<T>(IEqualityComparer<T>? equality = null, bool saveSpace = false) :
+  IAnalyzer<GenealogyGraph<T>, GenealogyAnalysis<T>.Instance>,
   ICrossoverObserver<T>,
   IMutatorObserver<T>,
   IInterceptorObserver<T, PopulationState<T>>
   where T : notnull
 {
-  public class Instance(IEqualityComparer<T>? equality = null, bool saveSpace = false) : ICrossoverObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>, IMutatorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>, IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>
+  public class Instance(Run run, GenealogyAnalysis<T> analyzer, IEqualityComparer<T>? equality = null, bool saveSpace = false)
+    : AnalyzerRunInstance<GenealogyAnalysis<T>, GenealogyGraph<T>>(run, analyzer),
+      ICrossoverObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>,
+      IMutatorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>,
+      IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>
   {
     public readonly GenealogyGraph<T> Graph = new(equality ?? EqualityComparer<T>.Default);
 
@@ -39,28 +47,32 @@ public class GenealogyAnalysis<T>(IEqualityComparer<T>? equality = null, bool sa
     {
       var ordered = currentState.Population.OrderBy(keySelector: x => x.ObjectiveVector, problem.Objective.TotalOrderComparer).ToArray();
       Graph.SetAsNewGeneration(ordered.Select(x => x.Genotype), saveSpace);
+      PublishResult(Graph);
     }
   }
 
-  protected virtual Instance CreateExecutionInstance() => new(equality, saveSpace);
+  public virtual Instance CreateAnalyzerInstance(Run run) => new(run, this, equality, saveSpace);
 
   ICrossoverObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>
     IExecutable<ICrossoverObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>>
-    .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => CreateExecutionInstance();
+    .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => instanceRegistry.Run.ResolveAnalyzer(this);
 
   IMutatorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>
     IExecutable<IMutatorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>>>
-    .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => CreateExecutionInstance();
+    .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => instanceRegistry.Run.ResolveAnalyzer(this);
 
   IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>
     IExecutable<IInterceptorObserverInstance<T, ISearchSpace<T>, IProblem<T, ISearchSpace<T>>, PopulationState<T>>>
-    .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => CreateExecutionInstance();
+    .CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) => instanceRegistry.Run.ResolveAnalyzer(this);
 }
 
-public class RankAnalysis<T>(IEqualityComparer<T>? equality = null) : GenealogyAnalysis<T>(equality)
+public class RankAnalysis<T>(IEqualityComparer<T>? equality = null)
+  : GenealogyAnalysis<T>(equality),
+    IAnalyzer<RankAnalysisResult<T>, RankAnalysis<T>.Instance>
   where T : notnull
 {
-  public new class Instance(IEqualityComparer<T>? equality = null) : GenealogyAnalysis<T>.Instance(equality)
+  public new class Instance(Run run, RankAnalysis<T> analyzer, IEqualityComparer<T>? equality = null)
+    : GenealogyAnalysis<T>.Instance(run, analyzer, equality)
   {
     public List<List<double>> Ranks { get; } = [];
 
@@ -68,6 +80,7 @@ public class RankAnalysis<T>(IEqualityComparer<T>? equality = null) : GenealogyA
     {
       base.AfterInterception(newState, currentState, previousState, searchSpace, problem);
       RecordRanks(Graph, Ranks);
+      Run.SetResult((RankAnalysis<T>)Analyzer, new RankAnalysisResult<T>(Graph, Ranks.Select(x => (IReadOnlyList<double>)x.ToArray()).ToArray()));
     }
 
     private static void RecordRanks<TGenotype>(GenealogyGraph<TGenotype> graph, List<List<double>> ranks) where TGenotype : notnull
@@ -87,5 +100,5 @@ public class RankAnalysis<T>(IEqualityComparer<T>? equality = null) : GenealogyA
     }
   }
 
-  protected override GenealogyAnalysis<T>.Instance CreateExecutionInstance() => new Instance();
+  public new Instance CreateAnalyzerInstance(Run run) => new(run, this, equality);
 }
