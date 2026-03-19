@@ -1,4 +1,5 @@
 ﻿using HEAL.HeuristicLib.Execution;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Evaluators;
 using HEAL.HeuristicLib.Problems;
@@ -50,12 +51,11 @@ public static class AlgorithmExtensions
     where TProblem : class, IProblem<TGenotype, TSearchSpace>
     where TAlgorithmState : class, IAlgorithmState
   {
-    public Run<TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateRun(TProblem problem)
+    public Run<TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateRun(TProblem problem, params IReadOnlyList<IAnalyzer> analyzers)
     {
-      return new Run<TGenotype, TSearchSpace, TProblem, TAlgorithmState>(algorithm, problem);
+      return new Run<TGenotype, TSearchSpace, TProblem, TAlgorithmState>(algorithm, problem, analyzers);
     }
-    
-    
+
     public IAsyncEnumerable<TAlgorithmState> RunStreamingAsync(
       TProblem problem,
       IRandomNumberGenerator random,

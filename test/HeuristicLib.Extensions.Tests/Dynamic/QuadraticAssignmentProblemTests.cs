@@ -1,7 +1,6 @@
 ﻿using HEAL.HeuristicLib.Genotypes.Vectors;
 using HEAL.HeuristicLib.Problems.Dynamic.QuadraticAssignment;
 using HEAL.HeuristicLib.Problems.QuadraticAssignment;
-using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.Tests;
 
 namespace HEAL.HeuristicLib.Extensions.Tests.Dynamic;

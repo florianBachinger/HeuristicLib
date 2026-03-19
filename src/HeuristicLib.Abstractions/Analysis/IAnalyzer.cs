@@ -2,7 +2,10 @@
 
 namespace HEAL.HeuristicLib.Analysis;
 
-public interface IAnalyzer;
+public interface IAnalyzer
+{
+  IAnalyzerRunInstance CreateAnalyzerInstance(Run run);
+}
 
 public interface IAnalyzer<out TResult> : IAnalyzer;
 
@@ -11,10 +14,15 @@ public interface IAnalyzer<TResult, out TAnalyzerRunInstance> : IAnalyzer<TResul
   where TAnalyzerRunInstance : class, IAnalyzerRunInstance
 {
   // ToDo: think if we ned an abstract system of "scope" instead of explicit Execution and Run scope that we currently have.
-  TAnalyzerRunInstance CreateAnalyzerInstance(Run run);
+  new TAnalyzerRunInstance CreateAnalyzerInstance(Run run);
+
+  IAnalyzerRunInstance IAnalyzer.CreateAnalyzerInstance(Run run) => CreateAnalyzerInstance(run);
 }
 
-public interface IAnalyzerRunInstance : IExecutionInstance;
+public interface IAnalyzerRunInstance : IExecutionInstance
+{
+  void RegisterTaps(IAnalyzerTapRegistry taps);
+}
 
 public abstract class AnalyzerRunInstance<TAnalyzer, TResult>(Run run, TAnalyzer analyzer) : IAnalyzerRunInstance
   where TAnalyzer : class, IAnalyzer<TResult>
@@ -28,4 +36,6 @@ public abstract class AnalyzerRunInstance<TAnalyzer, TResult>(Run run, TAnalyzer
   {
 	  Run.SetResult(Analyzer, result);
   }
+
+  public abstract void RegisterTaps(IAnalyzerTapRegistry taps);
 }

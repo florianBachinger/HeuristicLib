@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using HEAL.HeuristicLib.Execution;
-using HEAL.HeuristicLib.Operators.Evaluators;
-using HEAL.HeuristicLib.Operators.Interceptors;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -10,13 +8,12 @@ using HEAL.HeuristicLib.States;
 namespace HEAL.HeuristicLib.Problems.Dynamic;
 
 // ToDo: A DynamicProblem should be, foremost, a Problem. It "being" also an Observer, is an interesting way of implementing about it, but we have to think if this is really what we want.
-public abstract class DynamicProblem<TGenotype, TSearchSpace> : SingleSolutionProblem<TGenotype, TSearchSpace>,
-                                                                IEvaluatorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>,
-                                                                IInterceptorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>,
-                                                                IDynamicProblem<TGenotype, TSearchSpace>,
-                                                                IEvaluatorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>,
-                                                                IInterceptorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>,
-                                                                IDisposable
+public abstract class DynamicProblem<TGenotype, TSearchSpace> : 
+  SingleSolutionProblem<TGenotype, TSearchSpace>,
+  IDynamicProblem<TGenotype, TSearchSpace>,
+  IEvaluatorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>,
+  IInterceptorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>,
+  IDisposable
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
   private readonly ConcurrentBag<(TGenotype solution, ObjectiveVector objective, EvaluationTiming timing)> evaluationLog = [];
@@ -66,13 +63,6 @@ public abstract class DynamicProblem<TGenotype, TSearchSpace> : SingleSolutionPr
 
   public abstract ObjectiveVector Evaluate(TGenotype solution, IRandomNumberGenerator random, EvaluationTiming timing);
 
-  IEvaluatorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>
-    IExecutable<IEvaluatorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>>.CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
-    => this;
-
-  IInterceptorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>
-    IExecutable<IInterceptorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>>.CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
-    => this;
 
   public void AfterEvaluation(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> objectiveVectors, TSearchSpace searchSpace, DynamicProblem<TGenotype, TSearchSpace> problem)
   {

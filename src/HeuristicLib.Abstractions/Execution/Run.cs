@@ -12,13 +12,17 @@ public abstract class Run
 {
   protected readonly ExecutionInstanceRegistry RootRegistry;
 
+  private readonly IReadOnlyList<IAnalyzer> analyzers;
+  private AnalyzerTapRegistry? analyzerTaps;
+
   protected readonly IDictionary<IAnalyzer, IAnalyzerRunInstance> AnalyzerInstances;
 
   protected readonly IDictionary<IAnalyzer, object> AnalyzerResults;
 
-  protected Run()
+  protected Run(IReadOnlyList<IAnalyzer>? analyzers = null)
   {
     RootRegistry = new ExecutionInstanceRegistry(this, parentRegistry: null);
+    this.analyzers = analyzers ?? [];
     AnalyzerInstances = new Dictionary<IAnalyzer, IAnalyzerRunInstance>(ReferenceEqualityComparer.Instance);
     AnalyzerResults = new Dictionary<IAnalyzer, object>(ReferenceEqualityComparer.Instance);
   }
@@ -33,17 +37,36 @@ public abstract class Run
     return RootRegistry.CreateChildRegistry();
   }
 
-  public TAnalyzerRunInstance ResolveAnalyzer<TResult, TAnalyzerRunInstance>(IAnalyzer<TResult, TAnalyzerRunInstance> analyzer)
-    where TResult : notnull
-    where TAnalyzerRunInstance : class, IAnalyzerRunInstance
+  internal AnalyzerTapRegistry GetAnalyzerTaps()
+  {
+    if (analyzerTaps is not null) {
+      return analyzerTaps;
+    }
+
+    analyzerTaps = new AnalyzerTapRegistry();
+    foreach (var analyzer in analyzers) {
+      ResolveAnalyzer(analyzer).RegisterTaps(analyzerTaps);
+    }
+
+    return analyzerTaps;
+  }
+
+  public IAnalyzerRunInstance ResolveAnalyzer(IAnalyzer analyzer)
   {
     if (AnalyzerInstances.TryGetValue(analyzer, out var analyzerInstance)) {
-      return (TAnalyzerRunInstance)analyzerInstance;
+      return analyzerInstance;
     }
 
     var createdAnalyzerInstance = analyzer.CreateAnalyzerInstance(this);
     AnalyzerInstances[analyzer] = createdAnalyzerInstance;
     return createdAnalyzerInstance;
+  }
+
+  public TAnalyzerRunInstance ResolveAnalyzer<TResult, TAnalyzerRunInstance>(IAnalyzer<TResult, TAnalyzerRunInstance> analyzer)
+    where TResult : notnull
+    where TAnalyzerRunInstance : class, IAnalyzerRunInstance
+  {
+    return (TAnalyzerRunInstance)ResolveAnalyzer((IAnalyzer)analyzer);
   }
 
   public void SetResult<TResult>(IAnalyzer<TResult> analyzer, TResult result)
@@ -84,7 +107,8 @@ public class Run<TGenotype, TSearchSpace, TProblem, TState> : Run
 
   public TProblem Problem { get; }
 
-  public Run(IAlgorithm<TGenotype, TSearchSpace, TProblem, TState> algorithm, TProblem problem)
+  public Run(IAlgorithm<TGenotype, TSearchSpace, TProblem, TState> algorithm, TProblem problem, IReadOnlyList<IAnalyzer>? analyzers = null)
+    : base(analyzers)
   {
     Algorithm = algorithm;
     Problem = problem;

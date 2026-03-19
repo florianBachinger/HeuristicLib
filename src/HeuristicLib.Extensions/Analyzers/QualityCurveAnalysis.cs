@@ -1,30 +1,34 @@
 ﻿using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
-using HEAL.HeuristicLib.Operators.Evaluators;
+using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 
 namespace HEAL.HeuristicLib.Analyzers;
 
-public class QualityCurveAnalysis<TGenotype>
-  : IAnalyzer<IReadOnlyList<(ISolution<TGenotype> best, int evalCount)>, QualityCurveAnalysis<TGenotype>.Instance>,
-    IEvaluatorObserver<TGenotype>
+public class QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator)
+  : IAnalyzer<IReadOnlyList<(ISolution<TGenotype> best, int evalCount)>, QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>.Instance>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
+  public IEvaluator<TGenotype, TSearchSpace, TProblem> Evaluator { get; } = evaluator;
+
   public Instance CreateAnalyzerInstance(Run run) => new(run, this);
 
-  public IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)
-    => instanceRegistry.Run.ResolveAnalyzer(this);
-
-  public sealed class Instance(Run run, QualityCurveAnalysis<TGenotype> analyzer)
-    : AnalyzerRunInstance<QualityCurveAnalysis<TGenotype>, IReadOnlyList<(ISolution<TGenotype> best, int evalCount)>>(run, analyzer),
-      IEvaluatorObserverInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
+  public sealed class Instance(Run run, QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem> analyzer)
+    : AnalyzerRunInstance<QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>, IReadOnlyList<(ISolution<TGenotype> best, int evalCount)>>(run, analyzer)
   {
     public readonly List<(ISolution<TGenotype> best, int evalCount)> CurrentState = [];
     private ISolution<TGenotype>? best;
     private int evalCount;
 
-    public void AfterEvaluation(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> objectiveVectors, ISearchSpace<TGenotype> searchSpace, IProblem<TGenotype, ISearchSpace<TGenotype>> problem)
+    public override void RegisterTaps(IAnalyzerTapRegistry taps)
+    {
+      taps.Register(analyzer.Evaluator, AfterEvaluation);
+    }
+
+    public void AfterEvaluation(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> objectiveVectors, TSearchSpace searchSpace, TProblem problem)
     {
       for (var i = 0; i < genotypes.Count; i++) {
         var genotype = genotypes[i];
