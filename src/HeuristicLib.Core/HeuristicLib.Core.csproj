@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="alglib.net" Version="3.19.0" />
     <PackageReference Include="AutoDiff" Version="1.2.2" />
     <PackageReference Include="Generator.Equals" Version="3.3.0" />
     <PackageReference Include="MathNet.Numerics" Version="6.0.0-beta2" />

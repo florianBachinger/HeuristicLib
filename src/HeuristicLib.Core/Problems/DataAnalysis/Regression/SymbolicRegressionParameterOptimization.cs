@@ -12,7 +12,6 @@ namespace HEAL.HeuristicLib.Problems.DataAnalysis.Regression;
 
 public static class SymbolicRegressionParameterOptimization
 {
-
   public delegate void PFunc(double[] c, double[] x, ref double fx, object o);
 
   public delegate void PGrad(double[] c, double[] x, ref double fx, double[] grad, object o);
@@ -20,16 +19,16 @@ public static class SymbolicRegressionParameterOptimization
   public static readonly PearsonR2Evaluator[] Evaluator = [new()];
 
   public static double OptimizeParameters(ISymbolicDataAnalysisExpressionTreeInterpreter interpreter,
-    SymbolicExpressionTree tree,
-    RegressionProblemData problemData,
-    IReadOnlyList<int> rows,
-    int maxIterations,
-    bool updateVariableWeights = true,
-    double lowerEstimationLimit = double.MinValue,
-    double upperEstimationLimit = double.MaxValue,
-    bool updateParametersInTree = true,
-    Action<double[], double, object>? iterationCallback = null,
-    EvaluationsCounter? counter = null)
+                                          SymbolicExpressionTree tree,
+                                          RegressionProblemData problemData,
+                                          IReadOnlyList<int> rows,
+                                          int maxIterations,
+                                          bool updateVariableWeights = true,
+                                          double lowerEstimationLimit = double.MinValue,
+                                          double upperEstimationLimit = double.MaxValue,
+                                          bool updateParametersInTree = true,
+                                          Action<double[], double, object>? iterationCallback = null,
+                                          EvaluationsCounter? counter = null)
   {
     // Numeric parameters in the tree become variables for parameter optimization.
     // Variables in the tree become parameters (fixed values) for parameter optimization.
@@ -40,6 +39,7 @@ public static class SymbolicRegressionParameterOptimization
     if (!TreeToAutoDiffTermConverter.TryConvertToAutoDiff(tree, updateVariableWeights, out var parameters, out var initialParameters, out var func, out var funcGrad)) {
       throw new NotSupportedException("Could not optimize parameters of symbolic expression tree due to not supported symbols used in the tree.");
     }
+
     ArgumentNullException.ThrowIfNull(parameters);
     ArgumentNullException.ThrowIfNull(initialParameters);
     ArgumentNullException.ThrowIfNull(func);
@@ -48,6 +48,7 @@ public static class SymbolicRegressionParameterOptimization
     if (parameters.Count == 0) {
       return 0.0; // constant expressions always have an R� of 0.0 
     }
+
     var parameterEntries = parameters.ToArray(); // order of entries must be the same for x
 
     // extract initial parameters
@@ -91,30 +92,16 @@ public static class SymbolicRegressionParameterOptimization
     var functionCx1Func = CreatePFunc(func);
     var functionCx1Grad = CreatePGrad(funcGrad);
 
-    double[] cOpt1;
-    int retVal;
-
     double[] cOpt = [];
     var status = ExitCondition.None;
+    bool success = true;
 
     try {
-      (cOpt1, retVal) = AlgLibLevenbergMarquardt(maxIterations, iterationCallback, x, y, n, m, k, functionCx1Func, functionCx1Grad, rowEvaluationsCounter, c.ToArray());
-    } catch (ArithmeticException) {
-      return originalQuality;
-    } catch (alglib.alglibexception) {
-      return originalQuality;
-    }
-
-    try {
-      (cOpt, status) = (cOpt1, ExitCondition.None); // MathNetLevenbergMarquardt(maxIterations, n, y, m, x, func, rowEvaluationsCounter, funcGrad, c.ToArray(), k);
+      (cOpt, status) = MathNetLevenbergMarquardt(maxIterations, n, y, m, x, func, rowEvaluationsCounter, funcGrad, c.ToArray(), k);
     } catch (NonConvergenceException) {
-      if (retVal != -7 && retVal != -8) {
-        throw;
-      }
+      success = false;
     } catch (ArgumentException) {
-      if (retVal != -7 && retVal != -8) {
-        throw;
-      }
+      success = false;
     }
 
     if (status is ExitCondition.InvalidValues) {
@@ -124,59 +111,31 @@ public static class SymbolicRegressionParameterOptimization
     counter.FunctionEvaluations += rowEvaluationsCounter.FunctionEvaluations / n;
     counter.GradientEvaluations += rowEvaluationsCounter.GradientEvaluations / n;
 
-    // retVal == -7  => parameter optimization failed due to wrong gradient
-    //          -8  => optimizer detected  NAN / INF  in  the target
-    //                 function and/ or gradient
-    if (retVal is -7 or -8) {
+    //optimizer detected  NAN / INF  in  the target function and/ or gradient
+    if (!success) {
       return originalQuality;
     }
+
     double quality;
-    UpdateParameters(tree, cOpt1, updateVariableWeights);
+    UpdateParameters(tree, cOpt, updateVariableWeights);
     try {
       quality = problemData.Evaluate(model, rows, Evaluator)[0];
     } catch (InvalidOperationException) {
       // this happens when the new parameters produce invalid results (e.g. catastrophic cancellation)
       UpdateParameters(tree, initialParameters, updateVariableWeights);
-
       return originalQuality;
     }
-
-    UpdateParameters(tree, cOpt, updateVariableWeights);
-    var quality2 = problemData.Evaluate(model, rows, Evaluator)[0];
-
-    Debug.Assert(Math.Abs(quality2 - quality) < 1e-3, "Math.Net!= alglib");
 
     var improvement = originalQuality - quality <= 0.001 && !double.IsNaN(quality);
 
     if (!improvement) {
       UpdateParameters(tree, initialParameters, updateVariableWeights); // reset tree parameters
-
       return originalQuality;
     }
 
-    if (!updateParametersInTree) {
+    if (!updateParametersInTree)
       UpdateParameters(tree, initialParameters, updateVariableWeights); // reset tree parameters
-    }
-
     return quality;
-  }
-
-  private static (double[] c, int retVal) AlgLibLevenbergMarquardt(int maxIterations, Action<double[], double, object>? iterationCallback, double[,] x, double[] y, int n, int m, int k, PFunc functionCx1Func, PGrad functionCx1Grad, EvaluationsCounter rowEvaluationsCounter, double[] c)
-  {
-    alglib.lsfitcreatefg(x, y, c, n, m, k, false, out var state);
-    alglib.lsfitsetcond(state, 0.0, maxIterations);
-    alglib.lsfitsetxrep(state, iterationCallback != null);
-    alglib.lsfitfit(state,
-      new alglib.ndimensional_pfunc(functionCx1Func),
-      new alglib.ndimensional_pgrad(functionCx1Grad), Callback, rowEvaluationsCounter);
-    alglib.lsfitresults(state, out var retVal, out c, out _);
-
-    return (c, retVal);
-
-    void Callback(double[] p, double f, object obj)
-    {
-      iterationCallback?.Invoke(p, f, obj);
-    }
   }
 
   private static void UpdateParameters(SymbolicExpressionTree tree, double[] parameters, bool updateVariableWeights)
@@ -195,14 +154,14 @@ public static class SymbolicRegressionParameterOptimization
 
           break;
         case VariableTreeNodeBase: {
-            if (node is FactorVariableTreeNode { Weights: not null } factorVarTreeNode) {
-              for (var j = 0; j < factorVarTreeNode.Weights.Length; j++) {
-                factorVarTreeNode.Weights[j] = parameters[i++];
-              }
+          if (node is FactorVariableTreeNode { Weights: not null } factorVarTreeNode) {
+            for (var j = 0; j < factorVarTreeNode.Weights.Length; j++) {
+              factorVarTreeNode.Weights[j] = parameters[i++];
             }
-
-            break;
           }
+
+          break;
+        }
       }
     }
   }
