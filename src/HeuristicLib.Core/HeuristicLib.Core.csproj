@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>HEAL.HeuristicLib.Core</AssemblyName>
     <RootNamespace>HEAL.HeuristicLib</RootNamespace>
+    <Description>Composable heuristic optimization algorithms, operators, search spaces and built-in problems.</Description>
   </PropertyGroup>
 
   <ItemGroup>

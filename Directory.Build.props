@@ -6,6 +6,13 @@
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Heuristic and Evolutionary Algorithms Laboratory (HEAL)</Authors>
+    <Company>University of Applied Sciences Upper Austria</Company>
+    <Copyright>(c) Heuristic and Evolutionary Algorithms Laboratory (HEAL)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
     
   <ItemGroup>
     <PackageReference Include="SonarAnalyzer.CSharp" Version="10.19.0.132793">

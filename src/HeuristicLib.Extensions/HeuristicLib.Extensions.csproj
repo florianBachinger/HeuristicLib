@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>HEAL.HeuristicLib.Extensions</AssemblyName>
     <RootNamespace>HEAL.HeuristicLib</RootNamespace>
+    <Description>Experimental features of HeuristicLib.</Description>
   </PropertyGroup>
 
   <ItemGroup>
