@@ -1,4 +1,4 @@
-﻿using HEAL.HeuristicLib.Analysis;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
@@ -8,24 +8,26 @@ using HEAL.HeuristicLib.SearchSpaces;
 namespace HEAL.HeuristicLib.Analyzers;
 
 public class QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator)
-  : IAnalyzer<IReadOnlyList<(ISolution<TGenotype> best, int evalCount)>, QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>.Instance>
+  : IAnalyzer<QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>.State>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   public IEvaluator<TGenotype, TSearchSpace, TProblem> Evaluator { get; } = evaluator;
 
-  public Instance CreateAnalyzerInstance(Run run) => new(run, this);
+  public State CreateAnalyzerState(Run run) => new(run, this);
 
-  public sealed class Instance(Run run, QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem> analyzer)
-    : AnalyzerRunInstance<QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>, IReadOnlyList<(ISolution<TGenotype> best, int evalCount)>>(run, analyzer)
+  public sealed class State(Run run, QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem> analyzer)
+    : AnalyzerRunState<QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>>(run, analyzer)
   {
-    public readonly List<(ISolution<TGenotype> best, int evalCount)> CurrentState = [];
+    private readonly List<(ISolution<TGenotype> best, int evalCount)> currentState = [];
     private ISolution<TGenotype>? best;
     private int evalCount;
 
-    public override void RegisterTaps(IAnalyzerTapRegistry taps)
+    public IReadOnlyList<(ISolution<TGenotype> best, int evalCount)> CurrentState => currentState;
+
+    public override void RegisterObservations(IObservationRegistry observationRegistry)
     {
-      taps.Register(analyzer.Evaluator, AfterEvaluation);
+      observationRegistry.Add(Analyzer.Evaluator, AfterEvaluation);
     }
 
     public void AfterEvaluation(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> objectiveVectors, TSearchSpace searchSpace, TProblem problem)
@@ -47,8 +49,7 @@ public class QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>(IEvaluator<
         }
 
         best = new Solution<TGenotype>(genotype, q);
-        CurrentState.Add((best, evalCount));
-        PublishResult(CurrentState.ToArray());
+        currentState.Add((best, evalCount));
       }
     }
   }

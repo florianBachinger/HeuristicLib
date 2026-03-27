@@ -59,9 +59,9 @@ public class GenealogyGraphTests
 
     var run = ga.WithMaxIterations(100).CreateRun(problem, analysis);
     var res = run.RunToCompletion(RandomNumberGenerator.Create(AlgorithmRandomSeed), cancellationToken: TestContext.Current.CancellationToken);
-    var ares = run.GetResult(analysis);
+    var ares = run.GetAnalyzerResult(analysis);
 
-    Assert.Equal(100, ares.Count);
+    Assert.Equal(100, ares.BestSolutions.Count);
     Assert.Equal(100, res.Population.Solutions.Count());
   }
 
@@ -90,15 +90,15 @@ public class GenealogyGraphTests
     var run = algorithm.WithMaxIterations(gens).CreateRun(problem, evalQualities, qualities, genealogyAnalysis);
     var res = run.RunToCompletion(RandomNumberGenerator.Create(AlgorithmRandomSeed), null, CancellationToken.None);
 
-    var qres = run.GetResult(qualities);
-    var eres = run.GetResult(evalQualities);
-    var gres = run.GetResult(genealogyAnalysis);
+    var qres = run.GetAnalyzerResult(qualities);
+    var eres = run.GetAnalyzerResult(evalQualities);
+    var gres = run.GetAnalyzerResult(genealogyAnalysis);
 
-    Assert.Equal(gens, qres.Count);
+    Assert.Equal(gens, qres.BestSolutions.Count);
     Assert.Equal(popsize, res.Population.Solutions.Length);
-    var graphViz = gres.ToGraphViz();
+    var graphViz = gres.Graph.ToGraphViz();
     Assert.True(graphViz.Length > 0);
-    Assert.Equal(qres[^1].Best.ObjectiveVector, eres[^1].best.ObjectiveVector);
+    Assert.Equal(qres.BestSolutions[^1].Best.ObjectiveVector, eres.CurrentState[^1].best.ObjectiveVector);
   }
 
   [Fact]
@@ -112,9 +112,9 @@ public class GenealogyGraphTests
     var genealogy = new GenealogyAnalysis<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace, IProblem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>, SingleSolutionState<SymbolicExpressionTree>>(mutator: algorithm.Mutator, interceptor: algorithm.Interceptor);
     var run = algorithm.WithMaxIterations(100).CreateRun(problem, genealogy);
     var res = run.RunToCompletion(RandomNumberGenerator.Create(AlgorithmRandomSeed), null, CancellationToken.None);
-    var gres = run.GetResult(genealogy);
+    var gres = run.GetAnalyzerResult(genealogy);
     Assert.Single(res.Population.Solutions);
-    var graphViz = gres.ToGraphViz();
+    var graphViz = gres.Graph.ToGraphViz();
     Assert.True(graphViz.Length > 0);
   }
 
@@ -142,12 +142,12 @@ public class GenealogyGraphTests
 
     var run = algorithm.WithMaxIterations(maximumIterations).CreateRun(problem, genealogy, qualities);
     var res = run.RunToCompletion(RandomNumberGenerator.Create(AlgorithmRandomSeed), cancellationToken: TestContext.Current.CancellationToken);
-    var gres = run.GetResult(genealogy);
-    var qres = run.GetResult(qualities);
+    var gres = run.GetAnalyzerResult(genealogy);
+    var qres = run.GetAnalyzerResult(qualities);
 
-    Assert.Equal(maximumIterations, qres.Count);
+    Assert.Equal(maximumIterations, qres.BestSolutions.Count);
     Assert.Equal(populationSize, res.Population.Solutions.Length);
-    var graphViz = gres.ToGraphViz();
+    var graphViz = gres.Graph.ToGraphViz();
     Assert.True(graphViz.Length > 0);
   }
 

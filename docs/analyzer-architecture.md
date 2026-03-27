@@ -25,7 +25,7 @@ Analyzer data has a different lifetime from normal operator or algorithm configu
 If analysis state were stored directly on a definition, re-running the same definition would mix old and new results.
 If analysis state were stored only inside an observer/decorator execution instance, results would be tied to registry mechanics rather than to the logical run.
 
-That is why HeuristicLib models analyzers as **definition-side hooks + run-scoped analyzer instances + run-owned results**.
+That is why HeuristicLib models analyzers as **definition-side hooks + run-scoped analyzer states + run-owned results**.
 
 ## The three layers of the analyzer system
 
@@ -38,16 +38,16 @@ An analyzer definition is a re-usable object that describes:
 - what the analyzer observes
 - how it hooks into the definition graph
 - what result type it publishes
-- how to create its runtime analyzer instance for a run
+- how to create its runtime analyzer state for a run
 
 All analyzers are run-scoped. The main contract is:
 
 ```csharp
-public interface IAnalyzer<TResult, out TAnalyzerRunInstance> : IAnalyzer<TResult>
+public interface IAnalyzer<TResult, out TAnalyzerRunState> : IAnalyzer<TResult>
   where TResult : notnull
-  where TAnalyzerRunInstance : class, IAnalyzerRunInstance
+  where TAnalyzerRunState : class, IAnalyzerRunState
 {
-  TAnalyzerRunInstance CreateAnalyzerInstance(Run run);
+  TAnalyzerRunState CreateAnalyzerState(Run run);
 }
 ```
 
@@ -75,9 +75,9 @@ For example:
 - a genealogy analyzer may need crossover + mutator + iteration-end hooks
 - a best/median/worst chart analyzer may need evaluator hooks for accumulation and interceptor hooks for iteration boundaries
 
-### 3) Run-scoped analyzer instance
+### 3) Run-scoped analyzer state
 
-At runtime, every analyzer gets **one analyzer instance per run**.
+At runtime, every analyzer gets **one analyzer state per run**.
 
 That instance:
 
@@ -85,17 +85,17 @@ That instance:
 - stores temporary mutable analysis state
 - publishes results into the `Run`
 
-This is the execution-side object:
+This is the run-scoped object:
 
 ```csharp
-public interface IAnalyzerRunInstance : IExecutionInstance;
+public interface IAnalyzerRunState : IExecutionInstance;
 ```
 
 A small convenience base class is available:
 
 ```csharp
-public abstract class AnalyzerRunInstance<TAnalyzer, TResult>(Run run, TAnalyzer analyzer)
-  : IAnalyzerRunInstance
+public abstract class AnalyzerRunState<TAnalyzer, TResult>(Run run, TAnalyzer analyzer)
+  : IAnalyzerRunState
   where TAnalyzer : class, IAnalyzer<TResult>
   where TResult : notnull
 {
@@ -124,9 +124,9 @@ The analyzer definition owns:
 
 It does **not** own mutable run results.
 
-### Analyzer instance owns temporary mutable analysis state
+### Analyzer state owns temporary mutable analysis state
 
-The run-scoped analyzer instance owns things like:
+The run-scoped analyzer state owns things like:
 
 - current counters
 - in-progress aggregation for the current iteration
@@ -168,11 +168,11 @@ The runtime flow looks like this.
 
 1. Create a `Run<TGenotype, TSearchSpace, TProblem, TState>`.
 2. The run owns a root `ExecutionInstanceRegistry`.
-3. The run also owns analyzer instances and analyzer results.
+3. The run also owns analyzer states and analyzer results.
 
 ### First hook invocation
 
-When a decorated operator is instantiated, its observer side resolves the analyzer instance through the run:
+When a decorated operator is instantiated, its observer side resolves the analyzer state through the run:
 
 ```csharp
 instanceRegistry.Run.ResolveAnalyzer(this)
@@ -180,14 +180,14 @@ instanceRegistry.Run.ResolveAnalyzer(this)
 
 This guarantees:
 
-- one analyzer instance per analyzer definition per run
-- the same analyzer instance is shared across all hook points of that analyzer
+- one analyzer state per analyzer definition per run
+- the same analyzer state is shared across all hook points of that analyzer
 
 ### During execution
 
 1. The operator or algorithm performs its normal work.
 2. The observable wrapper invokes the analyzer hook.
-3. The analyzer instance updates its temporary state.
+3. The analyzer state updates its temporary state.
 4. When a meaningful boundary is reached, it calls `PublishResult(...)`.
 
 In the current design, publishing is typically done **incrementally**.
@@ -236,7 +236,7 @@ This side answers:
 - When do I emit a new result snapshot?
 - What result shape is stored on the run?
 
-This is handled by the analyzer instance.
+This is handled by the analyzer state.
 
 ## Example: iteration statistics analyzer
 
@@ -262,7 +262,7 @@ The analyzer definition:
 
 ### Runtime side
 
-The analyzer instance:
+The analyzer state:
 
 - receives `AfterEvaluation(...)`
 - updates temporary counters/statistics
@@ -278,7 +278,7 @@ That is the intended pattern for analyzers that combine several hook points.
 
 This analyzer observes evaluation events and publishes a best-so-far quality curve.
 
-Its analyzer instance stores:
+Its analyzer state stores:
 
 - current best solution
 - current evaluation count
@@ -302,7 +302,7 @@ This analyzer combines several hook types:
 - mutator hooks
 - interceptor hooks
 
-Its analyzer instance builds a genealogy graph over time and publishes the evolving graph to the run.
+Its analyzer state builds a genealogy graph over time and publishes the evolving graph to the run.
 
 ## Retrieval model
 
@@ -330,7 +330,7 @@ When implementing a new analyzer, follow these rules.
 ### Do
 
 - keep analyzer definitions re-usable and configuration-only
-- put mutable analysis state into the analyzer instance
+- put mutable analysis state into the analyzer state
 - publish results into `Run`
 - attach through observable wrappers/decorators
 - use iteration boundaries for live result publishing when the analysis is iteration-based

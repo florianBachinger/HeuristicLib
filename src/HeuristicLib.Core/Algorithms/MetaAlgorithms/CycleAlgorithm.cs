@@ -96,14 +96,14 @@ public class CycleAlgorithmInstance<TAlgorithm, TGenotype, TSearchSpace, TProble
   private ExecutionInstanceRegistry ExecutionInstanceRegistry(TAlgorithm algorithm, Run run)
   {
     if (NewExecutionInstancesPerCycle) {
-      return new ExecutionInstanceRegistry(run);
+      return run.CreateNewRegistry(); 
     }
 
     if (algorithmInstanceRegistries.TryGetValue(algorithm, out var existingRegistry)) {
       return existingRegistry;
     }
 
-    var newRegistry = new ExecutionInstanceRegistry(run);
+    var newRegistry = run.CreateChildRegistry();
     algorithmInstanceRegistries[algorithm] = newRegistry;
     return newRegistry;
   }

@@ -1,4 +1,4 @@
-﻿using HEAL.HeuristicLib.Analysis;
+using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
@@ -9,29 +9,30 @@ using HEAL.HeuristicLib.States;
 namespace HEAL.HeuristicLib.Analyzers;
 
 public class AllPopulationsTracker<T, TS, TP, TR>(IInterceptor<T, TS, TP, TR> interceptor)
-  : IAnalyzer<IReadOnlyList<ISolution<T>[]>, AllPopulationsTracker<T, TS, TP, TR>.Instance>
+  : IAnalyzer<AllPopulationsTracker<T, TS, TP, TR>.State>
   where TS : class, ISearchSpace<T>
   where TP : class, IProblem<T, TS>
   where TR : PopulationState<T>
 {
   public IInterceptor<T, TS, TP, TR> Interceptor { get; } = interceptor;
 
-  public Instance CreateAnalyzerInstance(Run run) => new(run, this);
+  public State CreateAnalyzerState(Run run) => new(run, this);
 
-  public sealed class Instance(Run run, AllPopulationsTracker<T, TS, TP, TR> analyzer)
-    : AnalyzerRunInstance<AllPopulationsTracker<T, TS, TP, TR>, IReadOnlyList<ISolution<T>[]>>(run, analyzer)
+  public sealed class State(Run run, AllPopulationsTracker<T, TS, TP, TR> analyzer)
+    : AnalyzerRunState<AllPopulationsTracker<T, TS, TP, TR>>(run, analyzer)
   {
-    public List<ISolution<T>[]> AllSolutions { get; } = [];
+    private readonly List<ISolution<T>[]> allSolutions = [];
 
-    public override void RegisterTaps(IAnalyzerTapRegistry taps)
+    public IReadOnlyList<ISolution<T>[]> AllSolutions => allSolutions;
+
+    public override void RegisterObservations(IObservationRegistry observationRegistry)
     {
-      taps.Register(analyzer.Interceptor, AfterInterception);
+      observationRegistry.Add(Analyzer.Interceptor, AfterInterception);
     }
 
     public void AfterInterception(TR newState, TR currentState, TR? previousState, TS searchSpace, TP problem)
     {
-      AllSolutions.Add(currentState.Population.ToArray());
-      PublishResult(AllSolutions.ToArray());
+      allSolutions.Add(currentState.Population.ToArray());
     }
   }
 }

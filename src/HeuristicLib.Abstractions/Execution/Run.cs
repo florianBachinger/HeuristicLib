@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using HEAL.HeuristicLib.Algorithms;
+﻿using HEAL.HeuristicLib.Algorithms;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -10,26 +9,44 @@ namespace HEAL.HeuristicLib.Execution;
 
 public abstract class Run
 {
-  protected readonly ExecutionInstanceRegistry RootRegistry;
+  private readonly Lazy<ExecutionInstanceRegistry> rootRegistry;
+  protected ExecutionInstanceRegistry RootRegistry => rootRegistry.Value;
 
-  private readonly IReadOnlyList<IAnalyzer> analyzers;
-  private AnalyzerTapRegistry? analyzerTaps;
+  private readonly ObservationRegistry observationRegistry = new();
 
-  protected readonly IDictionary<IAnalyzer, IAnalyzerRunInstance> AnalyzerInstances;
-
-  protected readonly IDictionary<IAnalyzer, object> AnalyzerResults;
+  protected readonly IDictionary<IAnalyzer, IAnalyzerRunState> AnalyzerStates;
 
   protected Run(IReadOnlyList<IAnalyzer>? analyzers = null)
   {
-    RootRegistry = new ExecutionInstanceRegistry(this, parentRegistry: null);
-    this.analyzers = analyzers ?? [];
-    AnalyzerInstances = new Dictionary<IAnalyzer, IAnalyzerRunInstance>(ReferenceEqualityComparer.Instance);
-    AnalyzerResults = new Dictionary<IAnalyzer, object>(ReferenceEqualityComparer.Instance);
+    AnalyzerStates = new Dictionary<IAnalyzer, IAnalyzerRunState>(ReferenceEqualityComparer.Instance);
+
+    foreach (var analyzer in analyzers ?? []) {
+      var analyzerState = analyzer.CreateAnalyzerState(this);
+      AnalyzerStates.Add(analyzer, analyzerState);
+      analyzerState.RegisterObservations(observationRegistry);
+    }
+
+    rootRegistry = new Lazy<ExecutionInstanceRegistry>(() => {
+      var registry = new ExecutionInstanceRegistry(this, parentRegistry: null);
+      InstallObservations(registry, observationRegistry);
+      return registry;
+    });
+
+    _ = RootRegistry;
   }
-  
+
+  private static void InstallObservations(ExecutionInstanceRegistry registry, ObservationRegistry observationRegistry)
+  {
+    foreach (var installer in observationRegistry.Installers) {
+      installer.Install(registry);
+    }
+  }
+
   public ExecutionInstanceRegistry CreateNewRegistry()
   {
-    return new ExecutionInstanceRegistry(this, parentRegistry: null);
+    var registry = new ExecutionInstanceRegistry(this, parentRegistry: null);
+    InstallObservations(registry, observationRegistry);
+    return registry;
   }
 
   public ExecutionInstanceRegistry CreateChildRegistry()
@@ -37,65 +54,35 @@ public abstract class Run
     return RootRegistry.CreateChildRegistry();
   }
 
-  internal AnalyzerTapRegistry GetAnalyzerTaps()
+  public TAnalyzerRunState GetAnalyzerResult<TAnalyzerRunState>(IAnalyzer<TAnalyzerRunState> analyzer)
+    where TAnalyzerRunState : class, IAnalyzerRunState
   {
-    if (analyzerTaps is not null) {
-      return analyzerTaps;
+    if (AnalyzerStates.TryGetValue(analyzer, out var state)) {
+      return (TAnalyzerRunState)state;
     }
 
-    analyzerTaps = new AnalyzerTapRegistry();
-    foreach (var analyzer in analyzers) {
-      ResolveAnalyzer(analyzer).RegisterTaps(analyzerTaps);
-    }
-
-    return analyzerTaps;
+    throw new KeyNotFoundException($"No analyzer found for analyzer {analyzer}");
   }
 
-  public IAnalyzerRunInstance ResolveAnalyzer(IAnalyzer analyzer)
+  public bool TryGetAnalyzerResult<TAnalyzerRunState>(IAnalyzer<TAnalyzerRunState> analyzer, out TAnalyzerRunState? analyzerRunState)
+    where TAnalyzerRunState : class, IAnalyzerRunState
   {
-    if (AnalyzerInstances.TryGetValue(analyzer, out var analyzerInstance)) {
-      return analyzerInstance;
-    }
-
-    var createdAnalyzerInstance = analyzer.CreateAnalyzerInstance(this);
-    AnalyzerInstances[analyzer] = createdAnalyzerInstance;
-    return createdAnalyzerInstance;
-  }
-
-  public TAnalyzerRunInstance ResolveAnalyzer<TResult, TAnalyzerRunInstance>(IAnalyzer<TResult, TAnalyzerRunInstance> analyzer)
-    where TResult : notnull
-    where TAnalyzerRunInstance : class, IAnalyzerRunInstance
-  {
-    return (TAnalyzerRunInstance)ResolveAnalyzer((IAnalyzer)analyzer);
-  }
-
-  public void SetResult<TResult>(IAnalyzer<TResult> analyzer, TResult result)
-    where  TResult : notnull
-  {
-    AnalyzerResults[analyzer] = result;
-  }
-  
-  public bool TryGetResult<TResult>(IAnalyzer<TResult> analyzer, [MaybeNullWhen(false)] out TResult result)
-    where TResult : notnull
-  {
-    if (AnalyzerResults.TryGetValue(analyzer, out var resultObj)) {
-      result = (TResult)resultObj;
+    if (AnalyzerStates.TryGetValue(analyzer, out var state)) {
+      analyzerRunState = (TAnalyzerRunState)state;
       return true;
     }
-    result = default;
+
+    analyzerRunState = null;
     return false;
   }
-  
-  public TResult GetResult<TResult>(IAnalyzer<TResult> analyzer) 
-    where TResult : notnull
-  {
-     if (TryGetResult(analyzer, out var result)) {
-       return result;
-     }
-     throw new KeyNotFoundException($"No result found for analyzer {analyzer}");
-  }
-  
-  
+
+  public TAnalyzerRunState GetResult<TAnalyzerRunState>(IAnalyzer<TAnalyzerRunState> analyzer)
+    where TAnalyzerRunState : class, IAnalyzerRunState
+    => GetAnalyzerResult(analyzer);
+
+  public bool TryGetResult<TAnalyzerRunState>(IAnalyzer<TAnalyzerRunState> analyzer, out TAnalyzerRunState? analyzerRunState)
+    where TAnalyzerRunState : class, IAnalyzerRunState
+    => TryGetAnalyzerResult(analyzer, out analyzerRunState);
 }
 
 public class Run<TGenotype, TSearchSpace, TProblem, TState> : Run

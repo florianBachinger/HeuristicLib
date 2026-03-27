@@ -4,38 +4,33 @@ namespace HEAL.HeuristicLib.Analysis;
 
 public interface IAnalyzer
 {
-  IAnalyzerRunInstance CreateAnalyzerInstance(Run run);
+  IAnalyzerRunState CreateAnalyzerState(Run run);
 }
 
-public interface IAnalyzer<out TResult> : IAnalyzer;
-
-public interface IAnalyzer<TResult, out TAnalyzerRunInstance> : IAnalyzer<TResult>
-  where TResult : notnull
-  where TAnalyzerRunInstance : class, IAnalyzerRunInstance
+public interface IAnalyzer<out TAnalyzerRunState> : IAnalyzer
+  where TAnalyzerRunState : class, IAnalyzerRunState
 {
   // ToDo: think if we ned an abstract system of "scope" instead of explicit Execution and Run scope that we currently have.
-  new TAnalyzerRunInstance CreateAnalyzerInstance(Run run);
+  new TAnalyzerRunState CreateAnalyzerState(Run run);
 
-  IAnalyzerRunInstance IAnalyzer.CreateAnalyzerInstance(Run run) => CreateAnalyzerInstance(run);
+  IAnalyzerRunState IAnalyzer.CreateAnalyzerState(Run run) => CreateAnalyzerState(run);
 }
 
-public interface IAnalyzerRunInstance : IExecutionInstance
+public interface IAnalyzerRunState : IExecutionInstance
 {
-  void RegisterTaps(IAnalyzerTapRegistry taps);
+  void RegisterObservations(IObservationRegistry observationRegistry);
 }
 
-public abstract class AnalyzerRunInstance<TAnalyzer, TResult>(Run run, TAnalyzer analyzer) : IAnalyzerRunInstance
-  where TAnalyzer : class, IAnalyzer<TResult>
-  where TResult : notnull
+public abstract class AnalyzerRunState : IAnalyzerRunState
+{
+  public abstract void RegisterObservations(IObservationRegistry observationRegistry);
+}
+
+public abstract class AnalyzerRunState<TAnalyzer>(Run run, TAnalyzer analyzer) : AnalyzerRunState
+  where TAnalyzer : IAnalyzer
 {
   protected Run Run { get; } = run;
 
   protected TAnalyzer Analyzer { get; } = analyzer;
-
-  protected void PublishResult(TResult result)
-  {
-	  Run.SetResult(Analyzer, result);
-  }
-
-  public abstract void RegisterTaps(IAnalyzerTapRegistry taps);
 }
+

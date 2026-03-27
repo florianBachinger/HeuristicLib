@@ -1,4 +1,4 @@
-﻿using HEAL.HeuristicLib.Algorithms;
+using HEAL.HeuristicLib.Algorithms;
 using HEAL.HeuristicLib.Algorithms.Evolutionary;
 using HEAL.HeuristicLib.Algorithms.LocalSearch;
 using HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
@@ -246,19 +246,19 @@ public class PythonGenealogyAnalysis
   {
     public ExperimentResult<T> ToExperimentResult(Run run)
     {
-      var qRes = run.GetResult(Qualities);
+      var qRes = run.GetAnalyzerResult(Qualities).BestSolutions;
       var rankGraph = string.Empty;
       IReadOnlyList<List<double>> rankLines = [];
       var rankAnalysis = RankAnalysis;
       if (rankAnalysis is not null) {
-        var rankResult = run.GetResult((IAnalyzer<RankAnalysisResult<T>>)rankAnalysis);
+        var rankResult = run.GetAnalyzerResult<RankAnalysis<T, TE, IProblem<T, TE>, TRes>.State>(rankAnalysis).Result;
         rankGraph = rankResult.Graph.ToGraphViz();
         rankLines = rankResult.Ranks.Select(x => x.ToList()).ToArray();
       }
 
       IReadOnlyList<ISolution<T>[]> apRes = [];
-      if (AllPopulations is not null && run.TryGetResult<IReadOnlyList<ISolution<T>[]>>(AllPopulations, out var populations)) {
-        apRes = populations;
+      if (AllPopulations is not null && run.TryGetAnalyzerResult(AllPopulations, out var populations) && populations is not null) {
+        apRes = populations.AllSolutions;
       }
 
       var experimentResult = new ExperimentResult<T>(
@@ -290,7 +290,7 @@ public class PythonGenealogyAnalysis
   private sealed class CallbackAnalysis<T, TE, TState>(
     IInterceptor<T, TE, IProblem<T, TE>, TState> interceptor,
     Action<PopulationState<T>> callback)
-    : IAnalyzer<CallbackRegistration, CallbackAnalysis<T, TE, TState>.Instance>
+    : IAnalyzer<CallbackAnalysis<T, TE, TState>.State>
     where T : notnull
     where TE : class, ISearchSpace<T>
     where TState : PopulationState<T>
@@ -298,14 +298,14 @@ public class PythonGenealogyAnalysis
     public IInterceptor<T, TE, IProblem<T, TE>, TState> Interceptor { get; } = interceptor;
     public Action<PopulationState<T>> Callback { get; } = callback;
 
-    public Instance CreateAnalyzerInstance(Run run) => new(run, this);
+    public State CreateAnalyzerState(Run run) => new(run, this);
 
-    public sealed class Instance(Run run, CallbackAnalysis<T, TE, TState> analyzer)
-      : AnalyzerRunInstance<CallbackAnalysis<T, TE, TState>, CallbackRegistration>(run, analyzer)
+    public sealed class State(Run run, CallbackAnalysis<T, TE, TState> analyzer)
+      : AnalyzerRunState<CallbackAnalysis<T, TE, TState>>(run, analyzer)
     {
-      public override void RegisterTaps(IAnalyzerTapRegistry taps)
+      public override void RegisterObservations(IObservationRegistry observationRegistry)
       {
-        taps.Register(analyzer.Interceptor, AfterInterception);
+        observationRegistry.Add(analyzer.Interceptor, AfterInterception);
       }
 
       private void AfterInterception(TState newState, TState currentState, TState? previousState, TE searchSpace, IProblem<T, TE> problem)

@@ -4,6 +4,7 @@ using HEAL.HeuristicLib.Problems.DataAnalysis.Symbolic;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math;
 using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math.Variables;
 using MathNet.Numerics;
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Optimization;
 
 namespace HEAL.HeuristicLib.Problems.DataAnalysis.Regression;

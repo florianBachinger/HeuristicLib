@@ -23,7 +23,7 @@ public class ChooseOneOperatorTests
       encoding: DummySearchSpace<int>.Instance,
       objective: SingleObjective.Minimize);
     var rng = new SequenceRandomNumberGenerator(0.2, 0.8, 0.3);
-    var instance = mutator.CreateExecutionInstance(new Execution.ExecutionInstanceRegistry());
+    var instance = mutator.CreateExecutionInstance(new Execution.ExecutionInstanceRegistry(TestRun.Instance));
 
     var result = instance.Mutate([1, 2, 3], rng, DummySearchSpace<int>.Instance, problem);
 
@@ -66,7 +66,7 @@ public class ChooseOneOperatorTests
       encoding: DummySearchSpace<int>.Instance,
       objective: SingleObjective.Minimize);
     var rng = new SequenceRandomNumberGenerator(0.2, 0.8, 0.3);
-    var instance = crossover.CreateExecutionInstance(new Execution.ExecutionInstanceRegistry());
+    var instance = crossover.CreateExecutionInstance(new Execution.ExecutionInstanceRegistry(TestRun.Instance));
 
     var result = instance.Cross(
       [new Parents<int>(1, 10), new Parents<int>(2, 20), new Parents<int>(3, 30)],
@@ -89,7 +89,7 @@ public class ChooseOneOperatorTests
       evaluateFunc: x => x,
       encoding: DummySearchSpace<int>.Instance,
       objective: SingleObjective.Minimize);
-    var instance = mutator.CreateExecutionInstance(new Execution.ExecutionInstanceRegistry());
+    var instance = mutator.CreateExecutionInstance(new Execution.ExecutionInstanceRegistry(TestRun.Instance));
 
     var result = instance.Mutate([1, 2, 3], RandomNumberGenerator.Create(0), DummySearchSpace<int>.Instance, problem);
 
@@ -115,7 +115,7 @@ public class ChooseOneOperatorTests
       evaluateFunc: x => x,
       encoding: DummySearchSpace<int>.Instance,
       objective: SingleObjective.Minimize);
-    var instance = interceptor.CreateExecutionInstance(new Execution.ExecutionInstanceRegistry());
+    var instance = interceptor.CreateExecutionInstance(new Execution.ExecutionInstanceRegistry(TestRun.Instance));
 
     var result = instance.Transform(new TestAlgorithmState { Value = 1 }, previousState: null, DummySearchSpace<int>.Instance, problem);
 
