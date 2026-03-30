@@ -6,7 +6,6 @@ using HEAL.HeuristicLib.SearchSpaces.Trees.SymbolicExpressionTree.Symbols.Math.V
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Optimization;
-using static HEAL.HeuristicLib.Problems.DataAnalysis.Regression.TreeToAutoDiffTermConverter;
 
 namespace HEAL.HeuristicLib.Problems.DataAnalysis.Regression;
 
@@ -23,7 +22,6 @@ public static class SymbolicRegressionParameterOptimization
                                           double lowerEstimationLimit = double.MinValue,
                                           double upperEstimationLimit = double.MaxValue,
                                           bool updateParametersInTree = true,
-                                          Action<double[], double, object>? iterationCallback = null,
                                           EvaluationsCounter? counter = null)
   {
     // Numeric parameters in the tree become variables for parameter optimization.
@@ -31,7 +29,7 @@ public static class SymbolicRegressionParameterOptimization
     // For each parameter (variable in the original tree) we store the 
     // variable name, variable value (for factor vars) and lag as a DataForVariable object.
     // A dictionary is used to find parameters
-    if (!TryConvertToAutoDiff(tree, updateVariableWeights, out var parameters, out var initialParameters, out var func, out var funcGrad)) {
+    if (!TreeToAutoDiffTermConverter.TryConvertToAutoDiff(tree, updateVariableWeights, out var parameters, out var initialParameters, out var func, out var funcGrad)) {
       throw new NotSupportedException("Could not optimize parameters of symbolic expression tree due to not supported symbols used in the tree.");
     }
 
@@ -140,9 +138,9 @@ public static class SymbolicRegressionParameterOptimization
     }
   }
 
-  public static bool CanOptimizeParameters(SymbolicExpressionTree tree) => IsCompatible(tree);
+  public static bool CanOptimizeParameters(SymbolicExpressionTree tree) => TreeToAutoDiffTermConverter.IsCompatible(tree);
 
-  public static (double[] cOpt, ExitCondition status) MathNetLevenbergMarquardt(int maxIterations, int n, double[] y, int m, double[,] x, CompiledModel func, EvaluationsCounter rowEvaluationsCounter, CompiledModelGradient funcGrad, double[] c, int k)
+  private static (double[] cOpt, ExitCondition status) MathNetLevenbergMarquardt(int maxIterations, int n, double[] y, int m, double[,] x, TreeToAutoDiffTermConverter.CompiledModel func, EvaluationsCounter rowEvaluationsCounter, TreeToAutoDiffTermConverter.CompiledModelGradient funcGrad, double[] c, int k)
   {
     #region math.net.numerics
     var xIdx = Vector<double>.Build.Dense(n, init: i => i);

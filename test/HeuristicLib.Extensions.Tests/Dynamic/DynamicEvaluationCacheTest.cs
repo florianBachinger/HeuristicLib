@@ -23,14 +23,8 @@ file sealed class DummySearchSpace : ISearchSpace<DummyGenotype>
 file sealed class DummyDynamicProblem : DynamicProblem<DummyGenotype, DummySearchSpace>
 {
   public DummyDynamicProblem(IRandomNumberGenerator env, int epochLength)
-    : base(env, UpdatePolicy.AfterEvaluation, epochLength)
-  {
-    SearchSpace = new DummySearchSpace();
-    Objective = SingleObjective.Minimize;
-  }
-
-  public override DummySearchSpace SearchSpace { get; }
-  public override Objective Objective { get; }
+    : base(SingleObjective.Minimize, new DummySearchSpace(), env, UpdatePolicy.AfterEvaluation, epochLength)
+  { }
 
   public override ObjectiveVector Evaluate(DummyGenotype solution, IRandomNumberGenerator random, EvaluationTiming timing) => solution.Value;
 
@@ -61,7 +55,7 @@ public class DynamicEvaluationCacheTests
   public void DeduplicatesWithinBatch_EvaluatesOnce()
   {
     var env = RandomNumberGenerator.Create(0);
-    var problem = new DummyDynamicProblem(env, 10_000);// avoid boundary
+    var problem = new DummyDynamicProblem(env, 10_000); // avoid boundary
     var inner = new CountingEvaluator();
 
     var cached = new DynamicCachingEvaluator<DummyGenotype, DummySearchSpace, DummyDynamicProblem, int>(
@@ -86,7 +80,7 @@ public class DynamicEvaluationCacheTests
   public void CachesAcrossBatches_NoReevaluation_NoTick()
   {
     var env = RandomNumberGenerator.Create(0);
-    var problem = new DummyDynamicProblem(env, 10_000);// avoid boundary
+    var problem = new DummyDynamicProblem(env, 10_000); // avoid boundary
     var inner = new CountingEvaluator();
 
     var cached = new DynamicCachingEvaluator<DummyGenotype, DummySearchSpace, DummyDynamicProblem, int>(
@@ -108,7 +102,7 @@ public class DynamicEvaluationCacheTests
   {
     var env = RandomNumberGenerator.Create(0);
 
-    var problem = new DummyDynamicProblem(env, 2);// boundary every 2 evals
+    var problem = new DummyDynamicProblem(env, 2); // boundary every 2 evals
     var inner = new CountingEvaluator();
 
     var cached = new DynamicCachingEvaluator<DummyGenotype, DummySearchSpace, DummyDynamicProblem, int>(
@@ -136,7 +130,7 @@ public class DynamicEvaluationCacheTests
   public void GraceCount_Reached_AdvancesEpoch_WithoutTicking()
   {
     var env = RandomNumberGenerator.Create(0);
-    var problem = new DummyDynamicProblem(env, 10_000);// avoid natural boundary
+    var problem = new DummyDynamicProblem(env, 10_000); // avoid natural boundary
     var inner = new CountingEvaluator();
 
     var cached = new DynamicCachingEvaluator<DummyGenotype, DummySearchSpace, DummyDynamicProblem, int>(
@@ -174,7 +168,7 @@ public class DynamicEvaluationCacheTests
   public void HitStreakResets_WhenUncachedAppears()
   {
     var env = RandomNumberGenerator.Create(0);
-    var problem = new DummyDynamicProblem(env, 10_000);// avoid natural boundary
+    var problem = new DummyDynamicProblem(env, 10_000); // avoid natural boundary
     var inner = new CountingEvaluator();
 
     var cached = new DynamicCachingEvaluator<DummyGenotype, DummySearchSpace, DummyDynamicProblem, int>(

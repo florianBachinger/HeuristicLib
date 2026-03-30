@@ -15,38 +15,33 @@ public sealed class MovingPeaksProblem
   private double[] peakWidths = null!;
 
   public MovingPeaksProblem(MovingPeaksParameters parameters,
-    IRandomNumberGenerator environmentRandom,
-    UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation,
-    int epochLength = int.MaxValue)
-    : base(environmentRandom, updatePolicy, epochLength)
-  {
-    Validate(parameters);
-    Parameters = parameters;
-    Objective = SingleObjective.Maximize;
-    SearchSpace = new RealVectorSearchSpace(
+                            IRandomNumberGenerator environmentRandom,
+                            UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation,
+                            int epochLength = int.MaxValue)
+    : base(SingleObjective.Maximize, new RealVectorSearchSpace(
       parameters.Dimension,
       parameters.LowerBound,
       parameters.UpperBound
-    );
-
+    ), environmentRandom, updatePolicy, epochLength)
+  {
+    Validate(parameters);
+    Parameters = parameters;
     InitializePeaks();
   }
 
   public MovingPeaksProblem(MovingPeaksParameters parameters,
-    IRandomNumberGenerator environmentRandom,
-    (double[] center, double height, double width)[] peaks,
-    UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation,
-    int epochLength = int.MaxValue)
-    : base(environmentRandom, updatePolicy, epochLength)
-  {
-    Validate(parameters);
-    Parameters = parameters;
-    Objective = SingleObjective.Maximize;
-    SearchSpace = new RealVectorSearchSpace(
+                            IRandomNumberGenerator environmentRandom,
+                            (double[] center, double height, double width)[] peaks,
+                            UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation,
+                            int epochLength = int.MaxValue)
+    : base(SingleObjective.Maximize, new RealVectorSearchSpace(
       parameters.Dimension,
       parameters.LowerBound,
       parameters.UpperBound
-    );
+    ), environmentRandom, updatePolicy, epochLength)
+  {
+    Validate(parameters);
+    Parameters = parameters;
     ArgumentOutOfRangeException.ThrowIfNotEqual(peaks.Length, parameters.NumberOfPeaks);
     peakPositions = new double[parameters.NumberOfPeaks][];
     peakHeights = new double[parameters.NumberOfPeaks];
@@ -59,10 +54,8 @@ public sealed class MovingPeaksProblem
       peakWidths[i] = peaks[i].width;
     }
   }
-  public MovingPeaksParameters Parameters { get; }
 
-  public override RealVectorSearchSpace SearchSpace { get; }
-  public override Objective Objective { get; }
+  public MovingPeaksParameters Parameters { get; }
 
   private static void Validate(MovingPeaksParameters p)
   {

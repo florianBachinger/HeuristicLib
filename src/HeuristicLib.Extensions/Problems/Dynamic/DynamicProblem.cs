@@ -10,13 +10,13 @@ using HEAL.HeuristicLib.States;
 namespace HEAL.HeuristicLib.Problems.Dynamic;
 
 // ToDo: A DynamicProblem should be, foremost, a Problem. It "being" also an Observer, is an interesting way of implementing about it, but we have to think if this is really what we want.
-public abstract class DynamicProblem<TGenotype, TSearchSpace> :
-  IEvaluatorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>,
-  IInterceptorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>,
-  IDynamicProblem<TGenotype, TSearchSpace>,
-  IEvaluatorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>,
-  IInterceptorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>,
-  IDisposable
+public abstract class DynamicProblem<TGenotype, TSearchSpace> : SingleSolutionProblem<TGenotype, TSearchSpace>,
+                                                                IEvaluatorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>,
+                                                                IInterceptorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>,
+                                                                IDynamicProblem<TGenotype, TSearchSpace>,
+                                                                IEvaluatorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>,
+                                                                IInterceptorObserverInstance<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>, IAlgorithmState>,
+                                                                IDisposable
   where TSearchSpace : class, ISearchSpace<TGenotype>
 {
   private readonly ConcurrentBag<(TGenotype solution, ObjectiveVector objective, EvaluationTiming timing)> evaluationLog = [];
@@ -24,7 +24,7 @@ public abstract class DynamicProblem<TGenotype, TSearchSpace> :
 
   public readonly UpdatePolicy UpdatePolicy;
 
-  protected DynamicProblem(IRandomNumberGenerator environmentRandom, UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation, int epochLength = int.MaxValue)
+  protected DynamicProblem(Objective objective, TSearchSpace searchSpace, IRandomNumberGenerator environmentRandom, UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation, int epochLength = int.MaxValue) : base(objective, searchSpace)
   {
     ArgumentOutOfRangeException.ThrowIfNegativeOrZero(epochLength);
     UpdatePolicy = updatePolicy;
@@ -41,13 +41,10 @@ public abstract class DynamicProblem<TGenotype, TSearchSpace> :
     GC.SuppressFinalize(this);
   }
 
-  public abstract TSearchSpace SearchSpace { get; }
-  public abstract Objective Objective { get; }
-
   public event EventHandler<IReadOnlyList<(TGenotype, ObjectiveVector, EvaluationTiming)>>? OnEvaluation;
 
   // this method will be called in parallel
-  public ObjectiveVector Evaluate(TGenotype solution, IRandomNumberGenerator random)
+  public override ObjectiveVector Evaluate(TGenotype solution, IRandomNumberGenerator random)
   {
     // PredictAndTrain in parallel read lock
     var timing = EpochClock.IncreaseCount();

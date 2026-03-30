@@ -21,22 +21,15 @@ public sealed class NoisyFlowQuadraticAssignmentProblem
     double sigma,
     UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation,
     int epochLength = int.MaxValue
-  ) : base(environmentRandom, updatePolicy, epochLength)
+  ) : base(SingleObjective.Minimize, new PermutationSearchSpace(problemData.Size), environmentRandom, updatePolicy, epochLength)
   {
     ArgumentOutOfRangeException.ThrowIfNegative(sigma);
 
     baseProblemData = problemData;
     this.sigma = sigma;
-
-    Objective = SingleObjective.Minimize;
-    SearchSpace = new PermutationSearchSpace(problemData.Size);
-
     noisyFlows = (double[,])baseProblemData.Flows.Clone();
     Update(); // initialize state (or call RebuildNoisyFlows() directly)
   }
-
-  public override PermutationSearchSpace SearchSpace { get; }
-  public override Objective Objective { get; }
 
   public override ObjectiveVector Evaluate(Permutation solution, IRandomNumberGenerator random, EvaluationTiming timing)
   {

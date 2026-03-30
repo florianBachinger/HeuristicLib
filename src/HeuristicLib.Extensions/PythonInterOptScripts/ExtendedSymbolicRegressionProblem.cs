@@ -24,7 +24,7 @@ namespace HEAL.HeuristicLib.PythonInterOptScripts;
 /// This is a toy problem that uses a "normal" symbolic regression problem and adds more objectives provided by a generic function
 /// </summary>
 public class ExtendedSymbolicRegressionProblem(Objective objective, SymbolicExpressionTreeSearchSpace searchSpace, Func<SymbolicExpressionTree, double[]> myEval)
-  : Problem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>(objective, searchSpace)
+  : SingleSolutionProblem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>(objective, searchSpace)
 {
   public required SymbolicRegressionProblem InnerProblem { get; init; }
 

@@ -441,3 +441,4 @@ Desktop.ini
 /.idea/
 *.DotSettings
 examples/PythonInteroperability/PythonInteroperability.sln
+examples/PythonInteroperability/.venv

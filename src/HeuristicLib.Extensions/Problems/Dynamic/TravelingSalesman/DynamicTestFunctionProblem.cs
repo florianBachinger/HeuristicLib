@@ -1,5 +1,6 @@
 ﻿using HEAL.HeuristicLib.Genotypes.Vectors;
 using HEAL.HeuristicLib.Optimization;
+using HEAL.HeuristicLib.Problems.TestFunctions;
 using HEAL.HeuristicLib.Problems.TestFunctions.MetaFunctions;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.Random.Distributions;
@@ -11,12 +12,12 @@ namespace HEAL.HeuristicLib.Problems.Dynamic.TravelingSalesman;
 
 public class DynamicTestFunctionProblem : DynamicProblem<RealVector, RealVectorSearchSpace>
 {
-  private readonly IProblem<RealVector, RealVectorSearchSpace> problem;
+  private readonly TestFunctionProblem problem;
 
   public DynamicTestFunctionProblem(IRandomNumberGenerator environmentRandom,
-    IProblem<RealVector, RealVectorSearchSpace> problem,
-    UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation,
-    int epochLength = int.MaxValue) : base(environmentRandom, updatePolicy, epochLength)
+                                    TestFunctionProblem problem,
+                                    UpdatePolicy updatePolicy = UpdatePolicy.AfterEvaluation,
+                                    int epochLength = int.MaxValue) : base(problem.Objective, problem.SearchSpace, environmentRandom, updatePolicy, epochLength)
   {
     this.problem = problem;
     var rot = new double[problem.SearchSpace.Length, problem.SearchSpace.Length];
@@ -32,9 +33,6 @@ public class DynamicTestFunctionProblem : DynamicProblem<RealVector, RealVectorS
 
   public State CurrentState { get; private set; }
   public required DeviationSigmas DeviationSigma { get; init; }
-
-  public override RealVectorSearchSpace SearchSpace => problem.SearchSpace;
-  public override Objective Objective => problem.Objective;
 
   public override ObjectiveVector Evaluate(RealVector solution, IRandomNumberGenerator random, EvaluationTiming timing)
   {
@@ -142,7 +140,7 @@ public class DynamicTestFunctionProblem : DynamicProblem<RealVector, RealVectorS
     for (var i = 0; i < n; i++) {
       for (var j = 0; j < n; j++) {
         p[i, j] += (cos - 1) * (u[i] * u[j] + v[i] * v[j])
-          + sin * (v[i] * u[j] - u[i] * v[j]);
+                   + sin * (v[i] * u[j] - u[i] * v[j]);
       }
     }
 
