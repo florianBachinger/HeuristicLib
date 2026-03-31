@@ -71,7 +71,7 @@ public class ExtendedSymbolicRegressionProblem(Objective objective, SymbolicExpr
 
   public static Population<SymbolicExpressionTree> RunDefault(ExtendedSymbolicRegressionProblem p, int seed = 42)
   {
-    var symRegAllMutator = MultiMutator.Create(
+    var symRegAllMutator = ChooseOneMutator.Create(
       new ChangeNodeTypeManipulation(),
       new FullTreeShaker(),
       new OnePointShaker(),

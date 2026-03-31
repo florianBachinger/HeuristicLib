@@ -52,16 +52,61 @@ To keep results reproducible:
 HeuristicLib includes a few small composition patterns that keep calling code clean:
 
 - `mutator.WithRate(mutationRate)` wraps a mutator with a no-op mutator to achieve a per-offspring mutation probability.
-- “Multi operators” (for example, `MultiMutator`) choose among several operators using weights.
+- `ChooseOne*` helpers (for example, `ChooseOneMutator` and `ChooseOneCrossover`) choose among several operators using weights.
+- `Pipeline*` helpers (for example, `PipelineMutator` and `PipelineInterceptor`) apply several operators in sequence.
 
-## Interception vs observation
+## Choosing a base class when implementing an operator
 
-These are two different hooks with different responsibilities:
+The base classes in `src/HeuristicLib.Core/Operators` are mainly **authoring conveniences**.
+They do not introduce fundamentally different operator concepts; they package common implementation patterns on top of the role interfaces (`ICreator`, `IMutator`, `IEvaluator`, ...).
 
-- **Interceptor**: part of the algorithm pipeline (it returns a possibly modified state).
-- **Observer**: side effects only (logging, metrics, diagnostics).
+Use this checklist:
 
-See [Execution model](execution-model.md) for the current wiring guidance.
+1. **First choose the operator role**
+   - creation -> `ICreator`
+   - evaluation -> `IEvaluator`
+   - selection -> `ISelector`
+   - variation of existing genotypes -> `IMutator` / `ICrossover`
+   - survivor selection -> `IReplacer`
+   - stopping rule -> `ITerminator`
+   - state post-processing -> `IInterceptor`
+
+2. **If the operator is stateless and naturally processes one item at a time, prefer `SingleSolution*`**
+   - Examples: `SingleSolutionCreator`, `SingleSolutionMutator`, `SingleSolutionCrossover`, `SingleSolutionEvaluator`
+   - Use this when the batch implementation is just “apply the same logic independently to each element”.
+   - These bases already provide the batch loop and RNG splitting behavior.
+
+3. **If the operator is stateless but needs custom batch logic, use `Stateless*`**
+   - Examples: `StatelessSelector`, `StatelessReplacer`, `StatelessTerminator`, `StatelessInterceptor`
+   - Also use this for creators/mutators/crossovers/evaluators when you want to optimize across the whole batch instead of implementing per-item logic.
+
+4. **If the operator needs mutable per-run memory, use `Stateful*`**
+   - Examples: `StatefulTerminator`, `StatefulEvaluator`, `StatefulMutator`, ...
+   - Put configuration on the definition object.
+   - Put mutable runtime data into the nested `State` that becomes part of the execution instance.
+   - See [Definition vs execution instances](execution-instances.md) for the mental model.
+
+5. **If the operator wraps exactly one inner operator of the same role, use `Decorator*`**
+   - Examples: `DecoratorEvaluator`, `DecoratorMutator`, `DecoratorSelector`, ...
+   - Typical use cases: caching, limiting, adding elites before delegating, prepending predefined solutions.
+
+6. **If the operator combines several inner operators of the same role, use `Composite*`**
+   - Examples: `CompositeMutator`, `CompositeCrossover`, `CompositeTerminator`, ...
+   - Typical use cases: pipelines, weighted choice among operators, AND/OR combinations of terminators.
+
+7. **If none of the convenience bases fit, implement the operator contract directly**
+   - This is the fallback when you need full control over instancing or execution behavior.
+   - At the lowest level, that means implementing `IOperator<TExecutionInstance>` yourself.
+   - If you do that, you also need to handle the execution-instance split correctly. See [Definition vs execution instances](execution-instances.md).
+
+### Short version
+
+- plain stateless batch operator -> `Stateless*`
+- plain stateless per-item operator -> `SingleSolution*`
+- operator with mutable execution state -> `Stateful*`
+- operator that wraps one operator -> `Decorator*`
+- operator that coordinates several operators -> `Composite*`
+- full custom behavior -> implement the contract directly and handle execution instances yourself
 
 ## Next
 

@@ -183,7 +183,7 @@ sequenceDiagram
   Alg-->>Consumer: completes
 ```
 
-This aligns with meta-algorithms: they can interleave or concatenate streams, and observers can attach to each produced state.
+This aligns with meta-algorithms: they can interleave or concatenate streams while still treating execution as a stream of produced states.
 
 ## `CycleAlgorithm`: instancing per cycle vs re-using instances
 
@@ -248,6 +248,7 @@ Effect on `StagnationTerminator` (again, assuming the inner algorithm uses `GetO
 
 - Use **definition objects** for composition and configuration.
 - Put **mutable run state** only into execution instances.
+- When implementing a new operator, use the checklist in [Operators](operators.md#choosing-a-base-class-when-implementing-an-operator) to decide between `SingleSolution*`, `Stateless*`, `Stateful*`, `Decorator*`, and `Composite*`.
 - Use `instanceRegistry.GetOrCreate(...)` when you want:
   - shared sub-graphs to stay shared,
   - wrappers to decorate the same underlying instance,

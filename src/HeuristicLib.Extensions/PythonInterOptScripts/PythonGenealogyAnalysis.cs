@@ -245,14 +245,12 @@ public class PythonGenealogyAnalysis
 
   private static ChooseOneMutator<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace, IProblem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>> CreateSymRegAllMutator()
   {
-    var symRegAllMutator = MultiMutator.Create(
+    return ChooseOneMutator.Create(
       new ChangeNodeTypeManipulation(),
       new FullTreeShaker(),
       new OnePointShaker(),
       new RemoveBranchManipulation(),
       new ReplaceBranchManipulation());
-
-    return symRegAllMutator;
   }
   #endregion
 }

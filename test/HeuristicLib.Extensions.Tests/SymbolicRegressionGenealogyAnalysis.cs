@@ -29,7 +29,7 @@ public class GenealogyGraphTests
 {
   private static ChooseOneMutator<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace, IProblem<SymbolicExpressionTree, SymbolicExpressionTreeSearchSpace>> CreateSymRegAllMutator()
   {
-    var symRegAllMutator = MultiMutator.Create(
+    var symRegAllMutator = ChooseOneMutator.Create(
       new ChangeNodeTypeManipulation(),
       new FullTreeShaker(),
       new OnePointShaker(),

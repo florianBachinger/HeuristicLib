@@ -79,7 +79,7 @@ public class PythonInterOptEquationScoring(Objective objective, SymbolicExpressi
 
   public static Population<SymbolicExpressionTree> RunDefault(PythonInterOptEquationScoring p, int seed = 42)
   {
-    var symRegAllMutator = MultiMutator.Create(
+    var symRegAllMutator = ChooseOneMutator.Create(
       new ChangeNodeTypeManipulation(),
       new FullTreeShaker(),
       new OnePointShaker(),

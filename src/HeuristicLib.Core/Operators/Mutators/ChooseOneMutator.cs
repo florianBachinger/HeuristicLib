@@ -18,10 +18,7 @@ public partial record ChooseOneMutator<TGenotype, TSearchSpace, TProblem>
   public ImmutableArray<double> Weights { get; }
 
   [IgnoreEquality]
-  private readonly double sumWeights;
-
-  [IgnoreEquality]
-  private readonly double[] cumulativeSumWeights;
+  private readonly WeightedBatchDispatch dispatcher;
 
   public ChooseOneMutator(ImmutableArray<IMutator<TGenotype, TSearchSpace, TProblem>> mutators, ImmutableArray<double>? weights = null)
     : base(mutators)
@@ -30,76 +27,24 @@ public partial record ChooseOneMutator<TGenotype, TSearchSpace, TProblem>
       throw new ArgumentException("At least one mutator must be provided.", nameof(mutators));
     }
 
-    if (weights is not null && weights.Value.Length != mutators.Length) {
-      throw new ArgumentException("Weights must have the same length as mutator.", nameof(weights));
+    var effectiveWeights = weights ?? [.. Enumerable.Repeat(1.0, mutators.Length)];
+    if (effectiveWeights.Length != mutators.Length) {
+      throw new ArgumentException("Weights must have the same length as mutators.", nameof(weights));
     }
 
-    if (weights is not null && weights.Value.Any(p => p < 0)) {
-      throw new ArgumentException("Weights must be non-negative.", nameof(weights));
-    }
-
-    if (weights is not null && weights.Value.All(p => p <= 0)) {
-      throw new ArgumentException("At least one weight must be greater than zero.", nameof(weights));
-    }
-    
-    Weights = weights ?? [.. Enumerable.Repeat(1.0, mutators.Length)];
-
-    cumulativeSumWeights = new double[Weights.Length];
-    for (var i = 0; i < Weights.Length; i++) {
-      sumWeights += Weights[i];
-      cumulativeSumWeights[i] = sumWeights;
-    }
+    dispatcher = new WeightedBatchDispatch(effectiveWeights);
+    Weights = dispatcher.Weights;
   }
 
   protected override NoState CreateInitialState() => NoState.Instance;
 
-  protected override IReadOnlyList<TGenotype> Mutate(IReadOnlyList<TGenotype> parents, NoState _, IReadOnlyList<IMutatorInstance<TGenotype, TSearchSpace, TProblem>> mutators, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+  protected override IReadOnlyList<TGenotype> Mutate(IReadOnlyList<TGenotype> parents, NoState _, IReadOnlyList<IMutatorInstance<TGenotype, TSearchSpace, TProblem>> innerMutators, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
   {
-    // ToDo: Unify the logic for MultiOperators to avoid duplication.
-
-    var offspringCount = parents.Count;
-
-    // determine which mutator to use for each offspring
-    var operatorAssignment = new int[offspringCount];
-    var operatorCounts = new int[mutators.Count];
-    var randoms = random.NextDoubles(offspringCount);
-    for (var i = 0; i < offspringCount; i++) {
-      var r = randoms[i] * sumWeights;
-      var idx = Array.FindIndex(cumulativeSumWeights, w => r < w);
-      operatorAssignment[i] = idx;
-      operatorCounts[idx]++;
-    }
-
-    // batch parent by operator
-    var parentBatches = new List<TGenotype>[mutators.Count];
-    for (var i = 0; i < mutators.Count; i++) {
-      parentBatches[i] = new List<TGenotype>(operatorCounts[i]);
-    }
-
-    for (var i = 0; i < offspringCount; i++) {
-      var opIdx = operatorAssignment[i];
-      parentBatches[opIdx].Add(parents[i]);
-    }
-
-    // batch-create for each operator and collect
-    var offspring = new List<TGenotype>(offspringCount);
-
-    for (var i = 0; i < mutators.Count; i++) {
-      var batchOffspring = mutators[i].Mutate(parentBatches[i], random, searchSpace, problem);
-      offspring.AddRange(batchOffspring);
-    }
-
-    return offspring;
+    return dispatcher.Dispatch(parents, innerMutators, random, (mutator, batchParents) => mutator.Mutate(batchParents, random, searchSpace, problem));
   }
-  
-  // // ToDo: probably this can be in a base class on ensemble operators
-  // public sealed class State(IReadOnlyList<IMutatorInstance<TGenotype, TSearchSpace, TProblem>> mutatorInstances)
-  // {
-  //   public IReadOnlyList<IMutatorInstance<TGenotype, TSearchSpace, TProblem>> MutatorInstances { get; } = mutatorInstances;
-  // }
 }
 
-public static class MultiMutator
+public static class ChooseOneMutator
 {
   public static ChooseOneMutator<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(params IEnumerable<IMutator<TGenotype, TSearchSpace, TProblem>> mutators)
     where TSearchSpace : class, ISearchSpace<TGenotype>
@@ -113,41 +58,8 @@ public static class MultiMutator
     where TSearchSpace : class, ISearchSpace<TGenotype>
     where TProblem : class, IProblem<TGenotype, TSearchSpace>
   {
-    if (weights == null) {
-      throw new ArgumentNullException(nameof(weights));
-    }
-
     return new ChooseOneMutator<TGenotype, TSearchSpace, TProblem>(mutators, weights);
   }
-
-  // public static MultiMutator<TGenotype, TSearchSpace> Create<TGenotype, TSearchSpace>(IReadOnlyList<IMutator<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>> mutators, IReadOnlyList<double>? weights = null) 
-  //   where TSearchSpace : class, ISearchSpace<TGenotype>
-  // {
-  //   return new(mutators, weights);
-  // }
-
-  // public static MultiMutator<TGenotype> Create<TGenotype>(IReadOnlyList<IMutator<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>> mutators, IReadOnlyList<double>? weights = null)
-  // {
-  //   return new(mutators, weights);
-  // }
-
-  // public static MultiMutator<TGenotype, TSearchSpace, TProblem> Create<TGenotype, TSearchSpace, TProblem>(params ImmutableArray<IMutator<TGenotype, TSearchSpace, TProblem>> mutators) 
-  //   where TSearchSpace : class, ISearchSpace<TGenotype> 
-  //   where TProblem : class, IProblem<TGenotype, TSearchSpace>
-  // {
-  //   return new MultiMutator<TGenotype, TSearchSpace, TProblem>(mutators);
-  // }
-
-  // public static MultiMutator<TGenotype, TSearchSpace> Create<TGenotype, TSearchSpace>(params IReadOnlyList<IMutator<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>> mutators) 
-  //   where TSearchSpace : class, ISearchSpace<TGenotype>
-  // {
-  //   return new(mutators);
-  // }
-
-  // public static MultiMutator<TGenotype> Create<TGenotype>(params IReadOnlyList<IMutator<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>> mutators)
-  // {
-  //   return new(mutators);
-  // }
 
   extension<TGenotype, TSearchSpace, TProblem>(IMutator<TGenotype, TSearchSpace, TProblem> mutator)
    where TSearchSpace : class, ISearchSpace<TGenotype>

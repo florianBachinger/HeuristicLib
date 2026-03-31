@@ -32,7 +32,7 @@ public record AlpsGeneticAlgorithm<TGenotype, TSearchSpace, TProblem>
   // public IReplacer<TGenotype, TSearchSpace, TProblem> Replacer { get; }
 
   // ToDo: this is not yet correctly set.
-  // private readonly MultiMutator<TGenotype, TSearchSpace, TProblem> internalMutator = new([]); 
+  // private readonly ChooseOneMutator<TGenotype, TSearchSpace, TProblem> internalMutator;
   // private readonly ElitismReplacer<TGenotype> internalReplacer = new(1);
 
   public override AlpsGeneticAlgorithmInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry)

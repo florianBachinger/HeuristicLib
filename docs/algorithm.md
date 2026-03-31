@@ -21,11 +21,9 @@ The library also provides extension methods:
 
 ## `IAlgorithm<...>` and the base class in this repository
 
-`IAlgorithm<...>` is an aggregate interface that combines:
+`IAlgorithm<...>` is the algorithm definition interface.
 
-- `IExecutable` (run to completion)
-- `IIterable` (run step-by-step)
-- `IObservable` (exposes an optional observer)
+Its execution instance exposes the streaming runtime API used during execution.
 
 In this repository, most concrete algorithms inherit from:
 

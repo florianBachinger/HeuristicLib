@@ -19,16 +19,16 @@ public partial record PipelineMutator<TG, TS, TP>
   {
     // ToDo: think if we want to allow empty pipelines.
     if (mutators.Length == 0) {
-      throw new ArgumentException("At least one crossover must be provided.", nameof(mutators));
+      throw new ArgumentException("At least one mutator must be provided.", nameof(mutators));
     }
   }
 
   protected override NoState CreateInitialState() => NoState.Instance;
   
-  protected override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents, NoState _, IReadOnlyList<IMutatorInstance<TG, TS, TP>> mutators, IRandomNumberGenerator random, TS searchSpace, TP problem)
+  protected override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents, NoState _, IReadOnlyList<IMutatorInstance<TG, TS, TP>> innerMutators, IRandomNumberGenerator random, TS searchSpace, TP problem)
   {
     var current = parents;
-    foreach (var mutator in mutators) {
+    foreach (var mutator in innerMutators) {
       current = mutator.Mutate(current, random, searchSpace, problem);
     }
     return current;
