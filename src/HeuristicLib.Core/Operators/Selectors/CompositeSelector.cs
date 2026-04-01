@@ -39,3 +39,26 @@ public abstract partial record CompositeSelector<TGenotype, TSearchSpace, TProbl
     }
   }
 }
+
+public abstract record CompositeSelector<TGenotype, TSearchSpace, TProblem>
+  : CompositeSelector<TGenotype, TSearchSpace, TProblem, NoState>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected CompositeSelector(ImmutableArray<ISelector<TGenotype, TSearchSpace, TProblem>> innerSelectors)
+    : base(innerSelectors)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<ISolution<TGenotype>> Select(IReadOnlyList<ISolution<TGenotype>> population,
+    Objective objective, int count, NoState state,
+    IReadOnlyList<ISelectorInstance<TGenotype, TSearchSpace, TProblem>> innerSelectors,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+    => Select(population, objective, count, innerSelectors, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<ISolution<TGenotype>> Select(IReadOnlyList<ISolution<TGenotype>> population,
+    Objective objective, int count, IReadOnlyList<ISelectorInstance<TGenotype, TSearchSpace, TProblem>> innerSelectors,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
+}

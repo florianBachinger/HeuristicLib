@@ -1,5 +1,4 @@
 using Generator.Equals;
-using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -8,7 +7,7 @@ namespace HEAL.HeuristicLib.Operators.Mutators;
 
 [Equatable]
 public partial record PipelineMutator<TG, TS, TP> 
-  : CompositeMutator<TG, TS, TP, NoState>
+  : CompositeMutator<TG, TS, TP>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
 {
@@ -23,9 +22,9 @@ public partial record PipelineMutator<TG, TS, TP>
     }
   }
 
-  protected override NoState CreateInitialState() => NoState.Instance;
-  
-  protected override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents, NoState _, IReadOnlyList<IMutatorInstance<TG, TS, TP>> innerMutators, IRandomNumberGenerator random, TS searchSpace, TP problem)
+  protected override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents,
+    IReadOnlyList<IMutatorInstance<TG, TS, TP>> innerMutators, IRandomNumberGenerator random, TS searchSpace,
+    TP problem)
   {
     var current = parents;
     foreach (var mutator in innerMutators) {

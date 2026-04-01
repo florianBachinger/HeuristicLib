@@ -37,3 +37,26 @@ public abstract record DecoratorInterceptor<TGenotype, TSearchSpace, TProblem, T
     }
   }
 }
+
+public abstract record DecoratorInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
+  : DecoratorInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState, NoState>
+  where TAlgorithmState : class, IAlgorithmState
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected DecoratorInterceptor(IInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerInterceptor)
+    : base(innerInterceptor)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override TAlgorithmState Transform(TAlgorithmState currentState, TAlgorithmState? previousState,
+    NoState state, IInterceptorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerInterceptor,
+    TSearchSpace searchSpace, TProblem problem)
+    => Transform(currentState, previousState, innerInterceptor, searchSpace, problem);
+
+  protected abstract TAlgorithmState Transform(TAlgorithmState currentState, TAlgorithmState? previousState,
+    IInterceptorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerInterceptor,
+    TSearchSpace searchSpace, TProblem problem);
+}

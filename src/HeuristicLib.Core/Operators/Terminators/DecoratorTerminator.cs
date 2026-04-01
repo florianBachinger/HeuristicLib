@@ -37,3 +37,26 @@ public abstract record DecoratorTerminator<TGenotype, TAlgorithmState, TSearchSp
     }
   }
 }
+
+public abstract record DecoratorTerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>
+  : DecoratorTerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem, NoState>
+  where TAlgorithmState : class, IAlgorithmState
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected DecoratorTerminator(ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem> innerTerminator)
+    : base(innerTerminator)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override bool ShouldTerminate(TAlgorithmState algorithmState, NoState state,
+    ITerminatorInstance<TGenotype, TAlgorithmState, TSearchSpace, TProblem> innerTerminator,
+    TSearchSpace searchSpace, TProblem problem)
+    => ShouldTerminate(algorithmState, innerTerminator, searchSpace, problem);
+
+  protected abstract bool ShouldTerminate(TAlgorithmState algorithmState,
+    ITerminatorInstance<TGenotype, TAlgorithmState, TSearchSpace, TProblem> innerTerminator,
+    TSearchSpace searchSpace, TProblem problem);
+}

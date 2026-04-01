@@ -8,7 +8,7 @@ namespace HEAL.HeuristicLib.Operators.Crossovers;
 
 [Equatable]
 public partial record ChooseOneCrossover<TGenotype, TSearchSpace, TProblem>
-  : CompositeCrossover<TGenotype, TSearchSpace, TProblem, NoState>
+  : CompositeCrossover<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
@@ -36,11 +36,8 @@ public partial record ChooseOneCrossover<TGenotype, TSearchSpace, TProblem>
 	  Weights = dispatcher.Weights;
   }
 
-  protected override NoState CreateInitialState() => NoState.Instance;
-
   protected override IReadOnlyList<TGenotype> Cross(
 	  IReadOnlyList<IParents<TGenotype>> parents,
-	  NoState _,
 	  IReadOnlyList<ICrossoverInstance<TGenotype, TSearchSpace, TProblem>> innerCrossovers,
 	  IRandomNumberGenerator random,
 	  TSearchSpace searchSpace,

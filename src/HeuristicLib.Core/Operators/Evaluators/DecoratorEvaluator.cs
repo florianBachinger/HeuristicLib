@@ -37,3 +37,25 @@ public abstract record DecoratorEvaluator<TGenotype, TSearchSpace, TProblem, TSt
     }
   }
 }
+
+public abstract record DecoratorEvaluator<TGenotype, TSearchSpace, TProblem>
+  : DecoratorEvaluator<TGenotype, TSearchSpace, TProblem, NoState>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected DecoratorEvaluator(IEvaluator<TGenotype, TSearchSpace, TProblem> innerEvaluator)
+    : base(innerEvaluator)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes, NoState state,
+    IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> innerEvaluator, IRandomNumberGenerator random,
+    TSearchSpace searchSpace, TProblem problem)
+    => Evaluate(genotypes, innerEvaluator, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes,
+    IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> innerEvaluator, IRandomNumberGenerator random,
+    TSearchSpace searchSpace, TProblem problem);
+}

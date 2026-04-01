@@ -38,3 +38,27 @@ public abstract record DecoratorReplacer<TGenotype, TSearchSpace, TProblem, TSta
     }
   }
 }
+
+public abstract record DecoratorReplacer<TGenotype, TSearchSpace, TProblem>
+  : DecoratorReplacer<TGenotype, TSearchSpace, TProblem, NoState>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected DecoratorReplacer(IReplacer<TGenotype, TSearchSpace, TProblem> innerReplacer)
+    : base(innerReplacer)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<ISolution<TGenotype>> Replace(IReadOnlyList<ISolution<TGenotype>> previousPopulation,
+    IReadOnlyList<ISolution<TGenotype>> offspringPopulation, Objective objective, int count, NoState state,
+    IReplacerInstance<TGenotype, TSearchSpace, TProblem> innerReplacer, IRandomNumberGenerator random,
+    TSearchSpace searchSpace, TProblem problem)
+    => Replace(previousPopulation, offspringPopulation, objective, count, innerReplacer, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<ISolution<TGenotype>> Replace(IReadOnlyList<ISolution<TGenotype>> previousPopulation,
+    IReadOnlyList<ISolution<TGenotype>> offspringPopulation, Objective objective, int count,
+    IReplacerInstance<TGenotype, TSearchSpace, TProblem> innerReplacer, IRandomNumberGenerator random,
+    TSearchSpace searchSpace, TProblem problem);
+}

@@ -1,5 +1,4 @@
-﻿using HEAL.HeuristicLib.Execution;
-using HEAL.HeuristicLib.Optimization;
+﻿using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -8,7 +7,7 @@ namespace HEAL.HeuristicLib.Operators.Selectors;
 
 // ToDo: If we assume that a selector cannot select the whole requested number of solutions, the EliteSelector could simply be a PipelineSelector with a BestSelector and then another selector for the remaining.
 public record EliteSelector<TGenotype, TSearchSpace, TProblem>
-  : DecoratorSelector<TGenotype, TSearchSpace, TProblem, NoState>
+  : DecoratorSelector<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
@@ -22,10 +21,8 @@ public record EliteSelector<TGenotype, TSearchSpace, TProblem>
     this.elites = elites;
   }
 
-  protected override NoState CreateInitialState() => NoState.Instance;
-
   protected override IReadOnlyList<ISolution<TGenotype>> Select(IReadOnlyList<ISolution<TGenotype>> population,
-    Objective objective, int count, NoState _, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selectorForRemaining,
+    Objective objective, int count, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selectorForRemaining,
     IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
   {
     var selectedElites = BestSelector.Select(population, objective, this.elites, random);

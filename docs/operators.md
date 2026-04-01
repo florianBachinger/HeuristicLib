@@ -89,10 +89,14 @@ Use this checklist:
 5. **If the operator wraps exactly one inner operator of the same role, use `Decorator*`**
    - Examples: `DecoratorEvaluator`, `DecoratorMutator`, `DecoratorSelector`, ...
    - Typical use cases: caching, limiting, adding elites before delegating, prepending predefined solutions.
+   - If the wrapper does **not** need its own extra execution state, prefer the lower-arity `Decorator*<...>` base.
+   - If it does need mutable per-run wrapper state, use the `Decorator*<..., TState>` form.
 
 6. **If the operator combines several inner operators of the same role, use `Composite*`**
    - Examples: `CompositeMutator`, `CompositeCrossover`, `CompositeTerminator`, ...
    - Typical use cases: pipelines, weighted choice among operators, AND/OR combinations of terminators.
+   - If the wrapper does **not** need its own extra execution state, prefer the lower-arity `Composite*<...>` base.
+   - If it does need mutable per-run wrapper state, use the `Composite*<..., TState>` form.
 
 7. **If none of the convenience bases fit, implement the operator contract directly**
    - This is the fallback when you need full control over instancing or execution behavior.
@@ -104,8 +108,8 @@ Use this checklist:
 - plain stateless batch operator -> `Stateless*`
 - plain stateless per-item operator -> `SingleSolution*`
 - operator with mutable execution state -> `Stateful*`
-- operator that wraps one operator -> `Decorator*`
-- operator that coordinates several operators -> `Composite*`
+- operator that wraps one operator -> `Decorator*` (`Decorator*<...>` without extra state, `Decorator*<..., TState>` with extra state)
+- operator that coordinates several operators -> `Composite*` (`Composite*<...>` without extra state, `Composite*<..., TState>` with extra state)
 - full custom behavior -> implement the contract directly and handle execution instances yourself
 
 ## Next

@@ -37,3 +37,25 @@ public abstract record DecoratorSelector<TGenotype, TSearchSpace, TProblem, TSta
     }
   }
 }
+
+public abstract record DecoratorSelector<TGenotype, TSearchSpace, TProblem>
+  : DecoratorSelector<TGenotype, TSearchSpace, TProblem, NoState>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected DecoratorSelector(ISelector<TGenotype, TSearchSpace, TProblem> innerSelector)
+    : base(innerSelector)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<ISolution<TGenotype>> Select(IReadOnlyList<ISolution<TGenotype>> population,
+    Objective objective, int count, NoState state, ISelectorInstance<TGenotype, TSearchSpace, TProblem> innerSelector,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+    => Select(population, objective, count, innerSelector, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<ISolution<TGenotype>> Select(IReadOnlyList<ISolution<TGenotype>> population,
+    Objective objective, int count, ISelectorInstance<TGenotype, TSearchSpace, TProblem> innerSelector,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
+}

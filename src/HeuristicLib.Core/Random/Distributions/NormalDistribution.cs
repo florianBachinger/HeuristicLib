@@ -1,6 +1,4 @@
-﻿using HEAL.HeuristicLib.Genotypes.Vectors;
-
-namespace HEAL.HeuristicLib.Random.Distributions;
+﻿namespace HEAL.HeuristicLib.Random.Distributions;
 
 public sealed class NormalDistribution(double mu = 0, double sigma = 1) : IDistribution<double>
 {

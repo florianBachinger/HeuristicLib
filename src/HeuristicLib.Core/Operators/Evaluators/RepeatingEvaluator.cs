@@ -23,7 +23,7 @@ public static class RepeatingEvaluator
 }
 
 public record RepeatingEvaluator<TGenotype, TSearchSpace, TProblem>
-  : DecoratorEvaluator<TGenotype, TSearchSpace, TProblem, NoState>
+  : DecoratorEvaluator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
@@ -37,9 +37,7 @@ public record RepeatingEvaluator<TGenotype, TSearchSpace, TProblem>
     this.aggregator = aggregator;
   }
 
-  protected override NoState CreateInitialState() => NoState.Instance;
-
-  protected override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes, NoState state,
+  protected override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes,
     IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> innerEvaluator, IRandomNumberGenerator random,
     TSearchSpace searchSpace, TProblem problem)
   {
@@ -57,7 +55,7 @@ public record RepeatingEvaluator<TGenotype, TSearchSpace, TProblem>
 }
 
 public record RepeatedEvaluator<TGenotype, TSearchSpace, TProblem>
-  : DecoratorEvaluator<TGenotype, TSearchSpace, TProblem, NoState>
+  : DecoratorEvaluator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
@@ -73,9 +71,7 @@ public record RepeatedEvaluator<TGenotype, TSearchSpace, TProblem>
     this.maxDegreeOfParallelism = maxDegreeOfParallelism;
   }
 
-  protected override NoState CreateInitialState() => NoState.Instance;
-
-  protected override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes, NoState state,
+  protected override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes,
     IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> innerEvaluator, IRandomNumberGenerator random,
     TSearchSpace searchSpace, TProblem problem)
   {

@@ -36,3 +36,25 @@ public abstract record DecoratorCrossover<TGenotype, TSearchSpace, TProblem, TSt
     }
   }
 }
+
+public abstract record DecoratorCrossover<TGenotype, TSearchSpace, TProblem>
+  : DecoratorCrossover<TGenotype, TSearchSpace, TProblem, NoState>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected DecoratorCrossover(ICrossover<TGenotype, TSearchSpace, TProblem> innerCrossover)
+    : base(innerCrossover)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<TGenotype> Cross(IReadOnlyList<IParents<TGenotype>> parents, NoState state,
+    ICrossoverInstance<TGenotype, TSearchSpace, TProblem> innerCrossover, IRandomNumberGenerator random,
+    TSearchSpace searchSpace, TProblem problem)
+    => Cross(parents, innerCrossover, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<TGenotype> Cross(IReadOnlyList<IParents<TGenotype>> parents,
+    ICrossoverInstance<TGenotype, TSearchSpace, TProblem> innerCrossover, IRandomNumberGenerator random,
+    TSearchSpace searchSpace, TProblem problem);
+}

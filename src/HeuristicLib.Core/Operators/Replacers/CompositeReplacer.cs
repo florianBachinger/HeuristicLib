@@ -40,3 +40,27 @@ public abstract partial record CompositeReplacer<TGenotype, TSearchSpace, TProbl
     }
   }
 }
+
+public abstract record CompositeReplacer<TGenotype, TSearchSpace, TProblem>
+  : CompositeReplacer<TGenotype, TSearchSpace, TProblem, NoState>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected CompositeReplacer(ImmutableArray<IReplacer<TGenotype, TSearchSpace, TProblem>> innerReplacers)
+    : base(innerReplacers)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<ISolution<TGenotype>> Replace(IReadOnlyList<ISolution<TGenotype>> previousPopulation,
+    IReadOnlyList<ISolution<TGenotype>> offspringPopulation, Objective objective, int count, NoState state,
+    IReadOnlyList<IReplacerInstance<TGenotype, TSearchSpace, TProblem>> innerReplacers,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+    => Replace(previousPopulation, offspringPopulation, objective, count, innerReplacers, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<ISolution<TGenotype>> Replace(IReadOnlyList<ISolution<TGenotype>> previousPopulation,
+    IReadOnlyList<ISolution<TGenotype>> offspringPopulation, Objective objective, int count,
+    IReadOnlyList<IReplacerInstance<TGenotype, TSearchSpace, TProblem>> innerReplacers,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
+}

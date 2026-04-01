@@ -39,3 +39,26 @@ public abstract partial record CompositeInterceptor<TGenotype, TSearchSpace, TPr
     }
   }
 }
+
+public abstract record CompositeInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState>
+  : CompositeInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState, NoState>
+  where TAlgorithmState : class, IAlgorithmState
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected CompositeInterceptor(ImmutableArray<IInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState>> innerInterceptors)
+    : base(innerInterceptors)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override TAlgorithmState Transform(TAlgorithmState currentState, TAlgorithmState? previousState,
+    NoState state, IReadOnlyList<IInterceptorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState>> innerInterceptors,
+    TSearchSpace searchSpace, TProblem problem)
+    => Transform(currentState, previousState, innerInterceptors, searchSpace, problem);
+
+  protected abstract TAlgorithmState Transform(TAlgorithmState currentState, TAlgorithmState? previousState,
+    IReadOnlyList<IInterceptorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState>> innerInterceptors,
+    TSearchSpace searchSpace, TProblem problem);
+}

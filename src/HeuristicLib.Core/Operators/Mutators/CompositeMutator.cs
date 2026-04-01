@@ -34,3 +34,24 @@ public abstract partial record CompositeMutator<TG, TS, TP, TState>
       => compositeMutator.Mutate(parents, state, innerMutators, random, searchSpace, problem);
   }
 }
+
+public abstract record CompositeMutator<TG, TS, TP>
+  : CompositeMutator<TG, TS, TP, NoState>
+  where TS : class, ISearchSpace<TG>
+  where TP : class, IProblem<TG, TS>
+{
+  protected CompositeMutator(ImmutableArray<IMutator<TG, TS, TP>> innerMutators)
+    : base(innerMutators)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents, NoState state,
+    IReadOnlyList<IMutatorInstance<TG, TS, TP>> innerMutators, IRandomNumberGenerator random, TS searchSpace, TP problem)
+    => Mutate(parents, innerMutators, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents,
+    IReadOnlyList<IMutatorInstance<TG, TS, TP>> innerMutators, IRandomNumberGenerator random, TS searchSpace,
+    TP problem);
+}

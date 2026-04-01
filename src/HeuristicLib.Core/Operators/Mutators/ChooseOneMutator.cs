@@ -1,5 +1,4 @@
 ﻿using Generator.Equals;
-using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -8,7 +7,7 @@ namespace HEAL.HeuristicLib.Operators.Mutators;
 
 [Equatable]
 public partial record ChooseOneMutator<TGenotype, TSearchSpace, TProblem>
-  : CompositeMutator<TGenotype, TSearchSpace, TProblem, NoState>
+  : CompositeMutator<TGenotype, TSearchSpace, TProblem>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
@@ -36,9 +35,9 @@ public partial record ChooseOneMutator<TGenotype, TSearchSpace, TProblem>
     Weights = dispatcher.Weights;
   }
 
-  protected override NoState CreateInitialState() => NoState.Instance;
-
-  protected override IReadOnlyList<TGenotype> Mutate(IReadOnlyList<TGenotype> parents, NoState _, IReadOnlyList<IMutatorInstance<TGenotype, TSearchSpace, TProblem>> innerMutators, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+  protected override IReadOnlyList<TGenotype> Mutate(IReadOnlyList<TGenotype> parents,
+    IReadOnlyList<IMutatorInstance<TGenotype, TSearchSpace, TProblem>> innerMutators,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
   {
     return dispatcher.Dispatch(parents, innerMutators, random, (mutator, batchParents) => mutator.Mutate(batchParents, random, searchSpace, problem));
   }

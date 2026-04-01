@@ -40,3 +40,26 @@ public abstract partial record CompositeTerminator<TGenotype, TAlgorithmState, T
     }
   }
 }
+
+public abstract record CompositeTerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>
+  : CompositeTerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem, NoState>
+  where TAlgorithmState : class, IAlgorithmState
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected CompositeTerminator(ImmutableArray<ITerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> innerTerminators)
+    : base(innerTerminators)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override bool ShouldTerminate(TAlgorithmState algorithmState, NoState state,
+    IReadOnlyList<ITerminatorInstance<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> innerTerminators,
+    TSearchSpace searchSpace, TProblem problem)
+    => ShouldTerminate(algorithmState, innerTerminators, searchSpace, problem);
+
+  protected abstract bool ShouldTerminate(TAlgorithmState algorithmState,
+    IReadOnlyList<ITerminatorInstance<TGenotype, TAlgorithmState, TSearchSpace, TProblem>> innerTerminators,
+    TSearchSpace searchSpace, TProblem problem);
+}

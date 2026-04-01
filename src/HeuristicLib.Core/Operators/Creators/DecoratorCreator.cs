@@ -34,3 +34,24 @@ public abstract record DecoratorCreator<TG, TS, TP, TState>
     }
   }
 }
+
+public abstract record DecoratorCreator<TG, TS, TP>
+  : DecoratorCreator<TG, TS, TP, NoState>
+  where TS : class, ISearchSpace<TG>
+  where TP : class, IProblem<TG, TS>
+{
+  protected DecoratorCreator(ICreator<TG, TS, TP> innerCreator)
+    : base(innerCreator)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<TG> Create(int count, NoState state,
+    ICreatorInstance<TG, TS, TP> innerCreator, IRandomNumberGenerator random, TS searchSpace, TP problem)
+    => Create(count, innerCreator, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<TG> Create(int count, ICreatorInstance<TG, TS, TP> innerCreator,
+    IRandomNumberGenerator random, TS searchSpace, TP problem);
+}
+

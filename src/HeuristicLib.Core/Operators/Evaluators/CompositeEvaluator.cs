@@ -39,3 +39,25 @@ public abstract partial record CompositeEvaluator<TGenotype, TSearchSpace, TProb
     }
   }
 }
+
+public abstract record CompositeEvaluator<TGenotype, TSearchSpace, TProblem>
+  : CompositeEvaluator<TGenotype, TSearchSpace, TProblem, NoState>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected CompositeEvaluator(ImmutableArray<IEvaluator<TGenotype, TSearchSpace, TProblem>> innerEvaluators)
+    : base(innerEvaluators)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes, NoState state,
+    IReadOnlyList<IEvaluatorInstance<TGenotype, TSearchSpace, TProblem>> innerEvaluators,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+    => Evaluate(genotypes, innerEvaluators, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<ObjectiveVector> Evaluate(IReadOnlyList<TGenotype> genotypes,
+    IReadOnlyList<IEvaluatorInstance<TGenotype, TSearchSpace, TProblem>> innerEvaluators,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
+}

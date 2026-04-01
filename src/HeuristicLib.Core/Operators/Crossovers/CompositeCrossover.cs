@@ -37,3 +37,25 @@ public abstract partial record CompositeCrossover<TGenotype, TSearchSpace, TProb
     }
   }
 }
+
+public abstract record CompositeCrossover<TGenotype, TSearchSpace, TProblem>
+  : CompositeCrossover<TGenotype, TSearchSpace, TProblem, NoState>
+  where TSearchSpace : class, ISearchSpace<TGenotype>
+  where TProblem : class, IProblem<TGenotype, TSearchSpace>
+{
+  protected CompositeCrossover(ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> innerCrossovers)
+    : base(innerCrossovers)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<TGenotype> Cross(IReadOnlyList<IParents<TGenotype>> parents, NoState state,
+    IReadOnlyList<ICrossoverInstance<TGenotype, TSearchSpace, TProblem>> innerCrossovers,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
+    => Cross(parents, innerCrossovers, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<TGenotype> Cross(IReadOnlyList<IParents<TGenotype>> parents,
+    IReadOnlyList<ICrossoverInstance<TGenotype, TSearchSpace, TProblem>> innerCrossovers,
+    IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
+}

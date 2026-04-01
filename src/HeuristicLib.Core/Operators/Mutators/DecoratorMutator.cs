@@ -32,3 +32,23 @@ public abstract record DecoratorMutator<TG, TS, TP, TState>
       => decoratorMutator.Mutate(parents, state, innerMutator, random, searchSpace, problem);
   }
 }
+
+public abstract record DecoratorMutator<TG, TS, TP>
+  : DecoratorMutator<TG, TS, TP, NoState>
+  where TS : class, ISearchSpace<TG>
+  where TP : class, IProblem<TG, TS>
+{
+  protected DecoratorMutator(IMutator<TG, TS, TP> innerMutator)
+    : base(innerMutator)
+  {
+  }
+
+  protected sealed override NoState CreateInitialState() => NoState.Instance;
+
+  protected sealed override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents, NoState state,
+    IMutatorInstance<TG, TS, TP> innerMutator, IRandomNumberGenerator random, TS searchSpace, TP problem)
+    => Mutate(parents, innerMutator, random, searchSpace, problem);
+
+  protected abstract IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents, IMutatorInstance<TG, TS, TP> innerMutator,
+    IRandomNumberGenerator random, TS searchSpace, TP problem);
+}
