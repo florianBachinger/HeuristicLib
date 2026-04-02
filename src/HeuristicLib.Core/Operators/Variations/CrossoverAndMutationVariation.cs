@@ -30,11 +30,12 @@ public class CrossoverAndMutationVariation<TGenotype, TSearchSpace, TProblem>
   {
     public IReadOnlyList<TGenotype> Alter(IReadOnlyList<TGenotype> parent, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
     {
-      if (parent.Count % 2 != 0) throw new ArgumentException("Crossover requires an even number of parents.", nameof(parent));
+      if (parent.Count % 2 != 0)
+        throw new ArgumentException("Crossover requires an even number of parents.", nameof(parent));
 
       var parentPairs = parent.ToParentPairs();
       var offspring = crossoverInstance.Cross(parentPairs, random, searchSpace, problem);
-      
+
       return mutatorInstance.Mutate(offspring, random, searchSpace, problem);
     }
   }

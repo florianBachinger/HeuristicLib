@@ -1,12 +1,10 @@
-using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
 
-namespace HEAL.HeuristicLib.Analyzers;
+namespace HEAL.HeuristicLib.Analysis;
 
 public class BestMedianWorstPerEvaluationAnalysis<TGenotype, TSearchSpace, TProblem>
   : IAnalyzer<BestMedianWorstPerEvaluationAnalysis<TGenotype, TSearchSpace, TProblem>.State>
@@ -24,10 +22,10 @@ public class BestMedianWorstPerEvaluationAnalysis<TGenotype, TSearchSpace, TProb
     Interceptor = interceptor;
   }
 
-  public State CreateAnalyzerState(Run run) => new(run, this);
+  public State CreateAnalyzerState() => new(this);
 
-  public sealed class State(Run run, BestMedianWorstPerEvaluationAnalysis<TGenotype, TSearchSpace, TProblem> analyzer)
-    : AnalyzerRunState<BestMedianWorstPerEvaluationAnalysis<TGenotype, TSearchSpace, TProblem>>(run, analyzer)
+  public sealed class State(BestMedianWorstPerEvaluationAnalysis<TGenotype, TSearchSpace, TProblem> analyzer)
+    : AnalyzerRunState<BestMedianWorstPerEvaluationAnalysis<TGenotype, TSearchSpace, TProblem>>(analyzer)
   {
     private int currentEvaluationsCount;
     private readonly List<(int evaluations, BestMedianWorstEntry<TGenotype> entry)> bestSolutions = [];
@@ -40,12 +38,12 @@ public class BestMedianWorstPerEvaluationAnalysis<TGenotype, TSearchSpace, TProb
       observationRegistry.Add(Analyzer.Interceptor, AfterInterception);
     }
 
-    public void AfterEvaluation(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> objectiveVectors, TSearchSpace searchSpace, TProblem problem)
+    private void AfterEvaluation(IReadOnlyList<TGenotype> genotypes, IReadOnlyList<ObjectiveVector> objectiveVectors, TSearchSpace searchSpace, TProblem problem)
     {
       currentEvaluationsCount += genotypes.Count;
     }
 
-    public void AfterInterception(PopulationState<TGenotype> newState, PopulationState<TGenotype> currentState, PopulationState<TGenotype>? previousState, TSearchSpace searchSpace, TProblem problem)
+    private void AfterInterception(PopulationState<TGenotype> newState, PopulationState<TGenotype> currentState, PopulationState<TGenotype>? previousState, TSearchSpace searchSpace, TProblem problem)
     {
       if (currentState.Population.Solutions.Length == 0) {
         throw new InvalidOperationException("Population is empty, cannot determine best/median/worst solution.");

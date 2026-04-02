@@ -12,21 +12,21 @@ public abstract record DecoratorTerminator<TGenotype, TAlgorithmState, TSearchSp
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   protected ITerminator<TGenotype, TSearchSpace, TProblem, TAlgorithmState> InnerTerminator { get; }
-  
+
   protected DecoratorTerminator(ITerminator<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerTerminator)
   {
     InnerTerminator = innerTerminator;
   }
-  
+
   public ITerminatorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new Instance(this, instanceRegistry.Resolve(InnerTerminator), CreateInitialState());
-  
+
   protected abstract TState CreateInitialState();
-  
+
   protected abstract bool ShouldTerminate(TAlgorithmState algorithmState, TState state,
     ITerminatorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerTerminator,
     TSearchSpace searchSpace, TProblem problem);
-  
+
   private sealed class Instance(DecoratorTerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem, TState> decorator,
     ITerminatorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerTerminator, TState terminatorState)
     : ITerminatorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState>

@@ -1,7 +1,5 @@
-﻿using System.Collections.Immutable;
-using Generator.Equals;
+﻿using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -17,15 +15,15 @@ public partial record ObservableEvaluator<TG, TS, TP>
 {
   [OrderedEquality]
   public ImmutableArray<IEvaluatorObserver<TG, TS, TP>> Observers { get; }
-  
+
   public ObservableEvaluator(IEvaluator<TG, TS, TP> evaluator, ImmutableArray<IEvaluatorObserver<TG, TS, TP>> observers)
     : base(evaluator)
   {
     Observers = observers;
   }
-  
+
   public ObservableEvaluator(IEvaluator<TG, TS, TP> evaluator, params IEnumerable<IEvaluatorObserver<TG, TS, TP>> observers)
-    : this(evaluator, [..observers])
+    : this(evaluator, [.. observers])
   {
   }
 

@@ -13,21 +13,21 @@ public abstract partial record CompositeCrossover<TGenotype, TSearchSpace, TProb
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   [OrderedEquality] protected ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> InnerCrossovers { get; }
-  
+
   protected CompositeCrossover(ImmutableArray<ICrossover<TGenotype, TSearchSpace, TProblem>> innerCrossovers)
   {
     InnerCrossovers = innerCrossovers;
   }
-  
+
   public ICrossoverInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new Instance(this, InnerCrossovers.Select(instanceRegistry.Resolve).ToArray(), CreateInitialState());
-  
+
   protected abstract TState CreateInitialState();
-  
+
   protected abstract IReadOnlyList<TGenotype> Cross(IReadOnlyList<IParents<TGenotype>> parents, TState state,
     IReadOnlyList<ICrossoverInstance<TGenotype, TSearchSpace, TProblem>> innerCrossovers,
     IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
-  
+
   private sealed class Instance(CompositeCrossover<TGenotype, TSearchSpace, TProblem, TState> composite, IReadOnlyList<ICrossoverInstance<TGenotype, TSearchSpace, TProblem>> innerCrossovers, TState state)
     : ICrossoverInstance<TGenotype, TSearchSpace, TProblem>
   {

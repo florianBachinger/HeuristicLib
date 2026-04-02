@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using HEAL.HeuristicLib.Algorithms;
 using HEAL.HeuristicLib.Algorithms.Evolutionary;
 using HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
@@ -56,8 +55,8 @@ public class PythonInterOptEquationScoring(Objective objective, SymbolicExpressi
     var p = new SymbolicRegressionProblem(data,
       symbolicExpressionTreeSearchSpace,
       new PearsonR2Evaluator()
-      // new RootMeanSquaredErrorEvaluator(),
-      // new TreeLengthEvaluator() //... other evaluators
+    // new RootMeanSquaredErrorEvaluator(),
+    // new TreeLengthEvaluator() //... other evaluators
     ) {
       ParameterOptimizationIterations = 5 //this is the effort spent on Parameter-Optimization
     };
@@ -73,8 +72,7 @@ public class PythonInterOptEquationScoring(Objective objective, SymbolicExpressi
 
     return new PythonInterOptEquationScoring(
         objective,
-        symbolicExpressionTreeSearchSpace, myEval)
-      { InnerProblem = p };
+        symbolicExpressionTreeSearchSpace, myEval) { InnerProblem = p };
   }
 
   public static Population<SymbolicExpressionTree> RunDefault(PythonInterOptEquationScoring p, int seed = 42)

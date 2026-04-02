@@ -1,5 +1,4 @@
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
@@ -27,8 +26,8 @@ public class GenealogyAnalysis<T, TS, TP, TR>(
   public IMutator<T, TS, TP>? Mutator { get; } = mutator;
   public IInterceptor<T, TS, TP, TR>? Interceptor { get; } = interceptor;
 
-  public class State(Run run, GenealogyAnalysis<T, TS, TP, TR> analyzer, IEqualityComparer<T>? equality = null, bool saveSpace = false)
-    : AnalyzerRunState<GenealogyAnalysis<T, TS, TP, TR>>(run, analyzer)
+  public class State(GenealogyAnalysis<T, TS, TP, TR> analyzer, IEqualityComparer<T>? equality = null, bool saveSpace = false)
+    : AnalyzerRunState<GenealogyAnalysis<T, TS, TP, TR>>(analyzer)
   {
     public GenealogyGraph<T> Graph { get; } = new(equality ?? EqualityComparer<T>.Default);
 
@@ -68,7 +67,7 @@ public class GenealogyAnalysis<T, TS, TP, TR>(
     }
   }
 
-  public virtual State CreateAnalyzerState(Run run) => new(run, this, equality, saveSpace);
+  public virtual State CreateAnalyzerState() => new(this, equality, saveSpace);
 }
 
 public class RankAnalysis<T, TS, TP, TR>(
@@ -83,8 +82,8 @@ public class RankAnalysis<T, TS, TP, TR>(
   where TR : PopulationState<T>
   where T : notnull
 {
-  public new class State(Run run, RankAnalysis<T, TS, TP, TR> analyzer, IEqualityComparer<T>? equality = null)
-    : GenealogyAnalysis<T, TS, TP, TR>.State(run, analyzer, equality)
+  public new class State(RankAnalysis<T, TS, TP, TR> analyzer, IEqualityComparer<T>? equality = null)
+    : GenealogyAnalysis<T, TS, TP, TR>.State(analyzer, equality)
   {
     public List<List<double>> Ranks { get; } = [];
 
@@ -113,7 +112,7 @@ public class RankAnalysis<T, TS, TP, TR>(
     }
   }
 
-  public new State CreateAnalyzerState(Run run) => new(run, this, equality);
+  public new State CreateAnalyzerState() => new(this, equality);
 
-  IAnalyzerRunState IAnalyzer.CreateAnalyzerState(Run run) => CreateAnalyzerState(run);
+  IAnalyzerRunState IAnalyzer.CreateAnalyzerState() => CreateAnalyzerState();
 }

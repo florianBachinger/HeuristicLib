@@ -1,7 +1,5 @@
-using System.Collections.Immutable;
 using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -17,7 +15,7 @@ public partial record ObservableReplacer<TG, TS, TP>
 {
   [OrderedEquality]
   public ImmutableArray<IReplacerObserver<TG, TS, TP>> Observers { get; }
-  
+
   public ObservableReplacer(IReplacer<TG, TS, TP> replacer, ImmutableArray<IReplacerObserver<TG, TS, TP>> observers)
     : base(replacer)
   {
@@ -25,10 +23,10 @@ public partial record ObservableReplacer<TG, TS, TP>
   }
 
   public ObservableReplacer(IReplacer<TG, TS, TP> replacer, params IEnumerable<IReplacerObserver<TG, TS, TP>> observers)
-    : this(replacer, [..observers])
+    : this(replacer, [.. observers])
   {
   }
-  
+
   protected override IReadOnlyList<ISolution<TG>> Replace(IReadOnlyList<ISolution<TG>> previousPopulation, IReadOnlyList<ISolution<TG>> offspringPopulation, Objective objective, int count, IReplacerInstance<TG, TS, TP> innerReplacer, IRandomNumberGenerator random, TS searchSpace, TP problem)
   {
     var result = innerReplacer.Replace(previousPopulation, offspringPopulation, objective, count, random, searchSpace, problem);

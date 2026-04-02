@@ -750,9 +750,6 @@ public sealed class RealVectorTests
 
     public IRandomNumberGenerator Fork(ulong forkKey) => throw new NotImplementedException();
 
-    public double[] NextDoubles(int length) =>
-      Enumerable.Range(0, length).Select(_ => NextDouble()).ToArray();
-
     // Add the remaining interface members as needed for your codebase,
     // typically throwing NotSupportedException if the tests do not use them.
   }

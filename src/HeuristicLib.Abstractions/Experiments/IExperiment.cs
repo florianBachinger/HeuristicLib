@@ -13,7 +13,6 @@ public interface IExperiment<TGenotype, in TSearchSpace, in TProblem, TAlgorithm
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
   where TAlgorithmState : class, IAlgorithmState
 {
-  
 }
 
 public interface IExperimentInstance<TGenotype, in TSearchSpace, in TProblem, TAlgorithmState, TAlgorithmKey>

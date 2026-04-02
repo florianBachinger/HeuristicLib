@@ -41,7 +41,7 @@ public static class MultiStreamAlgorithmExtensions
     //   return algorithmInstance.RunStreamingAsync(problem, null!, null).Select(kvp => new Run<TGenotype, TSearchSpace, TProblem, TAlgorithmState>(kvp.Key, problem)).ToList();
     // }
 
-    
+
     public IReadOnlyList<KeyValuePair<TAlgorithmKey, IAsyncEnumerable<TAlgorithmState>>> RunStreamingAsync(TProblem problem, IRandomNumberGenerator random, TAlgorithmState? initialState = null, CancellationToken ct = default)
     {
       //var run = new Run<TGenotype, TSearchSpace, TProblem, TAlgorithmState>(algorithm, problem);

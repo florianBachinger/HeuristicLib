@@ -1,16 +1,14 @@
-using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
 
-namespace HEAL.HeuristicLib.Analyzers;
+namespace HEAL.HeuristicLib.Analysis;
 
 public record BestMedianWorstEntry<T>(ISolution<T> Best, ISolution<T> Median, ISolution<T> Worst);
 
-public class BestMedianWorstAnalysis<T, TS, TP, TR> 
+public class BestMedianWorstAnalysis<T, TS, TP, TR>
   : IAnalyzer<BestMedianWorstAnalysis<T, TS, TP, TR>.State>
   where TS : class, ISearchSpace<T>
   where TP : class, IProblem<T, TS>
@@ -23,23 +21,17 @@ public class BestMedianWorstAnalysis<T, TS, TP, TR>
 
   public IInterceptor<T, TS, TP, TR> Interceptor { get; }
 
-  public State CreateAnalyzerState(Run run) => new(Interceptor);
+  public State CreateAnalyzerState() => new(this);
 
-  public sealed class State : AnalyzerRunState
+  public sealed class State(BestMedianWorstAnalysis<T, TS, TP, TR> analyzer)
+    : AnalyzerRunState<BestMedianWorstAnalysis<T, TS, TP, TR>>(analyzer)
   {
-    private readonly IInterceptor<T, TS, TP, TR> interceptor;
-    
     private readonly List<BestMedianWorstEntry<T>> bestSolutions = [];
     public IReadOnlyList<BestMedianWorstEntry<T>> BestSolutions => bestSolutions;
 
-    public State(IInterceptor<T, TS, TP, TR> interceptor)
-    {
-      this.interceptor = interceptor;
-    }
-
     public override void RegisterObservations(IObservationRegistry observationRegistry)
     {
-      observationRegistry.Add(interceptor, AfterInterception);
+      observationRegistry.Add(Analyzer.Interceptor, AfterInterception);
     }
 
     private void AfterInterception(TR newState, TR currentState, TR? previousState, TS searchSpace, TP problem)

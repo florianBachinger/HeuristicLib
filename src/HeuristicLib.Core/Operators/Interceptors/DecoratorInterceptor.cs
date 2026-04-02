@@ -12,21 +12,21 @@ public abstract record DecoratorInterceptor<TGenotype, TSearchSpace, TProblem, T
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   protected IInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState> InnerInterceptor { get; }
-  
+
   protected DecoratorInterceptor(IInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerInterceptor)
   {
     InnerInterceptor = innerInterceptor;
   }
-  
+
   public IInterceptorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new Instance(this, instanceRegistry.Resolve(InnerInterceptor), CreateInitialState());
-  
+
   protected abstract TState CreateInitialState();
-  
+
   protected abstract TAlgorithmState Transform(TAlgorithmState currentState, TAlgorithmState? previousState, TState state,
     IInterceptorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerInterceptor,
     TSearchSpace searchSpace, TProblem problem);
-  
+
   private sealed class Instance(DecoratorInterceptor<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TState> decorator,
     IInterceptorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> innerInterceptor, TState state)
     : IInterceptorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState>

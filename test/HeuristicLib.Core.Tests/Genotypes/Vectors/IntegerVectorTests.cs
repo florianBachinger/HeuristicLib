@@ -439,6 +439,5 @@ public sealed class IntegerVectorTests
     public IRandomNumberGenerator Fork(ulong forkKey) => throw new NotImplementedException();
 
     public double NextDouble() => throw new NotSupportedException();
-    public void Reset() => throw new NotSupportedException();
   }
 }

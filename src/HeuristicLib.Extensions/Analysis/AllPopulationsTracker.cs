@@ -1,12 +1,10 @@
-using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
 
-namespace HEAL.HeuristicLib.Analyzers;
+namespace HEAL.HeuristicLib.Analysis;
 
 public class AllPopulationsTracker<T, TS, TP, TR>(IInterceptor<T, TS, TP, TR> interceptor)
   : IAnalyzer<AllPopulationsTracker<T, TS, TP, TR>.State>
@@ -16,10 +14,10 @@ public class AllPopulationsTracker<T, TS, TP, TR>(IInterceptor<T, TS, TP, TR> in
 {
   public IInterceptor<T, TS, TP, TR> Interceptor { get; } = interceptor;
 
-  public State CreateAnalyzerState(Run run) => new(run, this);
+  public State CreateAnalyzerState() => new(this);
 
-  public sealed class State(Run run, AllPopulationsTracker<T, TS, TP, TR> analyzer)
-    : AnalyzerRunState<AllPopulationsTracker<T, TS, TP, TR>>(run, analyzer)
+  public sealed class State(AllPopulationsTracker<T, TS, TP, TR> analyzer)
+    : AnalyzerRunState<AllPopulationsTracker<T, TS, TP, TR>>(analyzer)
   {
     private readonly List<ISolution<T>[]> allSolutions = [];
 

@@ -1,7 +1,5 @@
-using System.Collections.Immutable;
 using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -17,15 +15,15 @@ public partial record ObservableCrossover<TG, TS, TP>
 {
   [OrderedEquality]
   public ImmutableArray<ICrossoverObserver<TG, TS, TP>> Observers { get; }
-  
+
   public ObservableCrossover(ICrossover<TG, TS, TP> crossover, ImmutableArray<ICrossoverObserver<TG, TS, TP>> observers)
-    : base(crossover) 
+    : base(crossover)
   {
     Observers = observers;
   }
-  
+
   public ObservableCrossover(ICrossover<TG, TS, TP> crossover, params IEnumerable<ICrossoverObserver<TG, TS, TP>> observers)
-    : this(crossover, [.. observers]) 
+    : this(crossover, [.. observers])
   {
   }
 

@@ -1,7 +1,7 @@
-﻿using HEAL.HeuristicLib.Optimization;
-using HEAL.HeuristicLib.Operators.Crossovers;
+﻿using HEAL.HeuristicLib.Operators.Crossovers;
 using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Operators.Mutators;
+using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.States;
@@ -155,7 +155,8 @@ public class ChooseOneOperatorTests
 
     public double NextDouble()
     {
-      if (doubles.Count == 0) throw new InvalidOperationException("No more predefined doubles are available.");
+      if (doubles.Count == 0)
+        throw new InvalidOperationException("No more predefined doubles are available.");
       return doubles.Dequeue();
     }
 

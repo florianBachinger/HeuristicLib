@@ -1,6 +1,5 @@
 using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -15,7 +14,7 @@ public partial record ObservableCreator<TG, TS, TP>
 {
   [OrderedEquality]
   public ImmutableArray<ICreatorObserver<TG, TS, TP>> Observers { get; }
-  
+
   public ObservableCreator(ICreator<TG, TS, TP> creator, ImmutableArray<ICreatorObserver<TG, TS, TP>> observers)
     : base(creator)
   {

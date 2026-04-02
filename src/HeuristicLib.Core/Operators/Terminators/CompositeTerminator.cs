@@ -14,21 +14,21 @@ public abstract partial record CompositeTerminator<TGenotype, TAlgorithmState, T
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   [OrderedEquality] protected ImmutableArray<ITerminator<TGenotype, TSearchSpace, TProblem, TAlgorithmState>> InnerTerminators { get; }
-  
+
   protected CompositeTerminator(ImmutableArray<ITerminator<TGenotype, TSearchSpace, TProblem, TAlgorithmState>> innerTerminators)
   {
     InnerTerminators = innerTerminators;
   }
-  
+
   public ITerminatorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new Instance(this, InnerTerminators.Select(instanceRegistry.Resolve).ToArray(), CreateInitialState());
-  
+
   protected abstract TState CreateInitialState();
-  
+
   protected abstract bool ShouldTerminate(TAlgorithmState algorithmState, TState state,
     IReadOnlyList<ITerminatorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState>> innerTerminators,
     TSearchSpace searchSpace, TProblem problem);
-  
+
   private sealed class Instance(CompositeTerminator<TGenotype, TAlgorithmState, TSearchSpace, TProblem, TState> composite,
     IReadOnlyList<ITerminatorInstance<TGenotype, TSearchSpace, TProblem, TAlgorithmState>> innerTerminators,
     TState terminatorState)

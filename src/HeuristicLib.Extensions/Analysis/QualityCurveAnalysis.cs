@@ -1,11 +1,9 @@
-using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 
-namespace HEAL.HeuristicLib.Analyzers;
+namespace HEAL.HeuristicLib.Analysis;
 
 public class QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>(IEvaluator<TGenotype, TSearchSpace, TProblem> evaluator)
   : IAnalyzer<QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>.State>
@@ -14,10 +12,10 @@ public class QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>(IEvaluator<
 {
   public IEvaluator<TGenotype, TSearchSpace, TProblem> Evaluator { get; } = evaluator;
 
-  public State CreateAnalyzerState(Run run) => new(run, this);
+  public State CreateAnalyzerState() => new(this);
 
-  public sealed class State(Run run, QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem> analyzer)
-    : AnalyzerRunState<QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>>(run, analyzer)
+  public sealed class State(QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem> analyzer)
+    : AnalyzerRunState<QualityCurveAnalysis<TGenotype, TSearchSpace, TProblem>>(analyzer)
   {
     private readonly List<(ISolution<TGenotype> best, int evalCount)> currentState = [];
     private ISolution<TGenotype>? best;

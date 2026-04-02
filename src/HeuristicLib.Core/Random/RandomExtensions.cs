@@ -9,7 +9,7 @@ public static class RandomExtensions
     public int NextInt(int low, int high, bool inclusiveHigh = false)
     {
       var range = checked(high - low + (inclusiveHigh ? 1 : 0));
-      ;
+
       if (range <= 0)
         throw new ArgumentOutOfRangeException(nameof(high));
 

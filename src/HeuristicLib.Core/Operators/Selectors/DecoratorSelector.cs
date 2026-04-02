@@ -12,21 +12,21 @@ public abstract record DecoratorSelector<TGenotype, TSearchSpace, TProblem, TSta
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   protected ISelector<TGenotype, TSearchSpace, TProblem> InnerSelector { get; }
-  
+
   protected DecoratorSelector(ISelector<TGenotype, TSearchSpace, TProblem> innerSelector)
   {
     InnerSelector = innerSelector;
   }
-  
+
   public ISelectorInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new Instance(this, instanceRegistry.Resolve(InnerSelector), CreateInitialState());
-  
+
   protected abstract TState CreateInitialState();
-  
+
   protected abstract IReadOnlyList<ISolution<TGenotype>> Select(IReadOnlyList<ISolution<TGenotype>> population,
     Objective objective, int count, TState state, ISelectorInstance<TGenotype, TSearchSpace, TProblem> selectorForRemaining,
     IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
-  
+
   private sealed class Instance(DecoratorSelector<TGenotype, TSearchSpace, TProblem, TState> decorator,
     ISelectorInstance<TGenotype, TSearchSpace, TProblem> innerSelector, TState state)
     : ISelectorInstance<TGenotype, TSearchSpace, TProblem>

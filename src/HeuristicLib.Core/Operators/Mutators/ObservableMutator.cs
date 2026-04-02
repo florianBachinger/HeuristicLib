@@ -1,7 +1,5 @@
-using System.Collections.Immutable;
 using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
@@ -16,19 +14,20 @@ public partial record ObservableMutator<TG, TS, TP>
 {
   [OrderedEquality]
   public ImmutableArray<IMutatorObserver<TG, TS, TP>> Observers { get; }
-  
+
   public ObservableMutator(IMutator<TG, TS, TP> mutator, ImmutableArray<IMutatorObserver<TG, TS, TP>> observers)
     : base(mutator)
   {
     Observers = observers;
   }
-  
+
   public ObservableMutator(IMutator<TG, TS, TP> mutator, params IEnumerable<IMutatorObserver<TG, TS, TP>> observers)
-    : this(mutator, [..observers])
+    : this(mutator, [.. observers])
   {
   }
-  
-  protected override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents, IMutatorInstance<TG, TS, TP> innerMutator, IRandomNumberGenerator random, TS searchSpace, TP problem) {
+
+  protected override IReadOnlyList<TG> Mutate(IReadOnlyList<TG> parents, IMutatorInstance<TG, TS, TP> innerMutator, IRandomNumberGenerator random, TS searchSpace, TP problem)
+  {
     var result = innerMutator.Mutate(parents, random, searchSpace, problem);
     foreach (var observer in Observers) {
       observer.AfterMutate(result, parents, searchSpace, problem);

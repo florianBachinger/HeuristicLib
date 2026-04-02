@@ -14,15 +14,15 @@ public abstract class Run
 
   private readonly ObservationRegistry observationRegistry = new();
 
-  protected readonly IDictionary<IAnalyzer, IAnalyzerRunState> AnalyzerStates;
+  private readonly Dictionary<IAnalyzer, IAnalyzerRunState> analyzerStates;
 
   protected Run(IReadOnlyList<IAnalyzer>? analyzers = null)
   {
-    AnalyzerStates = new Dictionary<IAnalyzer, IAnalyzerRunState>(ReferenceEqualityComparer.Instance);
+    analyzerStates = new Dictionary<IAnalyzer, IAnalyzerRunState>(ReferenceEqualityComparer.Instance);
 
     foreach (var analyzer in analyzers ?? []) {
-      var analyzerState = analyzer.CreateAnalyzerState(this);
-      AnalyzerStates.Add(analyzer, analyzerState);
+      var analyzerState = analyzer.CreateAnalyzerState();
+      analyzerStates.Add(analyzer, analyzerState);
       analyzerState.RegisterObservations(observationRegistry);
     }
 
@@ -57,7 +57,7 @@ public abstract class Run
   public TAnalyzerRunState GetAnalyzerResult<TAnalyzerRunState>(IAnalyzer<TAnalyzerRunState> analyzer)
     where TAnalyzerRunState : class, IAnalyzerRunState
   {
-    if (AnalyzerStates.TryGetValue(analyzer, out var state)) {
+    if (analyzerStates.TryGetValue(analyzer, out var state)) {
       return (TAnalyzerRunState)state;
     }
 
@@ -67,7 +67,7 @@ public abstract class Run
   public bool TryGetAnalyzerResult<TAnalyzerRunState>(IAnalyzer<TAnalyzerRunState> analyzer, out TAnalyzerRunState? analyzerRunState)
     where TAnalyzerRunState : class, IAnalyzerRunState
   {
-    if (AnalyzerStates.TryGetValue(analyzer, out var state)) {
+    if (analyzerStates.TryGetValue(analyzer, out var state)) {
       analyzerRunState = (TAnalyzerRunState)state;
       return true;
     }

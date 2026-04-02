@@ -2,19 +2,18 @@ using HEAL.HeuristicLib.Algorithms;
 using HEAL.HeuristicLib.Algorithms.Evolutionary;
 using HEAL.HeuristicLib.Algorithms.LocalSearch;
 using HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
-using HEAL.HeuristicLib.Analyzers;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.GenealogyAnalysis;
 using HEAL.HeuristicLib.Genotypes.Trees;
 using HEAL.HeuristicLib.Genotypes.Vectors;
+using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Creators.PermutationCreators;
 using HEAL.HeuristicLib.Operators.Creators.RealVectorCreators;
 using HEAL.HeuristicLib.Operators.Creators.SymbolicExpressionTreeCreators;
 using HEAL.HeuristicLib.Operators.Crossovers.PermutationCrossovers;
 using HEAL.HeuristicLib.Operators.Crossovers.RealVectorCrossovers;
 using HEAL.HeuristicLib.Operators.Crossovers.SymbolicExpressionTreeCrossovers;
-using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Operators.Mutators;
 using HEAL.HeuristicLib.Operators.Mutators.PermutationMutators;
@@ -127,53 +126,53 @@ public class PythonGenealogyAnalysis
 
     switch (parameters.AlgorithmName.ToLower()) {
       case "ga": {
-        var ga = GeneticAlgorithm.GetBuilder(parameters.Creator!, parameters.Crossover!, parameters.Mutator!);
-        ga.PopulationSize = parameters.PopulationSize;
-        ga.MutationRate = parameters.MutationRate;
-        ga.Elites = parameters.Elites;
-        if (parameters.Selector != null) {
-          ga.Selector = parameters.Selector;
-        }
+          var ga = GeneticAlgorithm.GetBuilder(parameters.Creator!, parameters.Crossover!, parameters.Mutator!);
+          ga.PopulationSize = parameters.PopulationSize;
+          ga.MutationRate = parameters.MutationRate;
+          ga.Elites = parameters.Elites;
+          if (parameters.Selector != null) {
+            ga.Selector = parameters.Selector;
+          }
 
-        var gaAlgorithm = ga.Build();
-        if (callback is not null && gaAlgorithm.Interceptor is null) {
-          gaAlgorithm = gaAlgorithm with {
-            Interceptor = new IdentityInterceptor<T, PopulationState<T>>()
-          };
-        }
+          var gaAlgorithm = ga.Build();
+          if (callback is not null && gaAlgorithm.Interceptor is null) {
+            gaAlgorithm = gaAlgorithm with {
+              Interceptor = new IdentityInterceptor<T, PopulationState<T>>()
+            };
+          }
 
-        var analyzers = CreateAnalyzers(gaAlgorithm, parameters);
-        var gaRun = gaAlgorithm.WithMaxIterations(parameters.Iterations).CreateRun(problem, GetAnalyzers(analyzers, gaAlgorithm.Interceptor, callback));
-        gaRun.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
-        return analyzers.ToExperimentResult(gaRun);
-      }
+          var analyzers = CreateAnalyzers(gaAlgorithm, parameters);
+          var gaRun = gaAlgorithm.WithMaxIterations(parameters.Iterations).CreateRun(problem, GetAnalyzers(analyzers, gaAlgorithm.Interceptor, callback));
+          gaRun.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
+          return analyzers.ToExperimentResult(gaRun);
+        }
       case "es": {
-        var es = EvolutionStrategy.GetBuilder(parameters.Creator!, parameters.Mutator!);
-        es.PopulationSize = parameters.PopulationSize;
-        es.NumberOfChildren = parameters.NoChildren;
-        es.Strategy = parameters.Strategy;
-        //es.Terminator = terminator;
-        if (parameters.Selector != null) {
-          es.Selector = parameters.Selector;
+          var es = EvolutionStrategy.GetBuilder(parameters.Creator!, parameters.Mutator!);
+          es.PopulationSize = parameters.PopulationSize;
+          es.NumberOfChildren = parameters.NoChildren;
+          es.Strategy = parameters.Strategy;
+          //es.Terminator = terminator;
+          if (parameters.Selector != null) {
+            es.Selector = parameters.Selector;
+          }
+
+          if (parameters.WithCrossover) {
+            es.Crossover = parameters.Crossover;
+          }
+
+          var esAlgorithm = es.Build();
+          if (callback is not null && esAlgorithm.Interceptor is null) {
+            esAlgorithm = esAlgorithm with {
+              Interceptor = new IdentityInterceptor<T, EvolutionStrategyState<T>>()
+            };
+          }
+
+          var analyzers = CreateAnalyzers(esAlgorithm, parameters);
+
+          var esRun = esAlgorithm.WithMaxIterations(parameters.Iterations).CreateRun(problem, GetAnalyzers(analyzers, esAlgorithm.Interceptor, callback));
+          esRun.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
+          return analyzers.ToExperimentResult(esRun);
         }
-
-        if (parameters.WithCrossover) {
-          es.Crossover = parameters.Crossover;
-        }
-
-        var esAlgorithm = es.Build();
-        if (callback is not null && esAlgorithm.Interceptor is null) {
-          esAlgorithm = esAlgorithm with {
-            Interceptor = new IdentityInterceptor<T, EvolutionStrategyState<T>>()
-          };
-        }
-
-        var analyzers = CreateAnalyzers(esAlgorithm, parameters);
-
-        var esRun = esAlgorithm.WithMaxIterations(parameters.Iterations).CreateRun(problem, GetAnalyzers(analyzers, esAlgorithm.Interceptor, callback));
-        esRun.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
-        return analyzers.ToExperimentResult(esRun);
-      }
       case "ls":
         var ls = HillClimber.GetBuilder(parameters.Creator!, parameters.Mutator!);
         ls.BatchSize = ls.MaxNeighbors = parameters.NoChildren;
@@ -183,26 +182,26 @@ public class PythonGenealogyAnalysis
         lsRun.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
         throw new NotSupportedException("Configured experiment result extraction is not implemented for local search in this analyzer pipeline.");
       case "nsga2": {
-        var nsga2 = NSGA2.GetBuilder(parameters.Creator!, parameters.Crossover!, parameters.Mutator!);
-        nsga2.PopulationSize = parameters.PopulationSize;
-        nsga2.MutationRate = parameters.MutationRate;
-        if (parameters.Selector != null) {
-          nsga2.Selector = parameters.Selector;
-        }
+          var nsga2 = NSGA2.GetBuilder(parameters.Creator!, parameters.Crossover!, parameters.Mutator!);
+          nsga2.PopulationSize = parameters.PopulationSize;
+          nsga2.MutationRate = parameters.MutationRate;
+          if (parameters.Selector != null) {
+            nsga2.Selector = parameters.Selector;
+          }
 
-        //nsga2.Terminator = terminator;
-        var nsga2Algorithm = nsga2.Build();
-        if (callback is not null && nsga2Algorithm.Interceptor is null) {
-          nsga2Algorithm = nsga2Algorithm with {
-            Interceptor = new IdentityInterceptor<T, PopulationState<T>>()
-          };
-        }
+          //nsga2.Terminator = terminator;
+          var nsga2Algorithm = nsga2.Build();
+          if (callback is not null && nsga2Algorithm.Interceptor is null) {
+            nsga2Algorithm = nsga2Algorithm with {
+              Interceptor = new IdentityInterceptor<T, PopulationState<T>>()
+            };
+          }
 
-        var analyzers = CreateAnalyzers(nsga2Algorithm, parameters);
-        var nsga2Run = nsga2Algorithm.WithMaxIterations(parameters.Iterations).CreateRun(problem, GetAnalyzers(analyzers, nsga2Algorithm.Interceptor, callback));
-        _ = nsga2Run.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
-        return analyzers.ToExperimentResult(nsga2Run);
-      }
+          var analyzers = CreateAnalyzers(nsga2Algorithm, parameters);
+          var nsga2Run = nsga2Algorithm.WithMaxIterations(parameters.Iterations).CreateRun(problem, GetAnalyzers(analyzers, nsga2Algorithm.Interceptor, callback));
+          _ = nsga2Run.RunToCompletion(RandomNumberGenerator.Create(parameters.Seed));
+          return analyzers.ToExperimentResult(nsga2Run);
+        }
       default:
         throw new ArgumentException($"Algorithm '{parameters.AlgorithmName}' is not supported.");
     }
@@ -298,19 +297,19 @@ public class PythonGenealogyAnalysis
     public IInterceptor<T, TE, IProblem<T, TE>, TState> Interceptor { get; } = interceptor;
     public Action<PopulationState<T>> Callback { get; } = callback;
 
-    public State CreateAnalyzerState(Run run) => new(run, this);
+    public State CreateAnalyzerState() => new(this);
 
-    public sealed class State(Run run, CallbackAnalysis<T, TE, TState> analyzer)
-      : AnalyzerRunState<CallbackAnalysis<T, TE, TState>>(run, analyzer)
+    public sealed class State(CallbackAnalysis<T, TE, TState> analyzer)
+      : AnalyzerRunState<CallbackAnalysis<T, TE, TState>>(analyzer)
     {
       public override void RegisterObservations(IObservationRegistry observationRegistry)
       {
-        observationRegistry.Add(analyzer.Interceptor, AfterInterception);
+        observationRegistry.Add(Analyzer.Interceptor, AfterInterception);
       }
 
       private void AfterInterception(TState newState, TState currentState, TState? previousState, TE searchSpace, IProblem<T, TE> problem)
       {
-        analyzer.Callback(newState);
+        Analyzer.Callback(newState);
       }
     }
   }

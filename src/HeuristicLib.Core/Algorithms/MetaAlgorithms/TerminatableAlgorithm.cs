@@ -11,7 +11,7 @@ namespace HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
 
 // ToDo: Think about if we really want to handle termination via decorators. Maybe as additional mechanism for algorithms that do not hav inner termination criterion, but otherwise, this feels overcomplicated.
 public record TerminatableAlgorithm<TG, TS, TP, TR>
-  : Algorithm<TG, TS, TP, TR>, ITerminatableAlgorithm<TG, TS, TP, TR>
+  : Algorithm<TG, TS, TP, TR>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
   where TR : class, IAlgorithmState
@@ -26,7 +26,7 @@ public record TerminatableAlgorithm<TG, TS, TP, TR>
     var algorithmInstance = instanceRegistry.Resolve(Algorithm);
 
     return new TerminatableAlgorithmInstance<TG, TS, TP, TR>(
-      instanceRegistry.Run, 
+      instanceRegistry.Run,
       evaluatorInstance,
       algorithmInstance,
       terminatorInstance

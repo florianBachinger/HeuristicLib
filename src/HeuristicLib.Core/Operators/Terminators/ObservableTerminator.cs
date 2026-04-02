@@ -1,7 +1,5 @@
-using System.Collections.Immutable;
 using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
@@ -24,7 +22,7 @@ public partial record ObservableTerminator<TG, TS, TP, TR>
   }
 
   public ObservableTerminator(ITerminator<TG, TS, TP, TR> terminator, params IEnumerable<ITerminatorObserver<TG, TS, TP, TR>> observers)
-    : this(terminator, [..observers])
+    : this(terminator, [.. observers])
   {
   }
 

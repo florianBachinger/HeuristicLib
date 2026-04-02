@@ -1,10 +1,11 @@
-﻿using HEAL.HeuristicLib.Execution;
+﻿using HEAL.HeuristicLib.Algorithms;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
 
-namespace HEAL.HeuristicLib.Algorithms.MultiStreamAlgorithms;
+namespace HEAL.HeuristicLib.Experiments;
 
 public record RepeatAlgorithm<TGenotype, TSearchSpace, TProblem, TAlgorithmState, TAlgorithm>
   : Experiment<TGenotype, TSearchSpace, TProblem, TAlgorithmState, int>
@@ -31,7 +32,7 @@ public class RepeatedAlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgor
 {
   protected readonly TAlgorithm Algorithm;
   protected readonly int Repetitions;
-  
+
   public RepeatedAlgorithmInstance(TAlgorithm algorithm, int repetitions)
   {
     Algorithm = algorithm;

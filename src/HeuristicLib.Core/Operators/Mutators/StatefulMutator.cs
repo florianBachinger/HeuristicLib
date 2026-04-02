@@ -15,10 +15,10 @@ public abstract record StatefulMutator<TGenotype, TSearchSpace, TProblem, TState
 
   protected abstract IReadOnlyList<TGenotype> Mutate(IReadOnlyList<TGenotype> parents, TState state,
     IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
-  
+
   public IMutatorInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new StatefulMutatorInstance(this, CreateInitialState());
-  
+
   private sealed class StatefulMutatorInstance(StatefulMutator<TGenotype, TSearchSpace, TProblem, TState> mutator, TState state)
     : IMutatorInstance<TGenotype, TSearchSpace, TProblem>
   {
@@ -29,7 +29,7 @@ public abstract record StatefulMutator<TGenotype, TSearchSpace, TProblem, TState
   }
 }
 
-public abstract record StatefulMutator<TGenotype, TSearchSpace, TState> 
+public abstract record StatefulMutator<TGenotype, TSearchSpace, TState>
   : IMutator<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   where TSearchSpace : class, ISearchSpace<TGenotype>
   where TState : class
@@ -38,10 +38,10 @@ public abstract record StatefulMutator<TGenotype, TSearchSpace, TState>
 
   protected abstract IReadOnlyList<TGenotype> Mutate(IReadOnlyList<TGenotype> parents, TState state,
     IRandomNumberGenerator random, TSearchSpace searchSpace);
-  
+
   public IMutatorInstance<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new StatefulMutatorInstance(this, CreateInitialState());
-  
+
   private sealed class StatefulMutatorInstance : IMutatorInstance<TGenotype, TSearchSpace, IProblem<TGenotype, TSearchSpace>>
   {
     private readonly StatefulMutator<TGenotype, TSearchSpace, TState> mutator;
@@ -60,18 +60,18 @@ public abstract record StatefulMutator<TGenotype, TSearchSpace, TState>
   }
 }
 
-public abstract record StatefulMutator<TGenotype, TState> 
+public abstract record StatefulMutator<TGenotype, TState>
   : IMutator<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
-  where  TState : class
+  where TState : class
 {
   protected abstract TState CreateInitialState();
 
   protected abstract IReadOnlyList<TGenotype> Mutate(IReadOnlyList<TGenotype> parents, TState state,
     IRandomNumberGenerator random);
-  
+
   public IMutatorInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new StatefulMutatorInstance(this, CreateInitialState());
-  
+
   private sealed class StatefulMutatorInstance : IMutatorInstance<TGenotype, ISearchSpace<TGenotype>, IProblem<TGenotype, ISearchSpace<TGenotype>>>
   {
     private readonly StatefulMutator<TGenotype, TState> mutator;

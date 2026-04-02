@@ -22,12 +22,13 @@ public record CrossoverOnlyVariation<TGenotype, TSearchSpace, TProblem>
   {
     return new Instance(instanceRegistry.Resolve(Crossover));
   }
-  
+
   public class Instance(ICrossoverInstance<TGenotype, TSearchSpace, TProblem> crossoverInstance) : IVariationInstance<TGenotype, TSearchSpace, TProblem>
   {
     public IReadOnlyList<TGenotype> Alter(IReadOnlyList<TGenotype> parent, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
     {
-      if (parent.Count % 2 != 0) throw new ArgumentException("Crossover requires an even number of parents.", nameof(parent));
+      if (parent.Count % 2 != 0)
+        throw new ArgumentException("Crossover requires an even number of parents.", nameof(parent));
 
       var parentPairs = parent.ToParentPairs();
       return crossoverInstance.Cross(parentPairs, random, searchSpace, problem);

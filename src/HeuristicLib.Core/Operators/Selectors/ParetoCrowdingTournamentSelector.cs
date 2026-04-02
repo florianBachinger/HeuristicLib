@@ -1,5 +1,4 @@
-﻿using HEAL.HeuristicLib.Operators.Replacers;
-using HEAL.HeuristicLib.Optimization;
+﻿using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
 
 namespace HEAL.HeuristicLib.Operators.Selectors;

@@ -14,21 +14,21 @@ public abstract partial record CompositeSelector<TGenotype, TSearchSpace, TProbl
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   [OrderedEquality] protected ImmutableArray<ISelector<TGenotype, TSearchSpace, TProblem>> InnerSelectors { get; }
-  
+
   protected CompositeSelector(ImmutableArray<ISelector<TGenotype, TSearchSpace, TProblem>> innerSelectors)
   {
     InnerSelectors = innerSelectors;
   }
-  
+
   public ISelectorInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new Instance(this, InnerSelectors.Select(instanceRegistry.Resolve).ToArray(), CreateInitialState());
-  
+
   protected abstract TState CreateInitialState();
-  
+
   protected abstract IReadOnlyList<ISolution<TGenotype>> Select(IReadOnlyList<ISolution<TGenotype>> population,
     Objective objective, int count, TState state, IReadOnlyList<ISelectorInstance<TGenotype, TSearchSpace, TProblem>> innerSelectors,
     IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem);
-  
+
   private sealed class Instance(CompositeSelector<TGenotype, TSearchSpace, TProblem, TState> composite,
     IReadOnlyList<ISelectorInstance<TGenotype, TSearchSpace, TProblem>> innerSelectors, TState state)
     : ISelectorInstance<TGenotype, TSearchSpace, TProblem>

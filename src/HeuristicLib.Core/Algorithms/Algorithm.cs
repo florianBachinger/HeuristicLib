@@ -1,5 +1,5 @@
-﻿using HEAL.HeuristicLib.Execution;
-using HEAL.HeuristicLib.Analysis;
+﻿using HEAL.HeuristicLib.Analysis;
+using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
 using HEAL.HeuristicLib.Operators.Evaluators;
 using HEAL.HeuristicLib.Problems;
@@ -28,7 +28,7 @@ public abstract class AlgorithmInstance<TGenotype, TSearchSpace, TProblem, TAlgo
   where TAlgorithmState : class, IAlgorithmState
 {
   protected readonly IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> Evaluator;
-  
+
   public Run Run { get; }
 
   protected AlgorithmInstance(Run run, IEvaluatorInstance<TGenotype, TSearchSpace, TProblem> evaluator)

@@ -28,7 +28,7 @@ public record EliteSelector<TGenotype, TSearchSpace, TProblem>
     var selectedElites = BestSelector.Select(population, objective, this.elites, random);
     var remainingCount = count - selectedElites.Count;
     var selecterdRemaining = selectorForRemaining.Select(population, objective, remainingCount, random, searchSpace, problem);
-    
+
     return selectedElites.Concat(selecterdRemaining).ToArray();
   }
 }

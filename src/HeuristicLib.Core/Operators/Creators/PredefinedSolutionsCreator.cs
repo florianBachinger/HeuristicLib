@@ -12,17 +12,17 @@ public partial record PredefinedSolutionsCreator<TGenotype, TSearchSpace, TProbl
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   public ICreator<TGenotype, TSearchSpace, TProblem> CreatorForRemainingSolutions => InnerCreator;
-  
+
   [OrderedEquality] public ImmutableArray<TGenotype> PredefinedSolutions { get; init; }
 
   public PredefinedSolutionsCreator(ImmutableArray<TGenotype> predefinedSolutions, ICreator<TGenotype, TSearchSpace, TProblem> creatorForRemainingSolutions)
     : base(creatorForRemainingSolutions)
-  { 
+  {
     PredefinedSolutions = predefinedSolutions;
   }
 
-  protected override State CreateInitialState() => new ();
-  
+  protected override State CreateInitialState() => new();
+
   protected override IReadOnlyList<TGenotype> Create(int count, State state, ICreatorInstance<TGenotype, TSearchSpace, TProblem> innerCreator, IRandomNumberGenerator random, TSearchSpace searchSpace, TProblem problem)
   {
     var offspring = new TGenotype[count];
@@ -50,7 +50,8 @@ public partial record PredefinedSolutionsCreator<TGenotype, TSearchSpace, TProbl
     return offspring;
   }
 
-  public new sealed class State {
+  public sealed class State
+  {
     public int CurrentSolutionIndex { get; set; } = 0;
   }
 }

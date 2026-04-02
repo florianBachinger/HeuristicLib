@@ -52,18 +52,17 @@ public class ExecutionInstanceRegistry
   public TExecutionInstance Resolve<TExecutionInstance>(IExecutable<TExecutionInstance> executable)
     where TExecutionInstance : class, IExecutionInstance
   {
-    var untypedExecutable = (IExecutable<IExecutionInstance>)executable;
+    IExecutable<IExecutionInstance> untypedExecutable = executable;
 
     if (registry.TryGetValue(untypedExecutable, out var localInstance)) {
       return (TExecutionInstance)localInstance;
     }
 
     if (TryGetReplacementExecutable(untypedExecutable, out var replacementExecutable)) {
-      if (executablesBeingCreated.Contains(untypedExecutable)) {
+      if (!executablesBeingCreated.Add(untypedExecutable)) {
         return executable.CreateExecutionInstance(this);
       }
 
-      executablesBeingCreated.Add(untypedExecutable);
       try {
         var createdInstance = replacementExecutable.CreateExecutionInstance(this);
         registry.Add(untypedExecutable, createdInstance);
@@ -85,7 +84,7 @@ public class ExecutionInstanceRegistry
   public void PreRegister<TExecutionInstance>(IExecutable<TExecutionInstance> executable, TExecutionInstance instance)
     where TExecutionInstance : class, IExecutionInstance
   {
-    var untypedExecutable = (IExecutable<IExecutionInstance>)executable;
+    IExecutable<IExecutionInstance> untypedExecutable = executable;
     if (!registry.TryAdd(untypedExecutable, instance)) {
       throw new InvalidOperationException("Object has already been registered");
     }
@@ -94,7 +93,7 @@ public class ExecutionInstanceRegistry
   public void PreRegister<TExecutionInstance>(IExecutable<TExecutionInstance> executable, IExecutable<TExecutionInstance> replacementExecutable)
     where TExecutionInstance : class, IExecutionInstance
   {
-    var untypedExecutable = (IExecutable<IExecutionInstance>)executable;
+    IExecutable<IExecutionInstance> untypedExecutable = executable;
     if (!replacementExecutables.TryAdd(untypedExecutable, replacementExecutable)) {
       throw new InvalidOperationException("Replacement executable has already been registered");
     }

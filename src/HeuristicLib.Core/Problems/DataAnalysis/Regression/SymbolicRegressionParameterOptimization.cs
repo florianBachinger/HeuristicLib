@@ -87,7 +87,8 @@ public static class SymbolicRegressionParameterOptimization
     counter.FunctionEvaluations += rowEvaluationsCounter.FunctionEvaluations / n;
     counter.GradientEvaluations += rowEvaluationsCounter.GradientEvaluations / n;
 
-    if (status is ExitCondition.InvalidValues || !success) return originalQuality;
+    if (status is ExitCondition.InvalidValues || !success)
+      return originalQuality;
 
     UpdateParameters(tree, cOpt, updateVariableWeights);
 
@@ -126,14 +127,14 @@ public static class SymbolicRegressionParameterOptimization
 
           break;
         case VariableTreeNodeBase: {
-          if (node is FactorVariableTreeNode { Weights: not null } factorVarTreeNode) {
-            for (var j = 0; j < factorVarTreeNode.Weights.Length; j++) {
-              factorVarTreeNode.Weights[j] = parameters[i++];
+            if (node is FactorVariableTreeNode { Weights: not null } factorVarTreeNode) {
+              for (var j = 0; j < factorVarTreeNode.Weights.Length; j++) {
+                factorVarTreeNode.Weights[j] = parameters[i++];
+              }
             }
-          }
 
-          break;
-        }
+            break;
+          }
       }
     }
   }

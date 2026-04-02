@@ -9,6 +9,7 @@ using HEAL.HeuristicLib.States;
 
 namespace HEAL.HeuristicLib.AlgorithmExecutions;
 
+[Obsolete("This does not bring the benefits we hoped and this should be replaced in the future.")]
 public class EvolutionaryAlgorithmExecution<TGenotype, TSearchSpace, TProblem>
   : IterativeAlgorithmInstance<TGenotype, TSearchSpace, TProblem, PopulationState<TGenotype>>
   where TSearchSpace : class, ISearchSpace<TGenotype>

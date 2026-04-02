@@ -1,7 +1,5 @@
-using System.Collections.Immutable;
 using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
@@ -17,15 +15,15 @@ public partial record ObservableInterceptor<TG, TS, TP, TR>
 {
   [OrderedEquality]
   public ImmutableArray<IInterceptorObserver<TG, TS, TP, TR>> Observers { get; }
-  
+
   public ObservableInterceptor(IInterceptor<TG, TS, TP, TR> interceptor, ImmutableArray<IInterceptorObserver<TG, TS, TP, TR>> observers)
     : base(interceptor)
   {
     Observers = observers;
   }
-  
+
   public ObservableInterceptor(IInterceptor<TG, TS, TP, TR> interceptor, params IEnumerable<IInterceptorObserver<TG, TS, TP, TR>> observers)
-    : this(interceptor, [..observers])
+    : this(interceptor, [.. observers])
   {
   }
 
@@ -39,7 +37,7 @@ public partial record ObservableInterceptor<TG, TS, TP, TR>
   }
 }
 
-public interface IInterceptorObserver<in TG, in TS, in TP, in TR> 
+public interface IInterceptorObserver<in TG, in TS, in TP, in TR>
   where TS : class, ISearchSpace<TG>
   where TP : class, IProblem<TG, TS>
   where TR : class, IAlgorithmState

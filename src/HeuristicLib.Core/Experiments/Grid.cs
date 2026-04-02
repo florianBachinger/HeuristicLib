@@ -1,7 +1,7 @@
 using System.Collections;
 using Generator.Equals;
 
-namespace HEAL.HeuristicLib.Algorithms.MultiStreamAlgorithms;
+namespace HEAL.HeuristicLib.Experiments;
 
 [Equatable]
 public sealed partial class Grid<T> : IEnumerable<T>

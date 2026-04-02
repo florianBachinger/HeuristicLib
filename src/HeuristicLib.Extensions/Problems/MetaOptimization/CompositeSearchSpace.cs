@@ -86,7 +86,7 @@ public record CompositeSearchSpace<T1, TS1, T2, TS2>(TS1 SearchSpace, TS2 Search
     public IMutatorInstance<T1, TS1, IProblem<T1, TS1>> OperatorInstance1 { get; } = operatorInstance1;
     public IMutatorInstance<T2, TS2, IProblem<T2, TS2>> OperatorInstance2 { get; } = operatorInstance2;
   }
-  
+
   public record Mutator(IMutator<T1, TS1, IProblem<T1, TS1>> Operator1, IMutator<T2, TS2, IProblem<T2, TS2>> Operator2)
     : IMutator<CompositeGenotype<T1, T2>, CompositeSearchSpace<T1, TS1, T2, TS2>, IProblem<CompositeGenotype<T1, T2>, CompositeSearchSpace<T1, TS1, T2, TS2>>>
   {

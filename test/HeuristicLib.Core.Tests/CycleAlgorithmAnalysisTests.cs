@@ -4,8 +4,8 @@ using HEAL.HeuristicLib.Algorithms.MetaAlgorithms;
 using HEAL.HeuristicLib.Analysis;
 using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Operators;
-using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Operators.Evaluators;
+using HEAL.HeuristicLib.Operators.Interceptors;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -150,10 +150,10 @@ public class CycleAlgorithmAnalysisTests
   {
     public IEvaluator<int, DummySearchSpace<int>, IProblem<int, DummySearchSpace<int>>> Evaluator { get; } = evaluator;
 
-    public State CreateAnalyzerState(Run run) => new(run, this);
+    public State CreateAnalyzerState() => new(this);
 
-    public sealed class State(Run run, EvaluationTraceAnalysis analyzer)
-      : AnalyzerRunState<EvaluationTraceAnalysis>(run, analyzer)
+    public sealed class State(EvaluationTraceAnalysis analyzer)
+      : AnalyzerRunState<EvaluationTraceAnalysis>(analyzer)
     {
       private readonly List<double> objectiveValues = [];
 
@@ -176,10 +176,10 @@ public class CycleAlgorithmAnalysisTests
   {
     public IInterceptor<int, DummySearchSpace<int>, IProblem<int, DummySearchSpace<int>>, PopulationState<int>> Interceptor { get; } = interceptor;
 
-    public State CreateAnalyzerState(Run run) => new(run, this);
+    public State CreateAnalyzerState() => new(this);
 
-    public sealed class State(Run run, InterceptionTraceAnalysis analyzer)
-      : AnalyzerRunState<InterceptionTraceAnalysis>(run, analyzer)
+    public sealed class State(InterceptionTraceAnalysis analyzer)
+      : AnalyzerRunState<InterceptionTraceAnalysis>(analyzer)
     {
       private readonly List<double> objectiveValues = [];
 

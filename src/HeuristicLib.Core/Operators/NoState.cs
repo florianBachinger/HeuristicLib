@@ -3,5 +3,5 @@
 public class NoState
 {
   private NoState() { }
-  public static readonly NoState  Instance = new NoState(); 
+  public static readonly NoState Instance = new NoState();
 }

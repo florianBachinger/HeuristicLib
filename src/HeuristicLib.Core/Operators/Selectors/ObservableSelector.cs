@@ -1,7 +1,5 @@
-using System.Collections.Immutable;
 using Generator.Equals;
 using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Execution;
 using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Problems;
 using HEAL.HeuristicLib.Random;
@@ -17,15 +15,15 @@ public partial record ObservableSelector<TG, TS, TP>
 {
   [OrderedEquality]
   public ImmutableArray<ISelectorObserver<TG, TS, TP>> Observers { get; }
-  
+
   public ObservableSelector(ISelector<TG, TS, TP> selector, ImmutableArray<ISelectorObserver<TG, TS, TP>> observers)
     : base(selector)
   {
     Observers = observers;
   }
-  
+
   public ObservableSelector(ISelector<TG, TS, TP> selector, params IEnumerable<ISelectorObserver<TG, TS, TP>> observers)
-    : this(selector, [..observers])
+    : this(selector, [.. observers])
   {
   }
 
@@ -36,7 +34,7 @@ public partial record ObservableSelector<TG, TS, TP>
     foreach (var observer in Observers) {
       observer.AfterSelection(result, population, objective, count, searchSpace, problem);
     }
-    return result;    
+    return result;
   }
 }
 

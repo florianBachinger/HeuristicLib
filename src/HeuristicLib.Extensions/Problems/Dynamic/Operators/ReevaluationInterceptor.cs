@@ -25,7 +25,7 @@ public record ReevaluationInterceptor<T, TE, TP, TR>
   {
     var evaluatorInstance = instanceRegistry.Resolve(evaluator);
     var instance = new Instance(evaluatorInstance);
-    
+
     // ToDo: maybe we have a memory leak here?
     subscribedProblem.EpochClock.OnEpochChange += (_, _) => instance.RequestReevaluation();
 
@@ -39,7 +39,7 @@ public record ReevaluationInterceptor<T, TE, TP, TR>
 
     public void RequestReevaluation() => Interlocked.Increment(ref requireReevaluation);
     public bool ConsumeReevaluationRequest() => Interlocked.Exchange(ref requireReevaluation, 0) != 0;
-    
+
     public TR Transform(TR currentState, TR? previousState, TE searchSpace, TP problem)
     {
       var result = currentState;

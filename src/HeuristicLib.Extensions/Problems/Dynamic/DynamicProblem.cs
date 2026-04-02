@@ -1,8 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using HEAL.HeuristicLib.Analysis;
-using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Operators.Evaluators;
 using HEAL.HeuristicLib.Operators.Interceptors;
+using HEAL.HeuristicLib.Optimization;
 using HEAL.HeuristicLib.Random;
 using HEAL.HeuristicLib.SearchSpaces;
 using HEAL.HeuristicLib.States;
@@ -10,7 +9,7 @@ using HEAL.HeuristicLib.States;
 namespace HEAL.HeuristicLib.Problems.Dynamic;
 
 // ToDo: A DynamicProblem should be, foremost, a Problem. It "being" also an Observer, is an interesting way of implementing about it, but we have to think if this is really what we want.
-public abstract class DynamicProblem<TGenotype, TSearchSpace> : 
+public abstract class DynamicProblem<TGenotype, TSearchSpace> :
   SingleSolutionProblem<TGenotype, TSearchSpace>,
   IDynamicProblem<TGenotype, TSearchSpace>,
   IEvaluatorObserver<TGenotype, TSearchSpace, DynamicProblem<TGenotype, TSearchSpace>>,

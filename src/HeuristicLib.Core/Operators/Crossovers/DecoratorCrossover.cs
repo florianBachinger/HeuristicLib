@@ -12,21 +12,21 @@ public abstract record DecoratorCrossover<TGenotype, TSearchSpace, TProblem, TSt
   where TProblem : class, IProblem<TGenotype, TSearchSpace>
 {
   protected ICrossover<TGenotype, TSearchSpace, TProblem> InnerCrossover { get; }
-  
+
   protected DecoratorCrossover(ICrossover<TGenotype, TSearchSpace, TProblem> innerCrossover)
   {
     InnerCrossover = innerCrossover;
   }
-  
+
   public ICrossoverInstance<TGenotype, TSearchSpace, TProblem> CreateExecutionInstance(ExecutionInstanceRegistry instanceRegistry) =>
     new Instance(this, instanceRegistry.Resolve(InnerCrossover), CreateInitialState());
-  
+
   protected abstract TState CreateInitialState();
-  
+
   protected abstract IReadOnlyList<TGenotype> Cross(IReadOnlyList<IParents<TGenotype>> parents, TState state,
     ICrossoverInstance<TGenotype, TSearchSpace, TProblem> innerCrossover, IRandomNumberGenerator random,
     TSearchSpace searchSpace, TProblem problem);
-  
+
   private sealed class Instance(DecoratorCrossover<TGenotype, TSearchSpace, TProblem, TState> decorator, ICrossoverInstance<TGenotype, TSearchSpace, TProblem> innerCrossover, TState state)
     : ICrossoverInstance<TGenotype, TSearchSpace, TProblem>
   {
